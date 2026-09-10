@@ -1,0 +1,3462 @@
+{
+  "Kerala": {
+    "tollPlazas": [
+      {
+        "tollName": "Chullimada Hamlet (Pampampallam)",
+        "highway": "NH 544",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2775
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Devikulam Plaza",
+        "highway": "NH 85",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 55,
+            "monthlyPass": 1260
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Kumbalam",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 70,
+            "monthlyPass": 1585
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Kumbla Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2890
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Olavanna Fee Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 195,
+            "monthlyPass": 4380
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Paliyekkara",
+        "highway": "NH 544",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2680
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Panniyankara",
+        "highway": "NH 544",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 175,
+            "monthlyPass": 3925
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Ponnarimangalam",
+        "highway": "NH 966A",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2150
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Thiruvallam",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 160,
+            "returnJourney": 240,
+            "monthlyPass": 5345
+          },
+          "commercialVehicle": {
+            "localDistrict": 80
+          }
+        }
+      },
+      {
+        "tollName": "Thiruvangad Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2515
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Vettichira Toll Plaza",
+        "highway": "NH 968",
+        "pricing": {
+          "car": {
+            "singleJourney": 145,
+            "returnJourney": 220,
+            "monthlyPass": 4875
+          },
+          "commercialVehicle": {
+            "localDistrict": 75
+          }
+        }
+      }
+    ]
+  },
+  "Andhra Pradesh": {
+    "tollPlazas": [
+      {
+        "tollName": "Aganampudi",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2220
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Amakathadu",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 140,
+            "returnJourney": 210,
+            "monthlyPass": 4625
+          },
+          "commercialVehicle": {
+            "localDistrict": 70
+          }
+        }
+      },
+      {
+        "tollName": "Annamapalli",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 95,
+            "monthlyPass": 2070
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Badava",
+        "highway": "NH 30",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2485
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Bandapalli",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1900
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Bandlapalli",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1810
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Basapuram",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3095
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Basinenipalli Toll Plaza",
+        "highway": "NH 167BG",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1160
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Bathalapalli",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 3020
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Bolapalli",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 190,
+            "returnJourney": 280,
+            "monthlyPass": 6265
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Brahmanapalli",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 2070
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Buchireddypalem",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1380
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Budhanam Fee Plaza",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Burakayalakota",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1885
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Chagalmarri",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3120
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Chapirevula",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 135,
+            "returnJourney": 205,
+            "monthlyPass": 4550
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Chillakallu",
+        "highway": "NH 65",
+        "pricing": {
+          "car": {
+            "singleJourney": 100,
+            "returnJourney": 155,
+            "monthlyPass": 3410
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Chinaganjam Toll Plaza",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 105,
+            "monthlyPass": 2365
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Chinthalapalem",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 55,
+            "monthlyPass": 1270
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Cholasamudram",
+        "highway": "NH 544E",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2220
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Danamaiahgaripalli Toll Plaza",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2530
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Davuluru",
+        "highway": "NH 65",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 200,
+            "monthlyPass": 4415
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "D C Palli",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1690
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Dukkavanipalem",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1560
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Dumpalagattu Paatimeeda Palli",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 70,
+            "monthlyPass": 1585
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Durgamvaripalli",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 70,
+            "monthlyPass": 1595
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Eathakota",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 190,
+            "monthlyPass": 4250
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Gadanki",
+        "highway": "NH 140",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 195,
+            "monthlyPass": 4340
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Gandaboyanapalle Toll Plaza",
+        "highway": "NH 71",
+        "pricing": {
+          "car": {
+            "singleJourney": 150,
+            "returnJourney": 225,
+            "monthlyPass": 5015
+          },
+          "commercialVehicle": {
+            "localDistrict": 75
+          }
+        }
+      },
+      {
+        "tollName": "Gantyada",
+        "highway": "NH 516E",
+        "pricing": {
+          "car": {
+            "singleJourney": 25,
+            "returnJourney": 35,
+            "monthlyPass": 815
+          },
+          "commercialVehicle": {
+            "localDistrict": 10
+          }
+        }
+      },
+      {
+        "tollName": "Gollaprolu",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 80,
+            "monthlyPass": 1735
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Gorribanda",
+        "highway": "NH 326A",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1175
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Goshtani",
+        "highway": "NH 516C",
+        "pricing": {
+          "car": {
+            "singleJourney": 12,
+            "returnJourney": 18,
+            "monthlyPass": 394
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Halaharvi",
+        "highway": "NH 167",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1665
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Jelli Palli",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2450
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Jodi Dharmapuram",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 2000
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Jonnada",
+        "highway": "NH 26",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 1980
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Kadarampalli Toll Plaza",
+        "highway": "NH 544DD",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1375
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Kalaparru",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 145,
+            "monthlyPass": 3215
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Karapadu (Old Bellupada)",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 4025
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Kasepalli",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 195,
+            "monthlyPass": 4325
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Kaza",
+        "highway": "NH 5 (New 16)",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 185,
+            "monthlyPass": 4070
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Keesara Fee Plaza",
+        "highway": "NH 65",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Krishnavaram",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 170,
+            "monthlyPass": 3775
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Laxmipuram",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 155,
+            "returnJourney": 230,
+            "monthlyPass": 5130
+          },
+          "commercialVehicle": {
+            "localDistrict": 75
+          }
+        }
+      },
+      {
+        "tollName": "Madapam",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 100,
+            "returnJourney": 155,
+            "monthlyPass": 3395
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Mahasamudram",
+        "highway": "NH 69",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3505
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Manapuram Toll Plaza",
+        "highway": "NH 26",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1815
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Mangapatnam Toll Plaza",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 110,
+            "returnJourney": 165,
+            "monthlyPass": 3710
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Marripalem",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1640
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Marur",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 145,
+            "returnJourney": 215,
+            "monthlyPass": 4780
+          },
+          "commercialVehicle": {
+            "localDistrict": 70
+          }
+        }
+      },
+      {
+        "tollName": "Medapi",
+        "highway": "NH 544D",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1815
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Mekalavaripalli Fee Plaza",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1620
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Merlapaka Fee Plaza",
+        "highway": "NH 71",
+        "pricing": {
+          "car": {
+            "singleJourney": 140,
+            "returnJourney": 205,
+            "monthlyPass": 4605
+          },
+          "commercialVehicle": {
+            "localDistrict": 70
+          }
+        }
+      },
+      {
+        "tollName": "Millampalli",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1290
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Mopidevi",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1315
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Mudiveedu",
+        "highway": "NH 340",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2245
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Munjuluru",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1630
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Nannuru",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3110
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Nathavalasa",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 175,
+            "monthlyPass": 3855
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Painampalli Khalu",
+        "highway": "NH 365A",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2160
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Paluvai",
+        "highway": "NH 167AD",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1665
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Panchvati Colony (Visakhapatnam Port Connectivity)",
+        "highway": "NH 5",
+        "pricing": {
+          "car": {
+            "singleJourney": 46,
+            "returnJourney": 70,
+            "monthlyPass": 1550
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Thenepalli",
+        "highway": "NH 40",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1135
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Unguturu",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 3970
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Upputuru Toll Plaza",
+        "highway": "NH 167C",
+        "pricing": {
+          "car": {
+            "singleJourney": 100,
+            "returnJourney": 150,
+            "monthlyPass": 3340
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Vaddupalli",
+        "highway": "NH 544DD",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1880
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Veeranjaneyapuram",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1575
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Veeravalli",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 170,
+            "returnJourney": 255,
+            "monthlyPass": 5620
+          },
+          "commercialVehicle": {
+            "localDistrict": 85
+          }
+        }
+      },
+      {
+        "tollName": "Vempadu",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 145,
+            "returnJourney": 220,
+            "monthlyPass": 4895
+          },
+          "commercialVehicle": {
+            "localDistrict": 75
+          }
+        }
+      },
+      {
+        "tollName": "Venkatachallam Fee Plaza (Nellore)",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Venkatapalem Toll Plaza",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 80,
+            "returnJourney": 120,
+            "monthlyPass": 2620
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Yerradoddi",
+        "highway": "NH 42",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 100,
+            "monthlyPass": 2250
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Shakapur",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2305
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Singarenipalli",
+        "highway": "NH 365BB",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 185,
+            "monthlyPass": 4125
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Sullurpet",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Sunambatti (Musunuru)",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2250
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Tangutur",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3580
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Pandillapalli",
+        "highway": "NH 544D",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 80,
+            "monthlyPass": 1730
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Pottipadu",
+        "highway": "NH 16",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2155
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Ramanathapuram Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 15,
+            "returnJourney": 25,
+            "monthlyPass": 545
+          },
+          "commercialVehicle": {
+            "localDistrict": 10
+          }
+        }
+      },
+      {
+        "tollName": "Rapur",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2970
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Raviguntapalli",
+        "highway": "NH 565",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1285
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Reddypalem Toll Plaza",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2750
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Rolla",
+        "highway": "NH 544E",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1515
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Rudravaram Toll Plaza",
+        "highway": "NH 340C",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 185,
+            "monthlyPass": 4160
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Sarandi Toll Plaza",
+        "highway": "NH 363",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 3045
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Seetharampuram",
+        "highway": "NH 216",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2220
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      }
+    ]
+  },
+  "Karnataka": {
+    "tollPlazas": [
+      {
+        "tollName": "Navayuga Bangalooru tollway Pvt Ltd.",
+        "highway": "NH NE-07",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Agrahara (Close Loop Toll)",
+        "highway": "NH NE-07",
+        "pricing": {
+          "car": {
+            "singleJourney": 0,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Attibele (Betl)",
+        "highway": "NH 7 (New 44)",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1075
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Attigulipura Fee Plaza",
+        "highway": "NH 948",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1125
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Bagepalli Toll Plaza",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 4025
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Balenahalli Toll Plaza",
+        "highway": "NH 150A",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 155,
+            "monthlyPass": 3485
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Bangalore–Nelamangala Plaza (Towards Bangalore)",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1145
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Bankapur Toll Plaza",
+        "highway": "NH 4 (New 48)",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3515
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Belekeri",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 4020
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Bijapur (Kasaba) Toll Plaza",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2525
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Brahmarakotlu Toll Plaza",
+        "highway": "NH 73",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1095
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Chalageri Toll Plaza",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 150,
+            "returnJourney": 225,
+            "monthlyPass": 5010
+          },
+          "commercialVehicle": {
+            "localDistrict": 75
+          }
+        }
+      },
+      {
+        "tollName": "Chokkenahalli Toll Plaza",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 60,
+            "monthlyPass": 1320
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Chowlaggere Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1670
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Devanahalli (Sadahalli) Toll Plaza",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 185,
+            "monthlyPass": 4070
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Elevated Section / Electronic City",
+        "highway": "NH 7 (New 44)",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 1790
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Gananguru Plaza",
+        "highway": "NH 275",
+        "pricing": {
+          "car": {
+            "singleJourney": 175,
+            "returnJourney": 260,
+            "monthlyPass": 5780
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Ganebail Toll Plaza",
+        "highway": "NH 4A (New 748)",
+        "pricing": {
+          "car": {
+            "singleJourney": 40,
+            "returnJourney": 55,
+            "monthlyPass": 1250
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Guilalu Toll Plaza",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2960
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Gundmi (Sasthan) Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2105
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Halligudi",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 110,
+            "returnJourney": 165,
+            "monthlyPass": 3720
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Harwal Toll Plaza",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2875
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Hattargi",
+        "highway": "NH 4 (New 48)",
+        "pricing": {
+          "car": {
+            "singleJourney": 25,
+            "returnJourney": 35,
+            "monthlyPass": 785
+          },
+          "commercialVehicle": {
+            "localDistrict": 10
+          }
+        }
+      },
+      {
+        "tollName": "Hebbalu",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 140,
+            "returnJourney": 210,
+            "monthlyPass": 4615
+          },
+          "commercialVehicle": {
+            "localDistrict": 70
+          }
+        }
+      },
+      {
+        "tollName": "Hedaginabele (Close Loop Toll)",
+        "highway": "NH NE-07",
+        "pricing": {
+          "car": {
+            "singleJourney": 0,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Hejmadi Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1780
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Hirebgewadi Toll Plaza",
+        "highway": "NH 4 (New 48)",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 185,
+            "monthlyPass": 4120
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Hirehalli Toll Plaza",
+        "highway": "NH 150A",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2515
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Hitnal",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1785
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Holegadde Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 175,
+            "monthlyPass": 3935
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Hoskote Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 20,
+            "returnJourney": 35,
+            "monthlyPass": 665
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Hulikunte",
+        "highway": "NH 648",
+        "pricing": {
+          "car": {
+            "singleJourney": 110,
+            "returnJourney": 160,
+            "monthlyPass": 3595
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Jajirakallu Toll Plaza",
+        "highway": "NH 150A",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 105,
+            "monthlyPass": 2315
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Kadabhalli (Kirasave) Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 1945
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kamkole Toll Plaza",
+        "highway": "NH 65",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 4030
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Kananakatte",
+        "highway": "NH 13 (New 50)",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3125
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Kaniminike Toll Plaza",
+        "highway": "NH 275",
+        "pricing": {
+          "car": {
+            "singleJourney": 180,
+            "returnJourney": 265,
+            "monthlyPass": 5920
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kannegala Toll Plaza",
+        "highway": "NH 766",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1120
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Kannoli Toll Plaza",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 105,
+            "monthlyPass": 2330
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Karabylu (Bellur Cross)",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 85,
+            "monthlyPass": 1745
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Karjeevanhally Toll Plaza",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2960
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "K N Huindy",
+        "highway": "NH 766",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 2010
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Kognoli Toll Plaza",
+        "highway": "NH 4 (New 48)",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 2010
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Krishnarajapura (Close Loop Toll)",
+        "highway": "NH NE-07",
+        "pricing": {
+          "car": {
+            "singleJourney": 0,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kulumpalya Toll Plaza",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 25,
+            "returnJourney": 35,
+            "monthlyPass": 825
+          },
+          "commercialVehicle": {
+            "localDistrict": 10
+          }
+        }
+      },
+      {
+        "tollName": "Linglapura",
+        "highway": "NH 206 (New 73)",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3125
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Mangalgi Toll Plaza",
+        "highway": "NH 65",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 3970
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Mulawad Toll Plaza",
+        "highway": "NH 52",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1505
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Mulbagal Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2630
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Mustapur Fee Plaza",
+        "highway": "NH 161A",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1465
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Nagarhalla Toll Plaza",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 4050
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Nalavadi Toll Plaza",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 195,
+            "monthlyPass": 4325
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Nalluru Devanahalli Toll Plaza",
+        "highway": "NH 648",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2805
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Nangli Toll Plaza (Gaddurur)",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 1120
+          },
+          "commercialVehicle": {
+            "localDistrict": 15
+          }
+        }
+      },
+      {
+        "tollName": "Nelamangala Toll Plaza (Doddakarenahalli)",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 85,
+            "monthlyPass": 1745
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Rajatadripura Toll Plaza",
+        "highway": "NH 206 (New 73)",
+        "pricing": {
+          "car": {
+            "singleJourney": 80,
+            "returnJourney": 115,
+            "monthlyPass": 2590
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Rampura (NH-548B)",
+        "highway": "NH 548B",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2850
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Sathyagala Toll Plaza",
+        "highway": "NH 948",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2555
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Shahapur",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2240
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Shantigrama Toll Plaza",
+        "highway": "NH 75",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1670
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Sheshagirihalli Toll Plaza",
+        "highway": "NH 275",
+        "pricing": {
+          "car": {
+            "singleJourney": 175,
+            "returnJourney": 260,
+            "monthlyPass": 5770
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Shirur Toll Plaza",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3535
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Somanahalli Toll Plaza",
+        "highway": "NH 948",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2840
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Sundrapalya (Close Loop Toll)",
+        "highway": "NH NE-07",
+        "pricing": {
+          "car": {
+            "singleJourney": 0,
+            "returnJourney": 0,
+            "monthlyPass": 0
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Talapady",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1870
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Thimmalapura Toll Plaza",
+        "highway": "NH 13 (New 50)",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 145,
+            "monthlyPass": 3185
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Vanagari",
+        "highway": "NH 50",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2240
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Yeddore",
+        "highway": "NH 766",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1525
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      }
+    ]
+  },
+  "Tamil Nadu": {
+    "tollPlazas": [
+      {
+        "tollName": "Athar (Tindivanam)",
+        "highway": "NH 45",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2420
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Bogalur",
+        "highway": "NH 87",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2945
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Boothakudi",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3570
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Chatrapatti",
+        "highway": "NH 83",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 155,
+            "monthlyPass": 3425
+          },
+          "commercialVehicle": {
+            "localDistrict": 50
+          }
+        }
+      },
+      {
+        "tollName": "Chennasamudram",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 80,
+            "monthlyPass": 1745
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Chittampatti",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 110,
+            "returnJourney": 165,
+            "monthlyPass": 3645
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Eliyarpathi",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 175,
+            "monthlyPass": 3865
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Enamkariyanandal",
+        "highway": "NH 234",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1210
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Etturvattam",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3570
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Gangarampalayam",
+        "highway": "NH 45A (New 332)",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 2045
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "H. Pudupatti",
+        "highway": "NH 179A",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3145
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "IVRCL Chengapally Tollways Limited (Kaniyur)",
+        "highway": "NH 544",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 190,
+            "monthlyPass": 4250
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kadhavani Toll Plaza",
+        "highway": "NH 179A",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 100,
+            "monthlyPass": 2265
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Kallakudi",
+        "highway": "NH 81",
+        "pricing": {
+          "car": {
+            "singleJourney": 80,
+            "returnJourney": 120,
+            "monthlyPass": 2645
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Kappalur",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3570
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Karagadhalli Toll Plaza",
+        "highway": "NH 844",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2860
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Kariyamangalam Fee Plaza",
+        "highway": "NH 66 (New 77)",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 90,
+            "monthlyPass": 1960
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Keezhkuppam",
+        "highway": "NH 532",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 70,
+            "monthlyPass": 1605
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Kodai Road (Kozhinjipatti)",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2195
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kodikottai",
+        "highway": "NH 210 (New 536)",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1420
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Kothattai",
+        "highway": "NH 45A (New 32)",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 195,
+            "monthlyPass": 4285
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Kovilvenni Toll Plaza",
+        "highway": "NH 83",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2520
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Krishnagiri",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 3015
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Kurungudi (Veeranallur)",
+        "highway": "NH 227 (New 81)",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1460
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "L&T Krishnagiri Thoppur (Palayam) Toll Plaza",
+        "highway": "NH 7 (New 44)",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 180,
+            "monthlyPass": 3555
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Lechchumanapatti",
+        "highway": "NH 210 (New 336, 36, 536)",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1660
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Lembalakudi",
+        "highway": "NH 210 (New 336, 36, 536)",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1425
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Madukkarai",
+        "highway": "NH 544",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1205
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Managethi",
+        "highway": "NH 81",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2485
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Manambadi Toll Plaza",
+        "highway": "NH 36",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3520
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Manavasi",
+        "highway": "NH 81",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1695
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Mettupatti*",
+        "highway": "NH 68 (New 79)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 1975
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Morattandi",
+        "highway": "NH 66",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 100,
+            "monthlyPass": 2270
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Nagampatti Fee Plaza",
+        "highway": "NH 66 (New 77)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2115
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Nallur",
+        "highway": "NH 5",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2755
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Nangilikondan Fee Plaza",
+        "highway": "NH 66 (New 77)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 95,
+            "monthlyPass": 2125
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Nanguneri",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 120,
+            "returnJourney": 175,
+            "monthlyPass": 3925
+          },
+          "commercialVehicle": {
+            "localDistrict": 60
+          }
+        }
+      },
+      {
+        "tollName": "Nathakarai*",
+        "highway": "NH 68 (New 79)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 1975
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Nemili (Sriperumbudur)",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 60,
+            "returnJourney": 95,
+            "monthlyPass": 2080
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Omalur (Kottagoundapatty)",
+        "highway": "NH 7 (New 44)",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 2835
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Palaya Gandharvakottai",
+        "highway": "NH 36",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1815
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Pallikonda",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 175,
+            "monthlyPass": 3910
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Paranur (Chengalpet)",
+        "highway": "NH 45",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2485
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Pattaraiperumbudur",
+        "highway": "NH 205",
+        "pricing": {
+          "car": {
+            "singleJourney": 20,
+            "returnJourney": 30,
+            "monthlyPass": 715
+          },
+          "commercialVehicle": {
+            "localDistrict": 10
+          }
+        }
+      },
+      {
+        "tollName": "Pongalur Toll Plaza",
+        "highway": "NH 81",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2760
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Ponnambalapatti",
+        "highway": "NH 83",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 190,
+            "monthlyPass": 3795
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Pudhurpandiyapuram",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 170,
+            "monthlyPass": 3775
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Pudukottai (Vagaikulam)",
+        "highway": "NH 138",
+        "pricing": {
+          "car": {
+            "singleJourney": 80,
+            "returnJourney": 120,
+            "monthlyPass": 2710
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Pudur",
+        "highway": "NH 785",
+        "pricing": {
+          "car": {
+            "singleJourney": 195,
+            "returnJourney": 290,
+            "monthlyPass": 6440
+          },
+          "commercialVehicle": {
+            "localDistrict": 95
+          }
+        }
+      },
+      {
+        "tollName": "Rasampalayam",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1710
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Salaipudhur",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 130,
+            "returnJourney": 200,
+            "monthlyPass": 4390
+          },
+          "commercialVehicle": {
+            "localDistrict": 65
+          }
+        }
+      },
+      {
+        "tollName": "Samayapuram",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1670
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Sameerapalem Toll Plaza",
+        "highway": "NH 167B",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 70,
+            "monthlyPass": 1560
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Seliyamedu Fee Plaza",
+        "highway": "NH 32",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2425
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Sengurichi",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 100,
+            "monthlyPass": 2040
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Sevugampatti Toll Plaza",
+        "highway": "NH 183",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 130,
+            "monthlyPass": 2860
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Shenbagampettai",
+        "highway": "NH 36",
+        "pricing": {
+          "car": {
+            "singleJourney": 85,
+            "returnJourney": 125,
+            "monthlyPass": 2760
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "Surapattu (Chennai Bypass II)",
+        "highway": "NH 4",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 115,
+            "monthlyPass": 2505
+          },
+          "commercialVehicle": {
+            "localDistrict": 40
+          }
+        }
+      },
+      {
+        "tollName": "S V Puram",
+        "highway": "NH 205",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 105,
+            "monthlyPass": 2355
+          },
+          "commercialVehicle": {
+            "localDistrict": 35
+          }
+        }
+      },
+      {
+        "tollName": "Thennamadevi",
+        "highway": "NH 234",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1195
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Thirumandurai",
+        "highway": "NH 38",
+        "pricing": {
+          "car": {
+            "singleJourney": 70,
+            "returnJourney": 100,
+            "monthlyPass": 2040
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Thiruparaithurai",
+        "highway": "NH 67",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 50,
+            "monthlyPass": 980
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Thirupathisaram",
+        "highway": "NH 944",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1455
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Thiruppachethi",
+        "highway": "NH 87",
+        "pricing": {
+          "car": {
+            "singleJourney": 95,
+            "returnJourney": 140,
+            "monthlyPass": 3105
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Thuvakudi",
+        "highway": "NH 67 (New 83)",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1205
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "U Ponnalagram",
+        "highway": "NH 532",
+        "pricing": {
+          "car": {
+            "singleJourney": 50,
+            "returnJourney": 75,
+            "monthlyPass": 1645
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Upparpatti",
+        "highway": "NH 183",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 85,
+            "monthlyPass": 1885
+          },
+          "commercialVehicle": {
+            "localDistrict": 30
+          }
+        }
+      },
+      {
+        "tollName": "Vaiguntham",
+        "highway": "NH 47 (New 544)",
+        "pricing": {
+          "car": {
+            "singleJourney": 75,
+            "returnJourney": 110,
+            "monthlyPass": 2210
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Valavanthankottai",
+        "highway": "NH 83",
+        "pricing": {
+          "car": {
+            "singleJourney": 90,
+            "returnJourney": 135,
+            "monthlyPass": 2995
+          },
+          "commercialVehicle": {
+            "localDistrict": 45
+          }
+        }
+      },
+      {
+        "tollName": "Vallam",
+        "highway": "NH 234",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1220
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Vanagaram (Chennai Bypass)",
+        "highway": "NH 45",
+        "pricing": {
+          "car": {
+            "singleJourney": 55,
+            "returnJourney": 80,
+            "monthlyPass": 1805
+          },
+          "commercialVehicle": {
+            "localDistrict": 25
+          }
+        }
+      },
+      {
+        "tollName": "Vaniyambadi",
+        "highway": "NH 48",
+        "pricing": {
+          "car": {
+            "singleJourney": 125,
+            "returnJourney": 185,
+            "monthlyPass": 4140
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Veeracholapuram (West)*",
+        "highway": "NH 68 (New 79)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 1975
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Velampatti Toll Plaza",
+        "highway": "NH 381",
+        "pricing": {
+          "car": {
+            "singleJourney": 45,
+            "returnJourney": 65,
+            "monthlyPass": 1495
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Velanchettiyur",
+        "highway": "NH 44",
+        "pricing": {
+          "car": {
+            "singleJourney": 115,
+            "returnJourney": 170,
+            "monthlyPass": 3375
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Vembukudi Toll Plaza",
+        "highway": "NH 36",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 155,
+            "monthlyPass": 3490
+          },
+          "commercialVehicle": {
+            "localDistrict": 55
+          }
+        }
+      },
+      {
+        "tollName": "Vennathur",
+        "highway": "NH 210 (New 536)",
+        "pricing": {
+          "car": {
+            "singleJourney": 35,
+            "returnJourney": 55,
+            "monthlyPass": 1230
+          },
+          "commercialVehicle": {
+            "localDistrict": 20
+          }
+        }
+      },
+      {
+        "tollName": "Vijayamangalem Toll Plaza",
+        "highway": "NH 47 (New 544)",
+        "pricing": {
+          "car": {
+            "singleJourney": 65,
+            "returnJourney": 100,
+            "monthlyPass": 2005
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      },
+      {
+        "tollName": "Vikravandi (Villupuram)*",
+        "highway": "NH 45",
+        "pricing": {
+          "car": {
+            "singleJourney": 105,
+            "returnJourney": 160,
+            "monthlyPass": 3170
+          },
+          "commercialVehicle": {
+            "localDistrict": 0
+          }
+        }
+      }
+    ]
+  }
+}
