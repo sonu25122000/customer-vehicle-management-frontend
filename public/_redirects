@@ -1,0 +1,4 @@
+# Proxies API calls to the Render-hosted backend so the frontend's
+# axios baseURL of '/api' keeps working unchanged in production.
+# Replace the target below with your actual Render service URL.
+/api/*  https://cvm-backend.onrender.com/api/:splat  200
