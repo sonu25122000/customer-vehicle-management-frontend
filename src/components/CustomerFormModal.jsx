@@ -11,12 +11,19 @@ const emptyForm = {
   rating: 0,
   notes: '',
   customerType: 'Good',
+  profileVerified: 'Pending',
 };
 
 const CUSTOMER_TYPES = [
   { value: 'VIP', label: 'VIP', activeClass: 'bg-amber-100 border-amber-400 text-amber-800' },
   { value: 'Good', label: 'Good', activeClass: 'bg-emerald-100 border-emerald-400 text-emerald-800' },
   { value: 'Bad', label: 'Bad', activeClass: 'bg-red-100 border-red-400 text-red-800' },
+];
+
+const PROFILE_VERIFIED_STATUSES = [
+  { value: 'Accepted', label: 'Accepted', activeClass: 'bg-emerald-100 border-emerald-400 text-emerald-800' },
+  { value: 'Rejected', label: 'Rejected', activeClass: 'bg-red-100 border-red-400 text-red-800' },
+  { value: 'Pending', label: 'Pending', activeClass: 'bg-amber-100 border-amber-400 text-amber-800' },
 ];
 
 const baseInputClass =
@@ -48,6 +55,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
           rating: initialData.rating || 0,
           notes: initialData.notes || '',
           customerType: initialData.customerType || 'Good',
+          profileVerified: initialData.profileVerified || 'Pending',
         }
       : emptyForm
   );
@@ -103,6 +111,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
       rating: form.rating || undefined,
       notes: form.notes.trim(),
       customerType: form.customerType,
+      profileVerified: form.profileVerified,
     });
   }
 
@@ -199,6 +208,24 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
                   }`}
                 >
                   {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <span className={labelTextClass}>Profile Verified</span>
+            <div className="flex gap-2">
+              {PROFILE_VERIFIED_STATUSES.map((s) => (
+                <button
+                  key={s.value}
+                  type="button"
+                  onClick={() => update('profileVerified', s.value)}
+                  className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                    form.profileVerified === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {s.label}
                 </button>
               ))}
             </div>

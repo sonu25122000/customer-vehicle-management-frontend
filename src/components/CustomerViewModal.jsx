@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
+import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 import TripStatusBadge from './TripStatusBadge';
 import ImageLightbox from './ImageLightbox';
 import { FileTextIcon } from './icons';
@@ -102,6 +103,9 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
             <DetailItem label="Mobile 2">{customer.mobile2 || '-'}</DetailItem>
             <DetailItem label="Customer Type">
               <CustomerTypeBadge type={customer.customerType} />
+            </DetailItem>
+            <DetailItem label="Profile Verified">
+              <ProfileVerifiedBadge status={customer.profileVerified} />
             </DetailItem>
             <DetailItem label="Last Booked Date">{formatDate(customer.lastBookedDate)}</DetailItem>
             <DetailItem label="Rating">
