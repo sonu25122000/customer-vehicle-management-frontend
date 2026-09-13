@@ -82,7 +82,7 @@ export default function LoginPage() {
   }, [error]);
 
   if (admin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/customers" replace />;
   }
 
   async function handleSubmit(e) {
@@ -90,7 +90,7 @@ export default function LoginPage() {
     const result = await dispatch(login({ username, password, remember }));
     if (login.fulfilled.match(result)) {
       toast.success('Welcome back!');
-      navigate('/dashboard', { replace: true });
+      navigate('/customers', { replace: true });
     }
   }
 

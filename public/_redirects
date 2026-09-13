@@ -1,4 +1,4 @@
-# Proxies API calls to the Render-hosted backend so the frontend's
-# axios baseURL of '/api' keeps working unchanged in production.
-# Replace the target below with your actual Render service URL.
-/api/*  https://cvm-backend.onrender.com/api/:splat  200
+# Netlify-style proxy config, kept for reference / in case this app is ever
+# hosted on Netlify. The live deployment is on Vercel, where vercel.json's
+# "rewrites" (not this file) is what actually proxies /api/* in production.
+/api/*  https://customer-vehicle-management-backend.vercel.app/api/:splat  200

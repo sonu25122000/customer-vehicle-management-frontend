@@ -6,7 +6,6 @@ import { fetchMe } from './store/authSlice';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import LoginPage from './pages/LoginPage';
-import OverviewPage from './pages/OverviewPage';
 import CustomersPage from './pages/CustomersPage';
 import VehiclesPage from './pages/VehiclesPage';
 import TripsPage from './pages/TripsPage';
@@ -59,13 +58,12 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<OverviewPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/vehicles" element={<VehiclesPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/toll-prices" element={<TollPricesPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/customers" replace />} />
       </Routes>
     </>
   );

@@ -1,5 +1,6 @@
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
+import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 import { EyeIcon, PencilIcon, TrashIcon, FileTextIcon } from './icons';
 
 function formatDate(value) {
@@ -44,7 +45,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
 
   return (
     <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-      <table className="w-full min-w-[860px] border-collapse text-xs">
+      <table className="w-full min-w-[980px] border-collapse text-xs">
         <thead>
           <tr>
             <th className={`${thClass} w-10`}>#</th>
@@ -52,6 +53,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
             <th className={thClass}>Mobile 1</th>
             <th className={thClass}>Mobile 2</th>
             <th className={thClass}>Customer Type</th>
+            <th className={thClass}>Profile Verified</th>
             <th className={thClass}>Last Booked Date</th>
             <th className={thClass}>Rating</th>
             <th className={`${thClass} whitespace-nowrap`}>Actions</th>
@@ -66,6 +68,9 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
               <td className={tdClass}>{c.mobile2 || '-'}</td>
               <td className={tdClass}>
                 <CustomerTypeBadge type={c.customerType} />
+              </td>
+              <td className={tdClass}>
+                <ProfileVerifiedBadge status={c.profileVerified} />
               </td>
               <td className={`${tdClass} whitespace-nowrap`}>{formatDate(c.lastBookedDate)}</td>
               <td className={tdClass}>
