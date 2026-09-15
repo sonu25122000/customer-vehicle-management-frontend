@@ -190,8 +190,10 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>Rating</span>
-              <StarRating value={form.rating} onChange={(v) => update('rating', v)} />
+              <span className={labelTextClass}>
+                Rating {!isEdit && <span className="font-normal text-gray-400">(available after creation)</span>}
+              </span>
+              <StarRating value={form.rating} onChange={(v) => update('rating', v)} readOnly={!isEdit} />
             </label>
           </div>
 
@@ -216,19 +218,26 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
           <div className="flex flex-col gap-1.5">
             <span className={labelTextClass}>Profile Verified</span>
             <div className="flex gap-2">
-              {PROFILE_VERIFIED_STATUSES.map((s) => (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => update('profileVerified', s.value)}
-                  className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
-                    form.profileVerified === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
+              {PROFILE_VERIFIED_STATUSES.map((s) => {
+                // A new customer always starts Pending — Accepted/Rejected only become
+                // choosable once editing an existing customer.
+                const disabled = !isEdit && s.value !== 'Pending';
+                return (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => !disabled && update('profileVerified', s.value)}
+                    disabled={disabled}
+                    className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    } ${form.profileVerified === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
             </div>
+            {!isEdit && <p className="text-xs text-gray-400">New customers always start as "Pending".</p>}
           </div>
 
           <label className="flex flex-col gap-1.5">

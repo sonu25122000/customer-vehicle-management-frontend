@@ -5,7 +5,7 @@ const VEHICLE_TYPES = ['Car', 'Bike', 'Scooty'];
 const CATEGORY_MAP = {
   Car: ['Sedan', 'Hatchback', 'SUV', 'Compact'],
   Bike: ['Sports', 'Cruiser', 'Commuter', 'Off-Road'],
-  Scooty: ['Standard', 'Electric', 'Gearless'],
+  Scooty: ['Standard', 'Electric'],
 };
 const MAKE_MAP = {
   Car: [
@@ -48,7 +48,7 @@ const MODEL_MAP = {
 };
 const TRANSMISSIONS = ['Manual', 'Automatic'];
 const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'Electric'];
-const VEHICLE_STATUSES = ['Active', 'In Hold', 'Inactive'];
+const VEHICLE_STATUSES = ['Active', 'On Hold', 'Inactive'];
 const VEHICLE_NO_RE = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/;
 
 const emptyForm = {
@@ -57,7 +57,7 @@ const emptyForm = {
   vehicleCategory: '',
   transmission: '',
   fuel: '',
-  status: 'In Hold',
+  status: 'On Hold',
   make: '',
   model: '',
   ownerName: '',
@@ -88,7 +88,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           vehicleCategory: initialData.vehicleCategory || '',
           transmission: initialData.transmission || '',
           fuel: initialData.fuel || '',
-          status: initialData.status || 'In Hold',
+          status: initialData.status || 'On Hold',
           make: initialData.make || '',
           model: initialData.model || '',
           ownerName: initialData.ownerName || '',
@@ -99,6 +99,10 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
   const [errors, setErrors] = useState({});
 
   const isEdit = mode === 'edit';
+  // Active can't be selected until all 4 photo sides are on file — initialData only carries
+  // photos when the caller fetched the full vehicle record (see VehiclesPage's openEdit).
+  const photos = initialData?.photos;
+  const hasAllPhotoSides = Boolean(photos?.front && photos?.back && photos?.passengerSide && photos?.driverSide);
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
@@ -134,7 +138,9 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
     if (!form.vehicleCategory.trim()) next.vehicleCategory = 'Vehicle category is required';
     if (!form.transmission.trim()) next.transmission = 'Transmission is required';
     if (!form.fuel.trim()) next.fuel = 'Fuel type is required';
-    if (!form.ownerName.trim()) next.ownerName = 'Owner/Customer name is required';
+    if (!form.make.trim()) next.make = 'Make is required';
+    if (!form.model.trim()) next.model = 'Model is required';
+    if (!form.ownerName.trim()) next.ownerName = 'Owner/Host name is required';
     if (!form.ownerMobile.trim()) next.ownerMobile = 'Owner mobile is required';
     else if (!/^[0-9]{10}$/.test(form.ownerMobile.trim())) next.ownerMobile = 'Enter a valid 10-digit mobile number';
 
@@ -229,44 +235,52 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>Make</span>
+              <span className={labelTextClass}>
+                Make <RequiredMark />
+              </span>
               <SearchableSelect
                 value={form.make}
                 onChange={(v) => update('make', v)}
                 options={form.vehicleType ? MAKE_MAP[form.vehicleType] : []}
                 disabled={!form.vehicleType}
+                error={Boolean(errors.make)}
                 placeholder={form.vehicleType ? 'Select make' : 'Select a vehicle type first'}
                 searchPlaceholder="Search makes..."
                 emptyMessage="Select a vehicle type first"
                 getOptionValue={(m) => m}
                 getOptionLabel={(m) => m}
               />
+              {errors.make && <span className={errorClass}>{errors.make}</span>}
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>Model</span>
+              <span className={labelTextClass}>
+                Model <RequiredMark />
+              </span>
               <SearchableSelect
                 value={form.model}
                 onChange={(v) => update('model', v)}
                 options={form.make ? MODEL_MAP[form.make] || [] : []}
                 disabled={!form.make}
+                error={Boolean(errors.model)}
                 placeholder={form.make ? 'Select model' : 'Select a make first'}
                 searchPlaceholder="Search models..."
                 emptyMessage="Select a make first"
                 getOptionValue={(m) => m}
                 getOptionLabel={(m) => m}
               />
+              {errors.model && <span className={errorClass}>{errors.model}</span>}
             </label>
 
             <label className="flex flex-col gap-1.5">
               <span className={labelTextClass}>
-                Owner/Customer <RequiredMark />
+                Owner/Host <RequiredMark />
               </span>
               <input
                 className={fieldClass('ownerName')}
                 value={form.ownerName}
                 onChange={(e) => update('ownerName', e.target.value)}
-                placeholder="Enter owner or customer name"
+                placeholder="Enter owner or host name"
                 aria-invalid={Boolean(errors.ownerName)}
               />
               {errors.ownerName && <span className={errorClass}>{errors.ownerName}</span>}
@@ -345,25 +359,37 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           <div className="flex flex-col gap-1.5">
             <span className={labelTextClass}>Vehicle Status</span>
             <div className="flex flex-wrap gap-2">
-              {VEHICLE_STATUSES.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => update('status', s)}
-                  className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
-                    form.status === s
-                      ? s === 'Active'
-                        ? 'border-emerald-400 bg-emerald-100 text-emerald-800'
-                        : s === 'In Hold'
-                          ? 'border-amber-400 bg-amber-100 text-amber-800'
-                          : 'border-red-400 bg-red-100 text-red-800'
-                      : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+              {VEHICLE_STATUSES.map((s) => {
+                // Creation only ever allows "On Hold" — a brand new vehicle has no photos yet,
+                // so it can't be Active either. On edit, Active additionally stays locked until
+                // all 4 photo sides are uploaded (see hasAllPhotoSides above).
+                const activeLockedForPhotos = s === 'Active' && isEdit && !hasAllPhotoSides;
+                const disabled = form.status !== s && ((!isEdit && s !== 'On Hold') || activeLockedForPhotos);
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => !disabled && update('status', s)}
+                    disabled={disabled}
+                    title={activeLockedForPhotos ? 'Upload all 4 vehicle photos (front, back, passenger side, driver side) before activating' : undefined}
+                    className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    } ${
+                      form.status === s
+                        ? s === 'Active'
+                          ? 'border-emerald-400 bg-emerald-100 text-emerald-800'
+                          : s === 'On Hold'
+                            ? 'border-amber-400 bg-amber-100 text-amber-800'
+                            : 'border-red-400 bg-red-100 text-red-800'
+                        : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
             </div>
+            {!isEdit && <p className="text-xs text-gray-400">New vehicles always start as "On Hold".</p>}
           </div>
 
           <p className="-mt-1 text-xs text-gray-400">

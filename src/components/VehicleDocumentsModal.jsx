@@ -67,7 +67,7 @@ function DocSlot({ label, existingUrl, pendingFile, pendingPreviewUrl, onPick, o
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onView(fileUrl);
+                  onView(fileUrl, isPdf);
                 }}
                 className="flex cursor-pointer items-center gap-1"
               >
@@ -197,7 +197,7 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
                 pendingPreviewUrl={objectUrlsRef.current[key]}
                 onPick={(file) => pick(key, file)}
                 onClear={() => clear(key)}
-                onView={(url) => setLightbox({ src: url, label })}
+                onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
                 disabled={uploading || compressing}
               />
             ))}
@@ -223,7 +223,7 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
         </div>
       </div>
 
-      <ImageLightbox src={lightbox?.src} label={lightbox?.label} onClose={() => setLightbox(null)} />
+      <ImageLightbox src={lightbox?.src} label={lightbox?.label} isPdf={lightbox?.isPdf} onClose={() => setLightbox(null)} />
     </div>
   );
 }

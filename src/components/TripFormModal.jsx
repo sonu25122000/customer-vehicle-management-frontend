@@ -4,7 +4,7 @@ import StarRating from './StarRating';
 import SearchableSelect from './SearchableSelect';
 import CustomerFormModal from './CustomerFormModal';
 import { PlusCircleIcon } from './icons';
-import { fetchCustomerOptions, createCustomer } from '../api/customers';
+import { fetchCustomerOptions, fetchCustomer, createCustomer } from '../api/customers';
 import { fetchVehicleOptions } from '../api/vehicles';
 import { TIME_OPTIONS } from '../utils/timeOptions';
 
@@ -97,20 +97,31 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   // form.status which tracks what the user is currently choosing.
   const existingStatus = isEdit ? initialData?.status || 'Yet to Start' : 'Yet to Start';
   const isCancelledTrip = isEdit && existingStatus === 'Cancelled';
-  // Vehicle/customer/start date+time are locked once a trip is past "Yet to Start" — reschedule
+  // Customer is never editable once a trip exists — only settable when creating it.
+  const customerLocked = isEdit;
+  // Vehicle/start date+time are locked once a trip is past "Yet to Start" — reschedule
   // (from the trip table) is the only way to change start date/time from then on.
   const coreLocked = isEdit && existingStatus !== 'Yet to Start';
-  // Once Completed, only amount-related fields + rating remain editable — end date/time and
-  // odometer readings are frozen too.
+  // Once Completed, end date/time are frozen — amount fields, odometer readings and rating
+  // remain editable (e.g. correcting the final odometer reading once the vehicle is back).
   const endFieldsLocked = isEdit && existingStatus === 'Completed';
   // The user is choosing to cancel this trip right now — only refund amount matters; every
   // other field's value is disabled here for clarity (the backend ignores them either way).
   const isCancelling = form.status === 'Cancelled' && existingStatus !== 'Cancelled';
   const ratingEnabled = form.status === 'Completed';
+  // Refund can never exceed the advance actually paid — see backend/src/controllers/tripController.js.
+  const maxRefund = Math.min(Number(form.advance || 0), Number(form.amount || 0));
 
   const availableStatuses = isEdit
     ? STATUS_OPTIONS.filter((s) => (ALLOWED_NEXT_STATUSES[existingStatus] || []).includes(s.value))
     : STATUS_OPTIONS.filter((s) => s.value === 'Yet to Start');
+
+  const [selectedCustomerDocs, setSelectedCustomerDocs] = useState(null);
+  // A trip can't move to "On Trip" until the customer's selfie, driving licence and Aadhaar
+  // are on file — see backend's same check in tripController.updateTrip.
+  const hasRequiredCustomerDocs = Boolean(
+    selectedCustomerDocs?.selfie && selectedCustomerDocs?.drivingLicence && selectedCustomerDocs?.aadhaar
+  );
 
   useEffect(() => {
     fetchCustomerOptions()
@@ -126,6 +137,24 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
         setVehicleOptions([]);
       });
   }, []);
+
+  useEffect(() => {
+    if (!form.customer) {
+      setSelectedCustomerDocs(null);
+      return undefined;
+    }
+    let cancelled = false;
+    fetchCustomer(form.customer)
+      .then((c) => {
+        if (!cancelled) setSelectedCustomerDocs(c.documents || {});
+      })
+      .catch(() => {
+        if (!cancelled) setSelectedCustomerDocs({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.customer]);
 
   // If this trip already references a customer/vehicle that isn't in the (active-only)
   // options list — e.g. a soft-deleted customer, or a vehicle that's non-Active/currently on
@@ -208,7 +237,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     if (isCancelling) {
       const refund = form.refundAmount === '' ? 0 : Number(form.refundAmount);
       if (refund < 0) next.refundAmount = 'Refund amount cannot be negative';
-      else if (refund > Number(form.amount || 0)) next.refundAmount = 'Refund cannot exceed the trip amount';
+      else if (refund > maxRefund) next.refundAmount = 'Refund cannot exceed the advance paid';
     }
 
     setErrors(next);
@@ -303,11 +332,18 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5 p-6">
-          {coreLocked && !isCancelling && (
+          {isEdit && !isCancelling && (
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-100">
-              This trip is <strong>{existingStatus}</strong> — customer, vehicle and start date/time can no longer be
-              changed here. Use <strong>Reschedule</strong> from the trip list to change the start date/time.
-              {endFieldsLocked && ' Only amount-related fields and rating remain editable.'}
+              {coreLocked ? (
+                <>
+                  This trip is <strong>{existingStatus}</strong> — customer, vehicle and start date/time can no
+                  longer be changed here. Use <strong>Reschedule</strong> from the trip list to change the start
+                  date/time.
+                  {endFieldsLocked && ' Only amount-related fields, odometer readings and rating remain editable.'}
+                </>
+              ) : (
+                'The customer on a trip can only be set at creation and cannot be changed here.'
+              )}
             </p>
           )}
           {isCancelling && (
@@ -329,7 +365,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                     onChange={(id) => update('customer', id)}
                     options={customerSelectOptions}
                     loading={customerSelectOptions === null}
-                    disabled={coreLocked}
+                    disabled={customerLocked}
                     error={Boolean(errors.customer)}
                     placeholder="Search by name or mobile"
                     searchPlaceholder="Search by name or mobile..."
@@ -348,7 +384,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                 <button
                   type="button"
                   onClick={() => setShowCreateCustomer(true)}
-                  disabled={coreLocked}
+                  disabled={customerLocked}
                   title="Create new customer"
                   className="flex flex-shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 transition-colors hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -543,7 +579,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   type="number"
                   min="0"
                   step="0.01"
-                  max={form.amount || undefined}
+                  max={maxRefund || undefined}
                   className={fieldClass('refundAmount')}
                   value={form.refundAmount}
                   onChange={(e) => update('refundAmount', e.target.value)}
@@ -553,7 +589,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                 {errors.refundAmount ? (
                   <span className={errorClass}>{errors.refundAmount}</span>
                 ) : (
-                  <span className="text-xs text-gray-400">Cannot exceed the trip amount (₹{Number(form.amount || 0).toLocaleString()})</span>
+                  <span className="text-xs text-gray-400">Cannot exceed the advance paid (₹{maxRefund.toLocaleString()})</span>
                 )}
               </label>
             )}
@@ -562,7 +598,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               <span className={labelTextClass}>Starting Odometer Reading</span>
               <input
                 inputMode="decimal"
-                disabled={endFieldsLocked || isCancelling}
+                disabled={isCancelling}
                 className={fieldClass('startOdometer')}
                 value={form.startOdometer}
                 onChange={(e) => updateNumber('startOdometer', e.target.value)}
@@ -574,7 +610,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               <span className={labelTextClass}>Ending Odometer Reading</span>
               <input
                 inputMode="decimal"
-                disabled={endFieldsLocked || isCancelling}
+                disabled={isCancelling}
                 className={fieldClass('endOdometer')}
                 value={form.endOdometer}
                 onChange={(e) => updateNumber('endOdometer', e.target.value)}
@@ -595,21 +631,33 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
           <div className="flex flex-col gap-1.5">
             <span className={labelTextClass}>Trip Status</span>
             <div className="flex flex-wrap gap-2">
-              {availableStatuses.map((s) => (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => availableStatuses.length > 1 && updateStatus(s.value)}
-                  disabled={availableStatuses.length === 1}
-                  className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
-                    availableStatuses.length > 1 ? 'cursor-pointer' : 'cursor-default'
-                  } ${form.status === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
-                >
-                  {s.value}
-                </button>
-              ))}
+              {availableStatuses.map((s) => {
+                // Starting a trip (moving into "On Trip") needs the customer's KYC documents
+                // on file first — see backend's matching check in tripController.updateTrip.
+                const lockedForDocs = s.value === 'On Trip' && existingStatus !== 'On Trip' && !hasRequiredCustomerDocs;
+                const disabled = availableStatuses.length === 1 || (form.status !== s.value && lockedForDocs);
+                return (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => !disabled && updateStatus(s.value)}
+                    disabled={disabled}
+                    title={lockedForDocs ? "Upload the customer's selfie, driving licence and Aadhaar before starting this trip" : undefined}
+                    className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    } ${form.status === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    {s.value}
+                  </button>
+                );
+              })}
             </div>
             {!isEdit && <p className="text-xs text-gray-400">New trips always start as "Yet to Start".</p>}
+            {availableStatuses.some((s) => s.value === 'On Trip') && !hasRequiredCustomerDocs && (
+              <p className="text-xs text-gray-400">
+                Select a customer with their selfie, driving licence and Aadhaar uploaded to start this trip.
+              </p>
+            )}
           </div>
 
           <p className="-mt-1 text-xs text-gray-400">

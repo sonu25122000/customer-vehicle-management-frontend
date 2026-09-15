@@ -77,7 +77,7 @@ function DocSlot({ label, imageOnly, allowCamera, existingUrl, pendingFile, pend
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onView(fileUrl);
+                  onView(fileUrl, isPdf);
                 }}
                 className="flex cursor-pointer items-center gap-1"
               >
@@ -250,7 +250,7 @@ export default function CustomerDocumentsModal({ customer: initialCustomer, onCl
                 pendingPreviewUrl={objectUrlsRef.current[key]}
                 onPick={(file) => pick(key, file)}
                 onClear={() => clear(key)}
-                onView={(url) => setLightbox({ src: url, label })}
+                onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
                 onCamera={() => setCameraSlot(key)}
                 disabled={uploading || compressing}
               />
@@ -277,7 +277,7 @@ export default function CustomerDocumentsModal({ customer: initialCustomer, onCl
         </div>
       </div>
 
-      <ImageLightbox src={lightbox?.src} label={lightbox?.label} onClose={() => setLightbox(null)} />
+      <ImageLightbox src={lightbox?.src} label={lightbox?.label} isPdf={lightbox?.isPdf} onClose={() => setLightbox(null)} />
 
       {cameraSlot && (
         <CameraCapture
