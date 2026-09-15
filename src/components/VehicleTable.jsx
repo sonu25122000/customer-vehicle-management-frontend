@@ -53,7 +53,7 @@ export default function VehicleTable({
             <th className={thClass}>Status</th>
             <th className={thClass}>Make</th>
             <th className={thClass}>Model</th>
-            <th className={thClass}>Owner/Customer</th>
+            <th className={thClass}>Owner/Host</th>
             <th className={thClass}>Owner Mobile</th>
             <th className={thClass}>Rating</th>
             <th className={`${thClass} whitespace-nowrap`}>Actions</th>

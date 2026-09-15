@@ -11,6 +11,17 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function formatDateTime(value) {
+  if (!value) return '-';
+  return new Date(value).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function combineDateTime(dateValue, timeStr) {
   if (!dateValue || !timeStr) return null;
   const d = new Date(dateValue);
@@ -86,7 +97,7 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             <DetailItem label="Status">
               <TripStatusBadge status={trip.status} />
             </DetailItem>
-            <DetailItem label="Booked Date">{formatDate(trip.bookedDate)}</DetailItem>
+            <DetailItem label="Booked Date">{formatDateTime(trip.bookedDate)}</DetailItem>
             <DetailItem label="Start">
               {formatDate(trip.startDate)} <span className="text-gray-500">{trip.startTime}</span>
             </DetailItem>

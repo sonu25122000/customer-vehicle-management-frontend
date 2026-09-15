@@ -61,7 +61,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <DetailItem label="Fuel">{vehicle.fuel || '-'}</DetailItem>
             <DetailItem label="Make">{vehicle.make || '-'}</DetailItem>
             <DetailItem label="Model">{vehicle.model || '-'}</DetailItem>
-            <DetailItem label="Owner/Customer">{vehicle.ownerName}</DetailItem>
+            <DetailItem label="Owner/Host">{vehicle.ownerName}</DetailItem>
             <DetailItem label="Owner Mobile">{vehicle.ownerMobile || '-'}</DetailItem>
             <DetailItem label="Status">
               <VehicleStatusBadge status={vehicle.status} />

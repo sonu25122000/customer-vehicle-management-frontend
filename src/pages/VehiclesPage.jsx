@@ -11,7 +11,7 @@ import VehicleDocumentsModal from '../components/VehicleDocumentsModal';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import FiltersPopover from '../components/FiltersPopover';
 import StatTile from '../components/StatTile';
-import { SearchIcon, CarIcon, RouteIcon, CheckCircleIcon } from '../components/icons';
+import { SearchIcon, CarIcon, RouteIcon, CheckCircleIcon, ClockIcon, GaugeIcon } from '../components/icons';
 import { setSearch } from '../store/filtersSlice';
 import {
   fetchVehicles,
@@ -124,6 +124,7 @@ export default function VehiclesPage() {
         toast.success('Vehicle updated successfully');
         setFormModal(null);
         loadVehicles();
+        loadStats();
         // If photos were skipped when this vehicle was first created, offer the upload
         // screen again now instead of only ever surfacing it once, at creation time.
         const p = res.data.photos;
@@ -174,6 +175,17 @@ export default function VehiclesPage() {
     }
   }
 
+  // The table row doesn't carry photo data (see backend's list-payload comment) — the edit form
+  // needs it to know whether Active can be selected (see VehicleFormModal's 4-photo gate).
+  async function openEdit(v) {
+    try {
+      const full = await fetchVehicle(v._id);
+      setFormModal({ mode: 'edit', data: full });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load vehicle details');
+    }
+  }
+
   async function handleDelete() {
     setDeleting(true);
     try {
@@ -195,24 +207,36 @@ export default function VehiclesPage() {
 
   return (
     <>
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatTile
           icon={CarIcon}
-          label="Total Vehicles"
+          label="Total Vehicle"
           value={statsLoading ? '—' : stats?.total ?? 0}
           accent="blue"
+        />
+        <StatTile
+          icon={CheckCircleIcon}
+          label="Active"
+          value={statsLoading ? '—' : stats?.active ?? 0}
+          accent="green"
+        />
+        <StatTile
+          icon={ClockIcon}
+          label="On Hold"
+          value={statsLoading ? '—' : stats?.onHold ?? 0}
+          accent="amber"
         />
         <StatTile
           icon={RouteIcon}
           label="On Trip"
           value={statsLoading ? '—' : stats?.onTrip ?? 0}
-          accent="amber"
+          accent="violet"
         />
         <StatTile
-          icon={CheckCircleIcon}
+          icon={GaugeIcon}
           label="Available"
           value={statsLoading ? '—' : stats?.available ?? 0}
-          accent="green"
+          accent="teal"
         />
       </div>
 
@@ -248,7 +272,7 @@ export default function VehiclesPage() {
         page={pagination.page || page}
         limit={LIMIT}
         onView={openView}
-        onEdit={(v) => setFormModal({ mode: 'edit', data: v })}
+        onEdit={openEdit}
         onDelete={setDeleteTarget}
         onManagePhotos={openPhotos}
         onManageDocuments={openDocuments}

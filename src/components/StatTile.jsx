@@ -4,6 +4,7 @@ const accentClasses = {
   amber: 'bg-amber-50 text-amber-600 ring-1 ring-amber-100',
   violet: 'bg-violet-50 text-violet-600 ring-1 ring-violet-100',
   red: 'bg-red-50 text-red-600 ring-1 ring-red-100',
+  teal: 'bg-teal-50 text-teal-600 ring-1 ring-teal-100',
 };
 
 export default function StatTile({ icon: Icon, label, value, sub, accent = 'blue' }) {
