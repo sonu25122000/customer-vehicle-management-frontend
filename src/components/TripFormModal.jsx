@@ -17,9 +17,10 @@ const STATUS_OPTIONS = [
 
 // Mirrors backend/src/controllers/tripController.js ALLOWED_STATUS_TRANSITIONS — a trip's
 // status only ever moves forward along one of these paths; Completed/Cancelled are terminal.
+// Once a trip is On Trip it can no longer be cancelled — only Completed.
 const ALLOWED_NEXT_STATUSES = {
   'Yet to Start': ['Yet to Start', 'On Trip', 'Cancelled'],
-  'On Trip': ['On Trip', 'Completed', 'Cancelled'],
+  'On Trip': ['On Trip', 'Completed'],
   Completed: ['Completed'],
   Cancelled: ['Cancelled'],
 };
@@ -116,12 +117,11 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     ? STATUS_OPTIONS.filter((s) => (ALLOWED_NEXT_STATUSES[existingStatus] || []).includes(s.value))
     : STATUS_OPTIONS.filter((s) => s.value === 'Yet to Start');
 
-  const [selectedCustomerDocs, setSelectedCustomerDocs] = useState(null);
-  // A trip can't move to "On Trip" until the customer's selfie, driving licence and Aadhaar
-  // are on file — see backend's same check in tripController.updateTrip.
-  const hasRequiredCustomerDocs = Boolean(
-    selectedCustomerDocs?.selfie && selectedCustomerDocs?.drivingLicence && selectedCustomerDocs?.aadhaar
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  // A trip can't move to "On Trip" until the customer's profile is Accepted — which itself only
+  // happens once selfie, driving licence and Aadhaar are on file. See backend's matching check
+  // in tripController.updateTrip.
+  const customerProfileAccepted = selectedCustomer?.profileVerified === 'Accepted';
 
   useEffect(() => {
     fetchCustomerOptions()
@@ -140,16 +140,16 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
 
   useEffect(() => {
     if (!form.customer) {
-      setSelectedCustomerDocs(null);
+      setSelectedCustomer(null);
       return undefined;
     }
     let cancelled = false;
     fetchCustomer(form.customer)
       .then((c) => {
-        if (!cancelled) setSelectedCustomerDocs(c.documents || {});
+        if (!cancelled) setSelectedCustomer(c);
       })
       .catch(() => {
-        if (!cancelled) setSelectedCustomerDocs({});
+        if (!cancelled) setSelectedCustomer({});
       });
     return () => {
       cancelled = true;
@@ -632,17 +632,17 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
             <span className={labelTextClass}>Trip Status</span>
             <div className="flex flex-wrap gap-2">
               {availableStatuses.map((s) => {
-                // Starting a trip (moving into "On Trip") needs the customer's KYC documents
-                // on file first — see backend's matching check in tripController.updateTrip.
-                const lockedForDocs = s.value === 'On Trip' && existingStatus !== 'On Trip' && !hasRequiredCustomerDocs;
-                const disabled = availableStatuses.length === 1 || (form.status !== s.value && lockedForDocs);
+                // Starting a trip (moving into "On Trip") needs the customer's profile to be
+                // Accepted first — see backend's matching check in tripController.updateTrip.
+                const lockedForProfile = s.value === 'On Trip' && existingStatus !== 'On Trip' && !customerProfileAccepted;
+                const disabled = availableStatuses.length === 1 || (form.status !== s.value && lockedForProfile);
                 return (
                   <button
                     key={s.value}
                     type="button"
                     onClick={() => !disabled && updateStatus(s.value)}
                     disabled={disabled}
-                    title={lockedForDocs ? "Upload the customer's selfie, driving licence and Aadhaar before starting this trip" : undefined}
+                    title={lockedForProfile ? "This customer's profile must be Accepted before starting this trip" : undefined}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                       disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     } ${form.status === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
@@ -653,9 +653,10 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               })}
             </div>
             {!isEdit && <p className="text-xs text-gray-400">New trips always start as "Yet to Start".</p>}
-            {availableStatuses.some((s) => s.value === 'On Trip') && !hasRequiredCustomerDocs && (
+            {availableStatuses.some((s) => s.value === 'On Trip') && !customerProfileAccepted && (
               <p className="text-xs text-gray-400">
-                Select a customer with their selfie, driving licence and Aadhaar uploaded to start this trip.
+                Select a customer whose profile is Accepted (selfie, driving licence and Aadhaar uploaded) to start
+                this trip.
               </p>
             )}
           </div>

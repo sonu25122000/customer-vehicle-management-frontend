@@ -10,6 +10,7 @@ import CustomersPage from './pages/CustomersPage';
 import VehiclesPage from './pages/VehiclesPage';
 import TripsPage from './pages/TripsPage';
 import TollPricesPage from './pages/TollPricesPage';
+import VehicleCatalogPage from './pages/VehicleCatalogPage';
 
 const SESSION_POLL_MS = Number(import.meta.env.VITE_SESSION_POLL_MS) || 15000;
 
@@ -60,6 +61,7 @@ export default function App() {
         >
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/vehicles" element={<VehiclesPage />} />
+          <Route path="/vehicle-catalog" element={<VehicleCatalogPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/toll-prices" element={<TollPricesPage />} />
         </Route>
