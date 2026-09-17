@@ -2,11 +2,12 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
-import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon } from './icons';
+import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon } from './icons';
 
 const navItems = [
   { to: '/customers', label: 'Customers', icon: UsersIcon, end: true },
   { to: '/vehicles', label: 'Vehicles', icon: CarIcon },
+  { to: '/vehicle-catalog', label: 'Vehicle Catalog', icon: TagIcon },
   { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/toll-prices', label: 'Toll Prices', icon: MapPinIcon },
 ];

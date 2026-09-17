@@ -1,51 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import SearchableSelect from './SearchableSelect';
+import { fetchVehicleCatalog } from '../api/vehicleCatalog';
 
-const VEHICLE_TYPES = ['Car', 'Bike', 'Scooty'];
-const CATEGORY_MAP = {
-  Car: ['Sedan', 'Hatchback', 'SUV', 'Compact'],
-  Bike: ['Sports', 'Cruiser', 'Commuter', 'Off-Road'],
-  Scooty: ['Standard', 'Electric'],
-};
-const MAKE_MAP = {
-  Car: [
-    'Maruti Suzuki', 'Hyundai', 'Tata', 'Mahindra', 'Honda', 'Toyota', 'Kia',
-    'Ford', 'Volkswagen', 'BMW', 'Mercedes-Benz', 'Audi', 'Renault', 'Nissan', 'Skoda',
-  ],
-  Bike: ['Royal Enfield', 'Bajaj', 'Hero MotoCorp', 'TVS', 'Yamaha', 'Honda', 'Suzuki', 'KTM', 'Kawasaki', 'Harley-Davidson'],
-  Scooty: ['Honda', 'TVS', 'Bajaj', 'Suzuki', 'Hero MotoCorp', 'Yamaha', 'Ather', 'Ola Electric', 'Vespa', 'Aprilia'],
-};
-// Model options depend on Make — keep in sync with backend/src/controllers/vehicleController.js MODEL_MAP.
-const MODEL_MAP = {
-  'Maruti Suzuki': ['Swift', 'Baleno', 'Dzire', 'WagonR', 'Alto', 'Ertiga', 'Brezza'],
-  Hyundai: ['i10', 'i20', 'Venue', 'Creta', 'Verna', 'Aura'],
-  Tata: ['Nexon', 'Punch', 'Tiago', 'Altroz', 'Harrier', 'Safari'],
-  Mahindra: ['XUV700', 'Scorpio', 'Bolero', 'Thar', 'XUV300'],
-  Honda: ['City', 'Amaze', 'Activa', 'Shine', 'Unicorn'],
-  Toyota: ['Innova', 'Fortuner', 'Glanza', 'Urban Cruiser'],
-  Kia: ['Seltos', 'Sonet', 'Carens'],
-  Ford: ['EcoSport', 'Figo', 'Endeavour'],
-  Volkswagen: ['Polo', 'Vento', 'Taigun'],
-  BMW: ['3 Series', '5 Series', 'X1'],
-  'Mercedes-Benz': ['C-Class', 'E-Class', 'GLA'],
-  Audi: ['A4', 'A6', 'Q3'],
-  Renault: ['Kwid', 'Triber', 'Kiger'],
-  Nissan: ['Magnite', 'Kicks'],
-  Skoda: ['Rapid', 'Octavia', 'Kushaq'],
-  'Royal Enfield': ['Classic 350', 'Bullet 350', 'Meteor 350', 'Hunter 350'],
-  Bajaj: ['Pulsar', 'Avenger', 'Platina', 'CT100'],
-  'Hero MotoCorp': ['Splendor', 'Passion', 'Glamour', 'HF Deluxe'],
-  TVS: ['Apache', 'Raider', 'Sport', 'Jupiter', 'Ntorq'],
-  Yamaha: ['FZ', 'R15', 'MT-15', 'Fascino'],
-  Suzuki: ['Gixxer', 'Access', 'Burgman'],
-  KTM: ['Duke 200', 'Duke 390', 'RC 200'],
-  Kawasaki: ['Ninja 300', 'Ninja 650', 'Splendor'],
-  'Harley-Davidson': ['Street 750', 'Iron 883'],
-  Ather: ['450X', '450S'],
-  'Ola Electric': ['S1 Pro', 'S1 Air'],
-  Vespa: ['VXL', 'SXL'],
-  Aprilia: ['SR 160', 'SXR 160'],
-};
 const TRANSMISSIONS = ['Manual', 'Automatic'];
 const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'Electric'];
 const VEHICLE_STATUSES = ['Active', 'On Hold', 'Inactive'];
@@ -97,6 +54,23 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
       : emptyForm
   );
   const [errors, setErrors] = useState({});
+  // Single nested tree from the DB: { vehicleTypes: [{ name, categories, makes: [{ name, models }] }] }
+  const [catalog, setCatalog] = useState(null);
+
+  useEffect(() => {
+    fetchVehicleCatalog()
+      .then(setCatalog)
+      .catch(() => {
+        toast.error('Failed to load vehicle types/categories/makes/models');
+        setCatalog({ vehicleTypes: [] });
+      });
+  }, []);
+
+  const vehicleTypeOptions = catalog ? catalog.vehicleTypes.map((t) => t.name) : [];
+  const selectedVehicleType = catalog?.vehicleTypes.find((t) => t.name === form.vehicleType);
+  const categoryOptions = selectedVehicleType?.categories || [];
+  const makeOptions = selectedVehicleType?.makes.map((m) => m.name) || [];
+  const modelOptions = selectedVehicleType?.makes.find((m) => m.name === form.make)?.models || [];
 
   const isEdit = mode === 'edit';
   // Active can't be selected until all 4 photo sides are on file — initialData only carries
@@ -205,10 +179,12 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               <SearchableSelect
                 value={form.vehicleType}
                 onChange={(v) => update('vehicleType', v)}
-                options={VEHICLE_TYPES}
+                options={vehicleTypeOptions}
+                loading={catalog === null}
                 error={Boolean(errors.vehicleType)}
                 placeholder="Select type"
                 searchPlaceholder="Search types..."
+                emptyMessage="No vehicle types yet — add one in Vehicle Catalog."
                 getOptionValue={(t) => t}
                 getOptionLabel={(t) => t}
               />
@@ -222,12 +198,13 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               <SearchableSelect
                 value={form.vehicleCategory}
                 onChange={(v) => update('vehicleCategory', v)}
-                options={form.vehicleType ? CATEGORY_MAP[form.vehicleType] : []}
+                options={form.vehicleType ? categoryOptions : []}
+                loading={catalog === null}
                 disabled={!form.vehicleType}
                 error={Boolean(errors.vehicleCategory)}
                 placeholder={form.vehicleType ? 'Select category' : 'Select a vehicle type first'}
                 searchPlaceholder="Search categories..."
-                emptyMessage="Select a vehicle type first"
+                emptyMessage={form.vehicleType ? 'No categories yet — add one in Vehicle Catalog.' : 'Select a vehicle type first'}
                 getOptionValue={(c) => c}
                 getOptionLabel={(c) => c}
               />
@@ -241,12 +218,13 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               <SearchableSelect
                 value={form.make}
                 onChange={(v) => update('make', v)}
-                options={form.vehicleType ? MAKE_MAP[form.vehicleType] : []}
+                options={form.vehicleType ? makeOptions : []}
+                loading={catalog === null}
                 disabled={!form.vehicleType}
                 error={Boolean(errors.make)}
                 placeholder={form.vehicleType ? 'Select make' : 'Select a vehicle type first'}
                 searchPlaceholder="Search makes..."
-                emptyMessage="Select a vehicle type first"
+                emptyMessage={form.vehicleType ? 'No makes yet — add one in Vehicle Catalog.' : 'Select a vehicle type first'}
                 getOptionValue={(m) => m}
                 getOptionLabel={(m) => m}
               />
@@ -260,12 +238,13 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               <SearchableSelect
                 value={form.model}
                 onChange={(v) => update('model', v)}
-                options={form.make ? MODEL_MAP[form.make] || [] : []}
+                options={form.make ? modelOptions : []}
+                loading={catalog === null}
                 disabled={!form.make}
                 error={Boolean(errors.model)}
                 placeholder={form.make ? 'Select model' : 'Select a make first'}
                 searchPlaceholder="Search models..."
-                emptyMessage="Select a make first"
+                emptyMessage={form.make ? 'No models yet — add one in Vehicle Catalog.' : 'Select a make first'}
                 getOptionValue={(m) => m}
                 getOptionLabel={(m) => m}
               />

@@ -63,6 +63,10 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
 
   const isEdit = mode === 'edit';
   const notesWords = wordCount(form.notes);
+  // Profile status can only move to Accepted once selfie, driving licence and Aadhaar are all
+  // on file — see backend's matching check in customerController.updateCustomer.
+  const docs = initialData?.documents || {};
+  const hasRequiredDocs = Boolean(docs.selfie && docs.drivingLicence && docs.aadhaar);
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
@@ -220,14 +224,17 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
             <div className="flex gap-2">
               {PROFILE_VERIFIED_STATUSES.map((s) => {
                 // A new customer always starts Pending — Accepted/Rejected only become
-                // choosable once editing an existing customer.
-                const disabled = !isEdit && s.value !== 'Pending';
+                // choosable once editing an existing customer. Accepted additionally stays
+                // locked until the selfie, driving licence and Aadhaar are all on file.
+                const lockedForDocs = s.value === 'Accepted' && isEdit && !hasRequiredDocs;
+                const disabled = (!isEdit && s.value !== 'Pending') || lockedForDocs;
                 return (
                   <button
                     key={s.value}
                     type="button"
                     onClick={() => !disabled && update('profileVerified', s.value)}
                     disabled={disabled}
+                    title={lockedForDocs ? 'Upload the selfie, driving licence and Aadhaar before accepting this profile' : undefined}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                       disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     } ${form.profileVerified === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
@@ -238,6 +245,12 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
               })}
             </div>
             {!isEdit && <p className="text-xs text-gray-400">New customers always start as "Pending".</p>}
+            {isEdit && !hasRequiredDocs && (
+              <p className="text-xs text-gray-400">
+                Upload the selfie, driving licence and Aadhaar (from the Documents screen) before this profile can be
+                Accepted.
+              </p>
+            )}
           </div>
 
           <label className="flex flex-col gap-1.5">

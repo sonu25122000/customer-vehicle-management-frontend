@@ -285,6 +285,35 @@ export function GaugeIcon(props) {
   );
 }
 
+export function TagIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <path d="M11.5 4h5.8A1.7 1.7 0 0 1 19 5.7v5.8a1.7 1.7 0 0 1-.5 1.2l-7.3 7.3a1.7 1.7 0 0 1-2.4 0l-5.3-5.3a1.7 1.7 0 0 1 0-2.4l7.3-7.3A1.7 1.7 0 0 1 11.5 4Z" />
+      <circle cx="14.7" cy="8.3" r="1.1" />
+    </svg>
+  );
+}
+
+export function FactoryIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <path d="M3.5 20.5v-8l5-3.2v3.2l5-3.2v3.2l5-3.2v11.2Z" />
+      <path d="M3.5 20.5h17" />
+      <path d="M7 17v-2.5M11 17v-2.5M15 17v-2.5" />
+    </svg>
+  );
+}
+
+export function LayersIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <path d="m12 4 8 4.5-8 4.5-8-4.5Z" strokeLinejoin="round" />
+      <path d="m4 13 8 4.5 8-4.5" />
+      <path d="m4 16.5 8 4.5 8-4.5" />
+    </svg>
+  );
+}
+
 export function MapPinIcon(props) {
   return (
     <svg viewBox="0 0 24 24" {...base(props)}>
