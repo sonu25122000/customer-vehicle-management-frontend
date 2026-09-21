@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { fetchCustomerOptions } from '../api/customers';
+import SearchableSelect from './SearchableSelect';
 import { SearchIcon } from './icons';
+import { TIME_OPTIONS } from '../utils/timeOptions';
 
 const baseInputClass =
   'rounded-lg border px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:ring-2';
@@ -18,14 +20,26 @@ function RequiredMark() {
   );
 }
 
-// datetime-local inputs want 'YYYY-MM-DDTHH:mm' in the browser's local time, with no
-// timezone/seconds suffix — this converts an ISO string (from the API) to that shape.
-function toLocalInput(isoString) {
-  if (!isoString) return '';
+// The date and time are picked separately (a date input + a 30-minute-interval time dropdown, the
+// same picker the trip form uses) — the native datetime-local input can't be limited to 30-minute
+// steps. This splits an ISO string from the API into the local 'YYYY-MM-DD' / 'HH:mm' pair.
+function splitLocal(isoString) {
+  if (!isoString) return { date: '', time: '' };
   const d = new Date(isoString);
-  if (Number.isNaN(d.getTime())) return '';
+  if (Number.isNaN(d.getTime())) return { date: '', time: '' };
   const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  };
+}
+
+function joinLocal(date, time) {
+  return date && time ? new Date(`${date}T${time}`) : null;
+}
+
+function todayLocal() {
+  return splitLocal(new Date().toISOString()).date;
 }
 
 const emptyForm = {
@@ -34,31 +48,51 @@ const emptyForm = {
   value: '',
   applicability: 'all',
   customers: [],
-  startAt: '',
-  expiresAt: '',
+  startDate: '',
+  startTime: '',
+  expiryDate: '',
+  expiryTime: '',
+  maxUsage: '',
   isActive: true,
 };
 
 export default function CouponFormModal({ mode, initialData, onClose, onSubmit, submitting }) {
-  const [form, setForm] = useState(() =>
-    initialData
-      ? {
-          code: initialData.code || '',
-          discountType: initialData.discountType || 'percentage',
-          value: initialData.value ?? '',
-          applicability: initialData.applicability || 'all',
-          customers: (initialData.customers || []).map((c) => (typeof c === 'string' ? c : c._id)),
-          startAt: toLocalInput(initialData.startAt),
-          expiresAt: toLocalInput(initialData.expiresAt),
-          isActive: initialData.isActive ?? true,
-        }
-      : emptyForm
-  );
+  const [form, setForm] = useState(() => {
+    if (!initialData) return emptyForm;
+    const start = splitLocal(initialData.startAt);
+    const expiry = splitLocal(initialData.expiresAt);
+    return {
+      code: initialData.code || '',
+      discountType: initialData.discountType || 'percentage',
+      value: initialData.value ?? '',
+      applicability: initialData.applicability || 'all',
+      customers: (initialData.customers || []).map((c) => (typeof c === 'string' ? c : c._id)),
+      startDate: start.date,
+      startTime: start.time,
+      expiryDate: expiry.date,
+      expiryTime: expiry.time,
+      maxUsage: initialData.maxUsage ?? '',
+      isActive: initialData.isActive ?? true,
+    };
+  });
   const [errors, setErrors] = useState({});
   const [customerOptions, setCustomerOptions] = useState(null);
   const [customerSearch, setCustomerSearch] = useState('');
 
   const isEdit = mode === 'edit';
+  const usageCount = isEdit ? initialData?.usageCount || 0 : 0;
+
+  // A coupon saved before the 30-minute rule existed may sit on an odd minute (e.g. 10:17) — keep
+  // that value selectable so opening the form doesn't blank it, while every *new* pick is on-grid.
+  function timeOptionsWith(current, filterFn) {
+    const base = filterFn ? TIME_OPTIONS.filter(filterFn) : TIME_OPTIONS;
+    if (!current || TIME_OPTIONS.some((t) => t.value === current)) return base;
+    return [{ value: current, label: current }, ...base];
+  }
+  const startTimeOptions = timeOptionsWith(form.startTime);
+  const sameDay = form.startDate && form.expiryDate && form.startDate === form.expiryDate;
+  // Same-day expiry has to be strictly after the start time.
+  const expiryTimeOptions = timeOptionsWith(form.expiryTime, sameDay && form.startTime ? (t) => t.value > form.startTime : undefined);
 
   useEffect(() => {
     if (form.applicability !== 'selected' || customerOptions !== null) return;
@@ -93,9 +127,27 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
     if (form.value === '' || Number(form.value) <= 0) next.value = 'Enter a value greater than 0';
     else if (form.discountType === 'percentage' && Number(form.value) > 100) next.value = 'Percentage cannot exceed 100';
     if (form.applicability === 'selected' && form.customers.length === 0) next.customers = 'Select at least one customer';
-    if (!form.startAt) next.startAt = 'Start date/time is required';
-    if (!form.expiresAt) next.expiresAt = 'Expiry date/time is required';
-    else if (form.startAt && new Date(form.expiresAt) <= new Date(form.startAt)) next.expiresAt = 'Expiry must be after the start date/time';
+    if (!form.startDate) next.startDate = 'Start date is required';
+    if (!form.startTime) next.startTime = 'Start time is required';
+    if (!form.expiryDate) next.expiryDate = 'Expiry date is required';
+    if (!form.expiryTime) next.expiryTime = 'Expiry time is required';
+
+    const startAt = joinLocal(form.startDate, form.startTime);
+    const expiresAt = joinLocal(form.expiryDate, form.expiryTime);
+    if (startAt && expiresAt) {
+      if (expiresAt <= startAt) {
+        next[form.expiryDate === form.startDate ? 'expiryTime' : 'expiryDate'] = 'Expiry must be after the start date/time';
+      } else {
+        // A new or changed expiry has to be in the future (an already-expired coupon can still be
+        // re-saved untouched) — same rule the backend applies.
+        const original = isEdit ? new Date(initialData.expiresAt).getTime() : null;
+        if (expiresAt.getTime() !== original && expiresAt <= new Date()) next.expiryDate = 'Expiry must be in the future';
+      }
+    }
+
+    if (form.maxUsage === '') next.maxUsage = 'Maximum usage is required';
+    else if (!Number.isInteger(Number(form.maxUsage)) || Number(form.maxUsage) < 1) next.maxUsage = 'Enter a whole number of at least 1';
+    else if (isEdit && Number(form.maxUsage) < usageCount) next.maxUsage = `Cannot be less than the times already used (${usageCount})`;
 
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -110,8 +162,9 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       value: Number(form.value),
       applicability: form.applicability,
       customers: form.applicability === 'selected' ? form.customers : [],
-      startAt: new Date(form.startAt).toISOString(),
-      expiresAt: new Date(form.expiresAt).toISOString(),
+      startAt: joinLocal(form.startDate, form.startTime).toISOString(),
+      expiresAt: joinLocal(form.expiryDate, form.expiryTime).toISOString(),
+      maxUsage: Number(form.maxUsage),
       isActive: form.isActive,
     });
   }
@@ -264,32 +317,99 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5">
               <span className={labelTextClass}>
-                Start Date &amp; Time <RequiredMark />
+                Start Date <RequiredMark />
               </span>
               <input
-                type="datetime-local"
-                className={fieldClass('startAt')}
-                value={form.startAt}
-                onChange={(e) => update('startAt', e.target.value)}
-                aria-invalid={Boolean(errors.startAt)}
+                type="date"
+                className={fieldClass('startDate')}
+                value={form.startDate}
+                onChange={(e) => update('startDate', e.target.value)}
+                aria-invalid={Boolean(errors.startDate)}
               />
-              {errors.startAt && <span className={errorClass}>{errors.startAt}</span>}
+              {errors.startDate && <span className={errorClass}>{errors.startDate}</span>}
             </label>
 
             <label className="flex flex-col gap-1.5">
               <span className={labelTextClass}>
-                Expiry Date &amp; Time <RequiredMark />
+                Start Time <RequiredMark />
+              </span>
+              <SearchableSelect
+                value={form.startTime}
+                onChange={(v) => update('startTime', v)}
+                options={startTimeOptions}
+                error={Boolean(errors.startTime)}
+                placeholder="Select start time"
+                searchPlaceholder="Search time..."
+                getOptionValue={(t) => t.value}
+                getOptionLabel={(t) => t.label}
+              />
+              {errors.startTime ? (
+                <span className={errorClass}>{errors.startTime}</span>
+              ) : (
+                <span className="text-xs text-gray-400">30-minute intervals</span>
+              )}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                Expiry Date <RequiredMark />
               </span>
               <input
-                type="datetime-local"
-                className={fieldClass('expiresAt')}
-                value={form.expiresAt}
-                onChange={(e) => update('expiresAt', e.target.value)}
-                aria-invalid={Boolean(errors.expiresAt)}
+                type="date"
+                min={form.startDate || todayLocal()}
+                className={fieldClass('expiryDate')}
+                value={form.expiryDate}
+                onChange={(e) => update('expiryDate', e.target.value)}
+                aria-invalid={Boolean(errors.expiryDate)}
               />
-              {errors.expiresAt && <span className={errorClass}>{errors.expiresAt}</span>}
+              {errors.expiryDate && <span className={errorClass}>{errors.expiryDate}</span>}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                Expiry Time <RequiredMark />
+              </span>
+              <SearchableSelect
+                value={form.expiryTime}
+                onChange={(v) => update('expiryTime', v)}
+                options={expiryTimeOptions}
+                error={Boolean(errors.expiryTime)}
+                placeholder="Select expiry time"
+                searchPlaceholder="Search time..."
+                getOptionValue={(t) => t.value}
+                getOptionLabel={(t) => t.label}
+              />
+              {errors.expiryTime ? (
+                <span className={errorClass}>{errors.expiryTime}</span>
+              ) : (
+                <span className="text-xs text-gray-400">30-minute intervals, after the start</span>
+              )}
             </label>
           </div>
+
+          <label className="flex flex-col gap-1.5 sm:max-w-[calc(50%-0.5rem)]">
+            <span className={labelTextClass}>
+              Maximum Usage <RequiredMark />
+            </span>
+            <input
+              type="number"
+              min={Math.max(usageCount, 1)}
+              step="1"
+              className={fieldClass('maxUsage')}
+              value={form.maxUsage}
+              onChange={(e) => update('maxUsage', e.target.value)}
+              placeholder="e.g. 50"
+              aria-invalid={Boolean(errors.maxUsage)}
+            />
+            {errors.maxUsage ? (
+              <span className={errorClass}>{errors.maxUsage}</span>
+            ) : (
+              <span className="text-xs text-gray-400">
+                {isEdit ? `Used ${usageCount} time${usageCount === 1 ? '' : 's'} so far. ` : ''}
+                Total number of times this coupon can be applied to trips.
+              </span>
+            )}
+          </label>
 
           <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
             <input

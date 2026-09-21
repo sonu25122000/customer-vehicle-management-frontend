@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { canDelete } from '../utils/permissions';
 import { CameraIcon, XIcon, UploadIcon, EyeIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
 import { compressImage } from '../utils/compressImage';
@@ -12,7 +14,7 @@ const MAIN_SLOTS = [
   { key: 'driverSide', label: 'Driver Side' },
 ];
 
-function PhotoSlot({ label, existingUrl, pendingUrl, onPick, onClear, onView, disabled }) {
+function PhotoSlot({ label, existingUrl, pendingUrl, onPick, onClear, onView, disabled, mayDelete }) {
   const inputRef = useRef(null);
   const previewUrl = pendingUrl || existingUrl;
 
@@ -33,18 +35,21 @@ function PhotoSlot({ label, existingUrl, pendingUrl, onPick, onClear, onView, di
                 Pending
               </span>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClear();
-              }}
-              disabled={disabled}
-              aria-label={`Remove ${label}`}
-              className="absolute right-1.5 top-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-opacity hover:bg-black/80"
-            >
-              <XIcon className="h-3.5 w-3.5" />
-            </button>
+            {/* Discarding a not-yet-uploaded photo is fine for anyone; removing a saved one is a delete (admin only). */}
+            {(pendingUrl || mayDelete) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClear();
+                }}
+                disabled={disabled}
+                aria-label={`Remove ${label}`}
+                className="absolute right-1.5 top-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-opacity hover:bg-black/80"
+              >
+                <XIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 bg-black/50 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 type="button"
@@ -93,6 +98,7 @@ function PhotoSlot({ label, existingUrl, pendingUrl, onPick, onClear, onView, di
 }
 
 export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, onDone }) {
+  const mayDelete = canDelete(useSelector((state) => state.auth.admin?.role));
   const [vehicle, setVehicle] = useState(initialVehicle);
   const [pending, setPending] = useState({ front: null, back: null, passengerSide: null, driverSide: null });
   const [pendingAdditional, setPendingAdditional] = useState([]);
@@ -219,6 +225,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
                 onClear={() => clearMain(key)}
                 onView={(url) => setLightbox({ src: url, label })}
                 disabled={uploading || removingSlot === key || compressing}
+                mayDelete={mayDelete}
               />
             ))}
           </div>
@@ -236,18 +243,20 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
                   className="group relative h-20 w-20 cursor-pointer overflow-hidden rounded-lg"
                 >
                   <img src={url} alt={`Additional ${i + 1}`} className="h-full w-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeSavedAdditional(i);
-                    }}
-                    disabled={removingSlot === `additional:${i}`}
-                    aria-label="Remove photo"
-                    className="absolute right-1 top-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <XIcon className="h-3 w-3" />
-                  </button>
+                  {mayDelete && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSavedAdditional(i);
+                      }}
+                      disabled={removingSlot === `additional:${i}`}
+                      aria-label="Remove photo"
+                      className="absolute right-1 top-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               ))}
               {pendingAdditional.map((file, i) => {

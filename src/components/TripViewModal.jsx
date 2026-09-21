@@ -122,6 +122,11 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             </DetailItem>
             {duration && <DetailItem label="Total Duration">{duration}</DetailItem>}
             <DetailItem label="Amount">₹{formatMoney(trip.amount)}</DetailItem>
+            {trip.couponCode && (
+              <DetailItem label="Coupon">
+                {trip.couponCode} (−₹{formatMoney(trip.couponDiscount)})
+              </DetailItem>
+            )}
             <DetailItem label="Toll Charges">₹{formatMoney(trip.tollCharges)}</DetailItem>
             <DetailItem label="Advance Paid">₹{formatMoney(trip.advance)}</DetailItem>
             <DetailItem label="Security Deposit">₹{formatMoney(trip.securityDeposit)}</DetailItem>

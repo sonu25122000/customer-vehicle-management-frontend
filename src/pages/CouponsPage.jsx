@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
 import CouponFormModal from '../components/CouponFormModal';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import StatTile from '../components/StatTile';
 import { SearchIcon, PercentIcon, CheckCircleIcon, AlertCircleIcon, PencilIcon, TrashIcon } from '../components/icons';
+import { canDelete } from '../utils/permissions';
 import { fetchCoupons, fetchCouponStats, createCoupon, updateCoupon, deleteCoupon } from '../api/coupons';
 
 const LIMIT = 10;
@@ -19,6 +21,8 @@ function couponStatus(coupon) {
 }
 
 export default function CouponsPage() {
+  // Moderators can view/create/edit coupons but not delete them (the backend enforces this too).
+  const mayDelete = canDelete(useSelector((state) => state.auth.admin?.role));
   const [search, setSearch] = useState('');
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -172,12 +176,13 @@ export default function CouponsPage() {
         <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500 shadow-sm">No coupons found.</div>
       ) : (
         <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-          <table className="w-full min-w-[900px] border-collapse text-xs">
+          <table className="w-full min-w-[1000px] border-collapse text-xs">
             <thead>
               <tr>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Code</th>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Discount</th>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Applicable To</th>
+                <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Usage</th>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Starts</th>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Expires</th>
                 <th className="bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Status</th>
@@ -198,6 +203,17 @@ export default function CouponsPage() {
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-700">
                       {c.applicability === 'all' ? 'All Customers' : `${c.customers?.length || 0} selected`}
                     </td>
+                    <td className="border-t border-gray-100 px-3 py-2 align-middle whitespace-nowrap text-gray-700">
+                      {c.maxUsage ? (
+                        <span className={c.usageCount >= c.maxUsage ? 'font-semibold text-red-600' : ''}>
+                          {c.usageCount || 0} / {c.maxUsage}
+                        </span>
+                      ) : (
+                        <span>
+                          {c.usageCount || 0} <span className="text-gray-400">/ unlimited</span>
+                        </span>
+                      )}
+                    </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.startAt).toLocaleString()}</td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.expiresAt).toLocaleString()}</td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle">
@@ -213,14 +229,16 @@ export default function CouponsPage() {
                         >
                           <PencilIcon className="h-3.5 w-3.5" />
                         </button>
-                        <button
-                          onClick={() => setDeleteTarget(c)}
-                          title="Delete"
-                          aria-label="Delete"
-                          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-red-50 text-red-600 transition-colors hover:bg-red-100"
-                        >
-                          <TrashIcon className="h-3.5 w-3.5" />
-                        </button>
+                        {mayDelete && (
+                          <button
+                            onClick={() => setDeleteTarget(c)}
+                            title="Delete"
+                            aria-label="Delete"
+                            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-red-50 text-red-600 transition-colors hover:bg-red-100"
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

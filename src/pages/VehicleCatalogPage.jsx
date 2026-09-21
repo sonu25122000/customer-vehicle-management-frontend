@@ -5,7 +5,7 @@ import SearchableSelect from '../components/SearchableSelect';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import { fetchVehicleCatalog, addCatalogItem, removeCatalogItem } from '../api/vehicleCatalog';
 import { CarIcon, TagIcon, FactoryIcon, LayersIcon, PlusCircleIcon, XIcon } from '../components/icons';
-import { canEdit } from '../utils/permissions';
+import { canEdit, canDelete } from '../utils/permissions';
 
 const TABS = [
   {
@@ -53,7 +53,9 @@ function countFor(kind, vehicleTypes) {
 }
 
 export default function VehicleCatalogPage() {
-  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+  const role = useSelector((state) => state.auth.admin?.role);
+  const mayEdit = canEdit(role);
+  const mayDelete = canDelete(role);
   // Single nested tree from the DB: { vehicleTypes: [{ name, categories, makes: [{ name, models }] }] }
   const [catalog, setCatalog] = useState(null);
   const [activeTab, setActiveTab] = useState('vehicleType');
@@ -322,7 +324,7 @@ export default function VehicleCatalogPage() {
                 className={`group flex items-center gap-1.5 rounded-full py-1.5 pl-3.5 pr-1.5 text-sm font-medium ring-1 transition-colors ${accent.chip} ${accent.ring} hover:ring-red-200`}
               >
                 <span>{itemName}</span>
-                {mayEdit && (
+                {mayDelete && (
                   <button
                     type="button"
                     onClick={() => confirmDelete(itemName)}

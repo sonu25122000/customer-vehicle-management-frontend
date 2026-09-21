@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { EyeIcon, PencilIcon, TrashIcon, CameraIcon, FileTextIcon } from './icons';
 import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
-import { canEdit } from '../utils/permissions';
+import { canEdit, canDelete } from '../utils/permissions';
 
 const thClass =
   'px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500 bg-gray-50';
@@ -20,7 +20,9 @@ export default function VehicleTable({
   onManagePhotos,
   onManageDocuments,
 }) {
-  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+  const role = useSelector((state) => state.auth.admin?.role);
+  const mayEdit = canEdit(role);
+  const mayDelete = canDelete(role);
 
   if (loading) {
     return (
@@ -129,14 +131,16 @@ export default function VehicleTable({
                       >
                         <FileTextIcon className="h-3.5 w-3.5" />
                       </button>
-                      <button
-                        onClick={() => onDelete(v)}
-                        title="Delete"
-                        aria-label="Delete"
-                        className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
-                      >
-                        <TrashIcon className="h-3.5 w-3.5" />
-                      </button>
+                      {mayDelete && (
+                        <button
+                          onClick={() => onDelete(v)}
+                          title="Delete"
+                          aria-label="Delete"
+                          className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </>
                   )}
                 </div>

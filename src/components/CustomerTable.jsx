@@ -3,7 +3,7 @@ import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 import { EyeIcon, PencilIcon, TrashIcon, FileTextIcon } from './icons';
-import { canEdit } from '../utils/permissions';
+import { canEdit, canDelete } from '../utils/permissions';
 
 function formatDate(value) {
   if (!value) return '-';
@@ -18,7 +18,9 @@ const actionBtn =
   'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors';
 
 export default function CustomerTable({ customers, loading, page, limit, onView, onEdit, onDelete, onDocuments }) {
-  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+  const role = useSelector((state) => state.auth.admin?.role);
+  const mayEdit = canEdit(role);
+  const mayDelete = canDelete(role);
 
   if (loading) {
     return (
@@ -108,14 +110,16 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
                       >
                         <FileTextIcon className="h-3.5 w-3.5" />
                       </button>
-                      <button
-                        onClick={() => onDelete(c)}
-                        title="Delete"
-                        aria-label="Delete"
-                        className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
-                      >
-                        <TrashIcon className="h-3.5 w-3.5" />
-                      </button>
+                      {mayDelete && (
+                        <button
+                          onClick={() => onDelete(c)}
+                          title="Delete"
+                          aria-label="Delete"
+                          className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </>
                   )}
                 </div>

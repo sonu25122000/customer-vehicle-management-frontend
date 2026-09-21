@@ -4,6 +4,11 @@ export function fetchCoupons({ search = '', page = 1, limit = 10 } = {}) {
   return api.get('/coupons', { params: { search, page, limit } }).then((res) => res.data);
 }
 
+// Coupons the trip form can offer for this customer (live, not used up, all-customers or listing them).
+export function fetchApplicableCoupons(customerId) {
+  return api.get('/coupons/applicable', { params: { customer: customerId } }).then((res) => res.data.data);
+}
+
 export function fetchCoupon(id) {
   return api.get(`/coupons/${id}`).then((res) => res.data.data);
 }
