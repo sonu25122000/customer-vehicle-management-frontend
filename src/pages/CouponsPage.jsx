@@ -199,6 +199,9 @@ export default function CouponsPage() {
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle font-semibold text-gray-900">
                       {c.discountType === 'percentage' ? `${c.value}%` : `₹${c.value}`}
+                      {c.discountType === 'percentage' && c.maxDiscount ? (
+                        <span className="ml-1 text-[0.7rem] font-normal text-gray-500">up to ₹{Number(c.maxDiscount).toLocaleString()}</span>
+                      ) : null}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-700">
                       {c.applicability === 'all' ? 'All Customers' : `${c.customers?.length || 0} selected`}

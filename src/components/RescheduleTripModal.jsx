@@ -17,11 +17,21 @@ export default function RescheduleTripModal({ trip, onClose, onSubmit, submittin
   const [startTime, setStartTime] = useState(trip.startTime || '');
   const [errors, setErrors] = useState({});
 
+  // The new start can't land after the trip's own end date/time.
+  const endDay = trip.endDate ? new Date(trip.endDate).toISOString().slice(0, 10) : '';
+  const startTimeOptions =
+    endDay && startDate === endDay && trip.endTime ? TIME_OPTIONS.filter((t) => t.value <= trip.endTime) : TIME_OPTIONS;
+
   function handleSubmit(e) {
     e.preventDefault();
     const next = {};
     if (!startDate) next.startDate = 'Start date is required';
     if (!startTime) next.startTime = 'Start time is required';
+    if (startDate && endDay && startDate > endDay) {
+      next.startDate = 'Start date cannot be after the trip end date';
+    } else if (startDate && endDay && startDate === endDay && startTime && trip.endTime && startTime > trip.endTime) {
+      next.startTime = 'Start time cannot be after the trip end time on the same day';
+    }
     setErrors(next);
     if (Object.keys(next).length) return;
     onSubmit({ startDate, startTime });
@@ -52,7 +62,11 @@ export default function RescheduleTripModal({ trip, onClose, onSubmit, submittin
             <input
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              max={endDay || undefined}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setErrors((prev) => ({ ...prev, startDate: undefined, startTime: undefined }));
+              }}
               className={`${baseInputClass} ${errors.startDate ? errorInputClass : validInputClass}`}
             />
             {errors.startDate && <span className={errorClass}>{errors.startDate}</span>}
@@ -62,8 +76,11 @@ export default function RescheduleTripModal({ trip, onClose, onSubmit, submittin
             <span className={labelTextClass}>New Start Time</span>
             <SearchableSelect
               value={startTime}
-              onChange={setStartTime}
-              options={TIME_OPTIONS}
+              onChange={(v) => {
+                setStartTime(v);
+                setErrors((prev) => ({ ...prev, startTime: undefined }));
+              }}
+              options={startTimeOptions}
               error={Boolean(errors.startTime)}
               placeholder="Select start time"
               searchPlaceholder="Search time..."

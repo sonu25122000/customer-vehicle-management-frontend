@@ -46,6 +46,7 @@ const emptyForm = {
   code: '',
   discountType: 'percentage',
   value: '',
+  maxDiscount: '',
   applicability: 'all',
   customers: [],
   startDate: '',
@@ -65,6 +66,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       code: initialData.code || '',
       discountType: initialData.discountType || 'percentage',
       value: initialData.value ?? '',
+      maxDiscount: initialData.maxDiscount ?? '',
       applicability: initialData.applicability || 'all',
       customers: (initialData.customers || []).map((c) => (typeof c === 'string' ? c : c._id)),
       startDate: start.date,
@@ -126,6 +128,9 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
     if (!form.code.trim()) next.code = 'Coupon code is required';
     if (form.value === '' || Number(form.value) <= 0) next.value = 'Enter a value greater than 0';
     else if (form.discountType === 'percentage' && Number(form.value) > 100) next.value = 'Percentage cannot exceed 100';
+    if (form.discountType === 'percentage' && form.maxDiscount !== '' && !(Number(form.maxDiscount) >= 1)) {
+      next.maxDiscount = 'Enter an amount of at least ₹1, or leave it blank for no cap';
+    }
     if (form.applicability === 'selected' && form.customers.length === 0) next.customers = 'Select at least one customer';
     if (!form.startDate) next.startDate = 'Start date is required';
     if (!form.startTime) next.startTime = 'Start time is required';
@@ -160,6 +165,8 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       code: form.code.trim().toUpperCase(),
       discountType: form.discountType,
       value: Number(form.value),
+      // Cap on the rupee discount — percentage coupons only (e.g. 20% up to ₹100); blank = no cap.
+      maxDiscount: form.discountType === 'percentage' && form.maxDiscount !== '' ? Number(form.maxDiscount) : null,
       applicability: form.applicability,
       customers: form.applicability === 'selected' ? form.customers : [],
       startAt: joinLocal(form.startDate, form.startTime).toISOString(),
@@ -271,6 +278,36 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               </div>
             </div>
           </div>
+
+          {form.discountType === 'percentage' && (
+            <label className="flex flex-col gap-1.5 sm:max-w-[calc(50%-0.5rem)]">
+              <span className={labelTextClass}>
+                Maximum Discount (₹) <span className="font-normal text-gray-400">(optional)</span>
+              </span>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="1"
+                  step="any"
+                  className={`${fieldClass('maxDiscount')} w-full pr-8`}
+                  value={form.maxDiscount}
+                  onChange={(e) => update('maxDiscount', e.target.value)}
+                  placeholder="e.g. 100"
+                  aria-invalid={Boolean(errors.maxDiscount)}
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">₹</span>
+              </div>
+              {errors.maxDiscount ? (
+                <span className={errorClass}>{errors.maxDiscount}</span>
+              ) : (
+                <span className="text-xs text-gray-400">
+                  {form.value && form.maxDiscount
+                    ? `${form.value}% off, up to ₹${Number(form.maxDiscount).toLocaleString()} per trip`
+                    : 'Caps the discount, e.g. 20% off up to ₹100. Leave blank for no cap.'}
+                </span>
+              )}
+            </label>
+          )}
 
           {form.applicability === 'selected' && (
             <div className="flex flex-col gap-1.5">

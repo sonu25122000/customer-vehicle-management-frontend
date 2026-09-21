@@ -70,7 +70,7 @@ function SelectionModal({ selected, runningTotal, onClose, onRemove, onClearAll,
                     {s.toll.tollName}
                     {s.toll.manual && (
                       <span className="ml-1.5 rounded-md bg-amber-50 px-1.5 py-0.5 align-middle text-[0.6rem] font-bold uppercase tracking-wide text-amber-700">
-                        Manual {s.toll.entryType}
+                        Manual
                       </span>
                     )}
                   </p>
@@ -210,7 +210,7 @@ export default function TollPricesPage() {
       body: selected.map((s, i) => [
         i + 1,
         selectedVehicle.vehicleNo.toUpperCase(),
-        s.toll.manual ? `${s.toll.tollName} (Manual ${s.toll.entryType})` : s.toll.tollName,
+        s.toll.tollName,
         s.toll.state || '-',
         s.toll.highway || '-',
         formatMoney(s.toll.pricing.car.singleJourney),
