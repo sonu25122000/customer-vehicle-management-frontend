@@ -7,8 +7,6 @@ const errorInputClass = 'border-red-400 focus:border-red-500 focus:ring-red-100'
 const labelTextClass = 'text-xs font-semibold text-gray-600';
 const errorClass = 'text-xs text-red-600';
 
-const TYPES = ['Toll', 'Parking'];
-
 function RequiredMark() {
   return (
     <span className="text-red-500" aria-hidden="true">
@@ -17,17 +15,13 @@ function RequiredMark() {
   );
 }
 
-// For charges FASTag deducted at a place that isn't in the toll plaza list (e.g. a parking lot).
-// Produces an entry shaped like a list toll so totals, the selection modal and the PDF treat it
-// the same way — just flagged `manual` so it's labelled as such.
+// For a FASTag charge that isn't in the toll plaza list (e.g. a parking lot): just a name and an
+// amount. The entry is shaped like a list toll so the total, the selection modal and the PDF treat
+// it the same way — flagged `manual` only so the UI can label it.
 export default function ManualTollModal({ initialName = '', onClose, onAdd }) {
-  const [form, setForm] = useState({ name: initialName, type: 'Toll', state: '', location: '', amount: '' });
+  const [name, setName] = useState(initialName);
+  const [amount, setAmount] = useState('');
   const [errors, setErrors] = useState({});
-
-  function update(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-  }
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
@@ -35,9 +29,9 @@ export default function ManualTollModal({ initialName = '', onClose, onAdd }) {
 
   function validate() {
     const next = {};
-    if (!form.name.trim()) next.name = 'Name is required';
-    if (form.amount === '') next.amount = 'Amount is required';
-    else if (!(Number(form.amount) > 0)) next.amount = 'Enter an amount greater than 0';
+    if (!name.trim()) next.name = 'Name is required';
+    if (amount === '') next.amount = 'Amount is required';
+    else if (!(Number(amount) > 0)) next.amount = 'Enter an amount greater than 0';
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -46,22 +40,21 @@ export default function ManualTollModal({ initialName = '', onClose, onAdd }) {
     e.preventDefault();
     if (!validate()) return;
     onAdd({
-      tollName: form.name.trim(),
-      state: form.state.trim(),
-      highway: form.location.trim(),
-      entryType: form.type,
+      tollName: name.trim(),
+      state: '',
+      highway: '',
       manual: true,
-      pricing: { car: { singleJourney: Number(form.amount) } },
+      pricing: { car: { singleJourney: Number(amount) } },
     });
   }
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/55 p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-sm rounded-xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Manual Entry</h2>
-            <p className="text-xs text-gray-400">For a FASTag charge that isn't in the toll list</p>
+            <p className="text-xs text-gray-400">For a charge that isn't in the toll list</p>
           </div>
           <button onClick={onClose} aria-label="Close" className="cursor-pointer text-2xl leading-none text-gray-400 transition-colors hover:text-gray-700">
             ×
@@ -69,62 +62,24 @@ export default function ManualTollModal({ initialName = '', onClose, onAdd }) {
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 p-6">
-          <div className="flex flex-col gap-1.5">
-            <span className={labelTextClass}>Type</span>
-            <div className="flex gap-2">
-              {TYPES.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => update('type', t)}
-                  className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
-                    form.type === t ? 'border-blue-400 bg-blue-100 text-blue-800' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <label className="flex flex-col gap-1.5">
             <span className={labelTextClass}>
-              {form.type === 'Parking' ? 'Parking Name' : 'Toll Name'} <RequiredMark />
+              Name <RequiredMark />
             </span>
             <input
               className={fieldClass('name')}
-              value={form.name}
-              onChange={(e) => update('name', e.target.value)}
-              placeholder={form.type === 'Parking' ? 'e.g. Adiyogi Parking' : 'e.g. Hoskote'}
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setErrors((prev) => ({ ...prev, name: undefined }));
+              }}
+              placeholder="e.g. Adiyogi Parking"
               maxLength={80}
               autoFocus
               aria-invalid={Boolean(errors.name)}
             />
             {errors.name && <span className={errorClass}>{errors.name}</span>}
           </label>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>State</span>
-              <input
-                className={fieldClass('state')}
-                value={form.state}
-                onChange={(e) => update('state', e.target.value)}
-                placeholder="e.g. Karnataka"
-                maxLength={40}
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>Highway / Location</span>
-              <input
-                className={fieldClass('location')}
-                value={form.location}
-                onChange={(e) => update('location', e.target.value)}
-                placeholder="e.g. NH 75"
-                maxLength={60}
-              />
-            </label>
-          </div>
 
           <label className="flex flex-col gap-1.5">
             <span className={labelTextClass}>
@@ -135,17 +90,18 @@ export default function ManualTollModal({ initialName = '', onClose, onAdd }) {
               min="0"
               step="0.01"
               className={fieldClass('amount')}
-              value={form.amount}
-              onChange={(e) => update('amount', e.target.value)}
+              value={amount}
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setErrors((prev) => ({ ...prev, amount: undefined }));
+              }}
               placeholder="0.00"
               aria-invalid={Boolean(errors.amount)}
             />
             {errors.amount && <span className={errorClass}>{errors.amount}</span>}
           </label>
 
-          <p className="-mt-1 text-xs text-gray-400">
-            <RequiredMark /> Required fields. The entry is added to the selection and included in the exported PDF.
-          </p>
+          <p className="-mt-1 text-xs text-gray-400">It's added to the selection and included in the exported PDF.</p>
 
           <div className="flex justify-end gap-3 pt-1">
             <button

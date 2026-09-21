@@ -88,7 +88,7 @@ export default function VehicleTable({
               <td className={tdClass}>
                 {v.ratingsGiven ? (
                   <span className="flex items-center gap-1">
-                    <StarRating value={Math.round(v.avgRating)} readOnly size="sm" />
+                    <StarRating value={v.avgRating} readOnly size="sm" />
                     <span className="text-[0.65rem] text-gray-400">({v.ratingsGiven})</span>
                   </span>
                 ) : (

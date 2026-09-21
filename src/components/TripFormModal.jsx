@@ -72,7 +72,8 @@ function toDateInputValue(value) {
 function couponDiscount(coupon, amount) {
   const gross = Number(amount) || 0;
   if (!coupon || gross <= 0) return 0;
-  const raw = coupon.discountType === 'percentage' ? (gross * coupon.value) / 100 : coupon.value;
+  let raw = coupon.discountType === 'percentage' ? (gross * coupon.value) / 100 : coupon.value;
+  if (coupon.discountType === 'percentage' && coupon.maxDiscount) raw = Math.min(raw, coupon.maxDiscount);
   return Math.round(Math.min(Math.max(raw, 0), gross) * 100) / 100;
 }
 
@@ -126,9 +127,11 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   const ratingEnabled = form.status === 'Completed';
   // Refund can never exceed the advance actually paid — see backend/src/controllers/tripController.js.
   const maxRefund = Math.min(Number(form.advance || 0), Number(form.amount || 0));
-  // A coupon can only be picked when the trip is created (see backend createTrip); after that it's
-  // shown read-only. The amount typed in is the gross — the backend stores it net of the discount.
-  const selectedCoupon = !isEdit ? couponOptions.find((c) => c._id === form.coupon) : null;
+  // A coupon can be picked when the trip is created, or later while editing as long as the trip
+  // doesn't have one yet (see backend createTrip/updateTrip); once applied it's shown read-only. The amount typed in is the gross — the backend stores it net of the discount.
+  const couponSelectable = !(isEdit && (initialData?.couponCode || existingStatus === 'Cancelled'));
+  const showCoupon = couponSelectable && !isCancelling;
+  const selectedCoupon = showCoupon ? couponOptions.find((c) => c._id === form.coupon) : null;
   const discount = couponDiscount(selectedCoupon, form.amount);
   const payableAmount = Math.max(Number(form.amount || 0) - discount, 0);
 
@@ -179,7 +182,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   // not used up) that are open to all customers or list this customer. Re-fetched whenever the
   // customer changes, and any previously picked coupon is dropped since it may not apply anymore.
   useEffect(() => {
-    if (isEdit) return undefined;
+    if (!couponSelectable) return undefined;
     setForm((prev) => (prev.coupon ? { ...prev, coupon: '' } : prev));
     if (!form.customer) {
       setCouponOptions([]);
@@ -203,7 +206,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     return () => {
       cancelled = true;
     };
-  }, [form.customer, isEdit]);
+  }, [form.customer, couponSelectable]);
 
   // If this trip already references a customer/vehicle that isn't in the (active-only)
   // options list — e.g. a soft-deleted customer, or a vehicle that's non-Active/currently on
@@ -240,8 +243,24 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   }
 
   function update(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    const next = { ...form, [field]: value };
+    // Moving the start (or end date) so that a previously chosen end time now falls before the
+    // start time on the same day would leave an invalid value hidden by the filtered dropdown —
+    // clear it and say why, so it has to be picked again.
+    const endTimeInvalidated =
+      ['startDate', 'startTime', 'endDate'].includes(field) &&
+      next.endTime &&
+      next.startTime &&
+      next.startDate &&
+      next.endDate === next.startDate &&
+      next.endTime < next.startTime;
+    if (endTimeInvalidated) next.endTime = '';
+    setForm(next);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: undefined,
+      ...(endTimeInvalidated ? { endTime: "End time can't be before the start time — pick it again" } : {}),
+    }));
   }
 
   function updateNumber(field, value) {
@@ -300,7 +319,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     onSubmit({
       customer: form.customer,
       vehicle: form.vehicle,
-      coupon: !isEdit && form.coupon ? form.coupon : undefined,
+      coupon: showCoupon && form.coupon ? form.coupon : undefined,
       startDate: form.startDate,
       startTime: form.startTime,
       endDate: form.endDate || undefined,
@@ -629,7 +648,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               {errors.securityDeposit && <span className={errorClass}>{errors.securityDeposit}</span>}
             </label>
 
-            {!isEdit && (
+            {showCoupon && (
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <span className={labelTextClass}>Coupon</span>
                 <SearchableSelect
@@ -651,7 +670,9 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                         <span className="flex min-w-0 flex-col">
                           <span className="truncate text-sm font-semibold tracking-wide text-indigo-700">{c.code}</span>
                           <span className="truncate text-[0.7rem] text-gray-400">
-                            {c.discountType === 'percentage' ? `${c.value}% off` : `₹${c.value} off`}
+                            {c.discountType === 'percentage'
+                              ? `${c.value}% off${c.maxDiscount ? ` (max ₹${Number(c.maxDiscount).toLocaleString()})` : ''}`
+                              : `₹${c.value} off`}
                             {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
                           </span>
                         </span>
@@ -673,6 +694,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   <span className="text-xs text-emerald-700">
                     {selectedCoupon.code} takes off ₹{discount.toLocaleString()} — payable amount ₹{payableAmount.toLocaleString()}
                     {form.amount === '' && ' (enter the amount to see the discount)'}
+                    {isEdit && form.amount !== '' && ' — the amount above is reduced by the coupon when you save'}
                   </span>
                 )}
               </div>

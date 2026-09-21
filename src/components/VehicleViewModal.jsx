@@ -88,7 +88,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <div className="flex flex-col items-center gap-1.5 text-center">
               {vehicle.ratingsGiven ? (
                 <>
-                  <StarRating value={Math.round(vehicle.avgRating)} readOnly size="sm" />
+                  <StarRating value={vehicle.avgRating} readOnly size="sm" />
                   <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">
                     Avg {vehicle.avgRating.toFixed(1)}
                   </span>
