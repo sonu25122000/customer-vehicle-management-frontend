@@ -5,6 +5,7 @@ import autoTable from 'jspdf-autotable';
 import tollData from '../data/tollPlazas.json';
 import { fetchVehicleOptions } from '../api/vehicles';
 import SearchableSelect from '../components/SearchableSelect';
+import ManualTollModal from '../components/ManualTollModal';
 import {
   SearchIcon,
   XIcon,
@@ -65,9 +66,16 @@ function SelectionModal({ selected, runningTotal, onClose, onRemove, onClearAll,
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-gray-900">{s.toll.tollName}</p>
+                  <p className="truncate text-sm font-semibold text-gray-900">
+                    {s.toll.tollName}
+                    {s.toll.manual && (
+                      <span className="ml-1.5 rounded-md bg-amber-50 px-1.5 py-0.5 align-middle text-[0.6rem] font-bold uppercase tracking-wide text-amber-700">
+                        Manual {s.toll.entryType}
+                      </span>
+                    )}
+                  </p>
                   <p className="truncate text-xs text-gray-400">
-                    {s.toll.state} &middot; {s.toll.highway}
+                    {[s.toll.state, s.toll.highway].filter(Boolean).join(' · ') || 'Added manually'}
                   </p>
                 </div>
                 <span className="flex-shrink-0 text-sm font-bold tabular-nums text-gray-900">
@@ -121,6 +129,7 @@ export default function TollPricesPage() {
   const [showModal, setShowModal] = useState(false);
   const [vehicleId, setVehicleId] = useState('');
   const [vehicleOptions, setVehicleOptions] = useState(null);
+  const [manualEntry, setManualEntry] = useState(null); // null = closed, otherwise { initialName }
   const nextIdRef = useRef(0);
 
   useEffect(() => {
@@ -142,6 +151,23 @@ export default function TollPricesPage() {
     }
     nextIdRef.current += 1;
     setSelected((prev) => [...prev, { id: nextIdRef.current, toll: plaza }]);
+  }
+
+  function openManualEntry(initialName = '') {
+    if (!vehicleId) {
+      toast.error('Select a vehicle before adding a manual entry');
+      return;
+    }
+    setManualEntry({ initialName });
+  }
+
+  // A hand-entered charge (e.g. FASTag parking that isn't in the list) joins the selection exactly
+  // like a list toll, so the total and the PDF include it without special-casing.
+  function addManualToll(entry) {
+    nextIdRef.current += 1;
+    setSelected((prev) => [...prev, { id: nextIdRef.current, toll: entry }]);
+    setManualEntry(null);
+    toast.success(`${entry.tollName} added`);
   }
 
   function removeToll(id) {
@@ -184,9 +210,9 @@ export default function TollPricesPage() {
       body: selected.map((s, i) => [
         i + 1,
         selectedVehicle.vehicleNo.toUpperCase(),
-        s.toll.tollName,
-        s.toll.state,
-        s.toll.highway,
+        s.toll.manual ? `${s.toll.tollName} (Manual ${s.toll.entryType})` : s.toll.tollName,
+        s.toll.state || '-',
+        s.toll.highway || '-',
         formatMoney(s.toll.pricing.car.singleJourney),
       ]),
       foot: [['', '', '', '', 'Total', formatMoney(runningTotal)]],
@@ -273,6 +299,14 @@ export default function TollPricesPage() {
                 getOptionSearchText={(v) => `${v.vehicleNo} ${v.make || ''} ${v.model || ''}`}
               />
             </div>
+            <button
+              type="button"
+              onClick={() => openManualEntry()}
+              title="Add a toll or parking charge that isn't in the list"
+              className="ml-auto flex flex-shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white ring-1 ring-white/25 transition-colors hover:bg-white/20"
+            >
+              <PlusCircleIcon className="h-4 w-4" /> Manual Entry
+            </button>
           </div>
         </div>
       </div>
@@ -306,6 +340,13 @@ export default function TollPricesPage() {
             No toll plaza found for &ldquo;<span className="font-semibold text-gray-800">{query}</span>&rdquo;
           </p>
           <p className="text-xs text-gray-400">Try a different spelling or a shorter search term</p>
+          <button
+            type="button"
+            onClick={() => openManualEntry(query.trim())}
+            className="mt-2 flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-blue-300 px-4 py-2 text-xs font-semibold text-blue-600 transition-colors hover:border-blue-400 hover:bg-blue-50"
+          >
+            <PlusCircleIcon className="h-4 w-4" /> Add &ldquo;{query.trim()}&rdquo; as a manual entry
+          </button>
         </div>
       ) : (
         <>
@@ -394,6 +435,14 @@ export default function TollPricesPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {manualEntry && (
+        <ManualTollModal
+          initialName={manualEntry.initialName}
+          onClose={() => setManualEntry(null)}
+          onAdd={addManualToll}
+        />
       )}
 
       {showModal && (

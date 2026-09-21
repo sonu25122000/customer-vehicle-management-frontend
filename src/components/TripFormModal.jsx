@@ -6,6 +6,7 @@ import CustomerFormModal from './CustomerFormModal';
 import { PlusCircleIcon } from './icons';
 import { fetchCustomerOptions, fetchCustomer, createCustomer } from '../api/customers';
 import { fetchVehicleOptions } from '../api/vehicles';
+import { fetchApplicableCoupons } from '../api/coupons';
 import { TIME_OPTIONS } from '../utils/timeOptions';
 
 const STATUS_OPTIONS = [
@@ -28,6 +29,7 @@ const ALLOWED_NEXT_STATUSES = {
 const emptyForm = {
   customer: '',
   vehicle: '',
+  coupon: '',
   startDate: '',
   startTime: '',
   endDate: '',
@@ -65,12 +67,22 @@ function toDateInputValue(value) {
   return d.toISOString().slice(0, 10);
 }
 
+// Mirrors backend/src/utils/couponRules.js calculateDiscount — a percentage of the amount or a flat
+// amount, never more than the amount itself. The backend recomputes it; this is only the preview.
+function couponDiscount(coupon, amount) {
+  const gross = Number(amount) || 0;
+  if (!coupon || gross <= 0) return 0;
+  const raw = coupon.discountType === 'percentage' ? (gross * coupon.value) / 100 : coupon.value;
+  return Math.round(Math.min(Math.max(raw, 0), gross) * 100) / 100;
+}
+
 export default function TripFormModal({ mode, initialData, onClose, onSubmit, submitting }) {
   const [form, setForm] = useState(() =>
     initialData
       ? {
           customer: initialData.customer?._id || initialData.customer || '',
           vehicle: initialData.vehicle?._id || initialData.vehicle || '',
+          coupon: '',
           startDate: toDateInputValue(initialData.startDate),
           startTime: initialData.startTime || '',
           endDate: toDateInputValue(initialData.endDate),
@@ -90,6 +102,8 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   const [errors, setErrors] = useState({});
   const [customerOptions, setCustomerOptions] = useState(null);
   const [vehicleOptions, setVehicleOptions] = useState(null);
+  const [couponOptions, setCouponOptions] = useState([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
   const [showCreateCustomer, setShowCreateCustomer] = useState(false);
   const [creatingCustomer, setCreatingCustomer] = useState(false);
 
@@ -112,6 +126,11 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   const ratingEnabled = form.status === 'Completed';
   // Refund can never exceed the advance actually paid — see backend/src/controllers/tripController.js.
   const maxRefund = Math.min(Number(form.advance || 0), Number(form.amount || 0));
+  // A coupon can only be picked when the trip is created (see backend createTrip); after that it's
+  // shown read-only. The amount typed in is the gross — the backend stores it net of the discount.
+  const selectedCoupon = !isEdit ? couponOptions.find((c) => c._id === form.coupon) : null;
+  const discount = couponDiscount(selectedCoupon, form.amount);
+  const payableAmount = Math.max(Number(form.amount || 0) - discount, 0);
 
   const availableStatuses = isEdit
     ? STATUS_OPTIONS.filter((s) => (ALLOWED_NEXT_STATUSES[existingStatus] || []).includes(s.value))
@@ -155,6 +174,36 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
       cancelled = true;
     };
   }, [form.customer]);
+
+  // Coupons offered for the chosen customer — only ones usable right now (active, in their window,
+  // not used up) that are open to all customers or list this customer. Re-fetched whenever the
+  // customer changes, and any previously picked coupon is dropped since it may not apply anymore.
+  useEffect(() => {
+    if (isEdit) return undefined;
+    setForm((prev) => (prev.coupon ? { ...prev, coupon: '' } : prev));
+    if (!form.customer) {
+      setCouponOptions([]);
+      return undefined;
+    }
+    let cancelled = false;
+    setCouponsLoading(true);
+    fetchApplicableCoupons(form.customer)
+      .then((list) => {
+        if (!cancelled) setCouponOptions(list);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCouponOptions([]);
+          toast.error('Failed to load coupons');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCouponsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.customer, isEdit]);
 
   // If this trip already references a customer/vehicle that isn't in the (active-only)
   // options list — e.g. a soft-deleted customer, or a vehicle that's non-Active/currently on
@@ -223,8 +272,8 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     if (form.advance !== '' && Number(form.advance) < 0) next.advance = 'Advance cannot be negative';
     if (form.securityDeposit !== '' && Number(form.securityDeposit) < 0)
       next.securityDeposit = 'Security deposit cannot be negative';
-    if (!next.advance && form.advance !== '' && form.amount !== '' && Number(form.advance) > Number(form.amount)) {
-      next.advance = 'Advance cannot be greater than the trip amount';
+    if (!next.advance && form.advance !== '' && form.amount !== '' && Number(form.advance) > payableAmount) {
+      next.advance = discount > 0 ? 'Advance cannot be greater than the amount payable after the coupon' : 'Advance cannot be greater than the trip amount';
     }
     if (
       form.startOdometer !== '' &&
@@ -251,6 +300,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     onSubmit({
       customer: form.customer,
       vehicle: form.vehicle,
+      coupon: !isEdit && form.coupon ? form.coupon : undefined,
       startDate: form.startDate,
       startTime: form.startTime,
       endDate: form.endDate || undefined,
@@ -558,7 +608,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               {errors.advance && <span className={errorClass}>{errors.advance}</span>}
               {!errors.advance && form.amount !== '' && form.advance !== '' && (
                 <span className="text-xs text-gray-400">
-                  Balance due: ₹{Math.max(Number(form.amount) - Number(form.advance), 0).toLocaleString()}
+                  Balance due: ₹{Math.max(payableAmount - Number(form.advance), 0).toLocaleString()}
                 </span>
               )}
             </label>
@@ -578,6 +628,63 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               />
               {errors.securityDeposit && <span className={errorClass}>{errors.securityDeposit}</span>}
             </label>
+
+            {!isEdit && (
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <span className={labelTextClass}>Coupon</span>
+                <SearchableSelect
+                  value={form.coupon}
+                  onChange={(id) => update('coupon', id)}
+                  options={[{ _id: '', code: 'No coupon' }, ...couponOptions]}
+                  loading={couponsLoading}
+                  disabled={!form.customer}
+                  placeholder={form.customer ? 'No coupon' : 'Select a customer first'}
+                  searchPlaceholder="Search coupon code..."
+                  emptyMessage="No coupons available for this customer."
+                  getOptionValue={(c) => c._id}
+                  getOptionLabel={(c) => c.code}
+                  renderOption={(c) =>
+                    c._id === '' ? (
+                      <span className="text-sm text-gray-500">No coupon</span>
+                    ) : (
+                      <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate text-sm font-semibold tracking-wide text-indigo-700">{c.code}</span>
+                          <span className="truncate text-[0.7rem] text-gray-400">
+                            {c.discountType === 'percentage' ? `${c.value}% off` : `₹${c.value} off`}
+                            {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
+                          </span>
+                        </span>
+                        <span
+                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                            c.applicability === 'all' ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-700'
+                          }`}
+                        >
+                          {c.applicability === 'all' ? 'All customers' : 'This customer'}
+                        </span>
+                      </span>
+                    )
+                  }
+                />
+                {form.customer && !couponsLoading && couponOptions.length === 0 && (
+                  <span className="text-xs text-gray-400">No coupons are currently applicable to this customer.</span>
+                )}
+                {selectedCoupon && (
+                  <span className="text-xs text-emerald-700">
+                    {selectedCoupon.code} takes off ₹{discount.toLocaleString()} — payable amount ₹{payableAmount.toLocaleString()}
+                    {form.amount === '' && ' (enter the amount to see the discount)'}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {isEdit && initialData?.couponCode && (
+              <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800 ring-1 ring-emerald-100 sm:col-span-2">
+                Coupon <strong>{initialData.couponCode}</strong> was applied when this trip was created (−₹
+                {Number(initialData.couponDiscount || 0).toLocaleString()}). The amount shown is already after the
+                discount, and the coupon can't be changed.
+              </p>
+            )}
 
             {isCancelling && (
               <label className="flex flex-col gap-1.5">

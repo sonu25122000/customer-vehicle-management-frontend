@@ -70,7 +70,7 @@ export default function App() {
           <Route
             path="/coupons"
             element={
-              <RoleRoute allow={['admin']}>
+              <RoleRoute allow={['moderator', 'admin']}>
                 <CouponsPage />
               </RoleRoute>
             }

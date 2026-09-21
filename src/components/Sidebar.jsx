@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
-import { isAdmin } from '../utils/permissions';
+import { isAdmin, canManageCoupons } from '../utils/permissions';
 import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon, PercentIcon, ShieldIcon } from './icons';
 import logo from '../assets/logo.png';
 
@@ -12,8 +12,8 @@ const navItems = [
   { to: '/vehicle-catalog', label: 'Vehicle Catalog', icon: TagIcon },
   { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/toll-prices', label: 'Toll Prices', icon: MapPinIcon },
-  { to: '/coupons', label: 'Coupons & Offers', icon: PercentIcon, adminOnly: true },
-  { to: '/users', label: 'Users', icon: ShieldIcon, adminOnly: true },
+  { to: '/coupons', label: 'Coupons & Offers', icon: PercentIcon, allowed: canManageCoupons },
+  { to: '/users', label: 'Users', icon: ShieldIcon, allowed: isAdmin },
 ];
 
 const linkBase =
@@ -23,7 +23,7 @@ export default function Sidebar({ open, onClose }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const role = useSelector((state) => state.auth.admin?.role);
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdmin(role));
+  const visibleNavItems = navItems.filter((item) => !item.allowed || item.allowed(role));
 
   async function handleLogout() {
     await dispatch(logout());
