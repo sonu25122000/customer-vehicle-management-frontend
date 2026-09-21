@@ -22,6 +22,18 @@ export const login = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      const res = await api.patch('/auth/change-password', { currentPassword, newPassword });
+      return res.data.message;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to change password');
+    }
+  }
+);
+
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   try {
     await api.post('/auth/logout');

@@ -1,7 +1,9 @@
+import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 import { EyeIcon, PencilIcon, TrashIcon, FileTextIcon } from './icons';
+import { canEdit } from '../utils/permissions';
 
 function formatDate(value) {
   if (!value) return '-';
@@ -16,6 +18,8 @@ const actionBtn =
   'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors';
 
 export default function CustomerTable({ customers, loading, page, limit, onView, onEdit, onDelete, onDocuments }) {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl bg-white shadow-sm">
@@ -86,30 +90,34 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
                   >
                     <EyeIcon className="h-3.5 w-3.5" />
                   </button>
-                  <button
-                    onClick={() => onEdit(c)}
-                    title="Edit"
-                    aria-label="Edit"
-                    className={`${actionBtn} bg-gray-100 text-gray-600 hover:bg-gray-200`}
-                  >
-                    <PencilIcon className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onDocuments(c)}
-                    title="Documents"
-                    aria-label="Documents"
-                    className={`${actionBtn} bg-violet-50 text-violet-600 hover:bg-violet-100`}
-                  >
-                    <FileTextIcon className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(c)}
-                    title="Delete"
-                    aria-label="Delete"
-                    className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
-                  >
-                    <TrashIcon className="h-3.5 w-3.5" />
-                  </button>
+                  {mayEdit && (
+                    <>
+                      <button
+                        onClick={() => onEdit(c)}
+                        title="Edit"
+                        aria-label="Edit"
+                        className={`${actionBtn} bg-gray-100 text-gray-600 hover:bg-gray-200`}
+                      >
+                        <PencilIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDocuments(c)}
+                        title="Documents"
+                        aria-label="Documents"
+                        className={`${actionBtn} bg-violet-50 text-violet-600 hover:bg-violet-100`}
+                      >
+                        <FileTextIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(c)}
+                        title="Delete"
+                        aria-label="Delete"
+                        className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
+                      >
+                        <TrashIcon className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>

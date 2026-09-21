@@ -13,12 +13,14 @@ import StatTile from '../components/StatTile';
 import { SearchIcon, UsersIcon, CrownIcon, CheckCircleIcon, AlertCircleIcon } from '../components/icons';
 import { setSearch } from '../store/filtersSlice';
 import { fetchCustomers, fetchCustomerStats, createCustomer, updateCustomer, deleteCustomer } from '../api/customers';
+import { canEdit } from '../utils/permissions';
 
 const LIMIT = 10;
 
 export default function CustomersPage() {
   const dispatch = useDispatch();
   const filters = useSelector((state) => state.filters);
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
 
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -217,12 +219,14 @@ export default function CustomersPage() {
 
         <FiltersPopover fields={['rating', 'sort']} />
 
-        <button
-          onClick={() => setFormModal({ mode: 'create', data: null })}
-          className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-        >
-          + Create Customer
-        </button>
+        {mayEdit && (
+          <button
+            onClick={() => setFormModal({ mode: 'create', data: null })}
+            className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            + Create Customer
+          </button>
+        )}
       </div>
 
       <CustomerTable
