@@ -1,5 +1,7 @@
+import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import TripStatusBadge from './TripStatusBadge';
+import { canEdit } from '../utils/permissions';
 
 function formatMoney(value) {
   const num = Number(value || 0);
@@ -49,6 +51,7 @@ function DetailItem({ label, children, full }) {
 }
 
 export default function TripViewModal({ trip, onClose, onEdit }) {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
   if (!trip) return null;
 
   const distance =
@@ -68,7 +71,14 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-bold text-gray-900">Trip Details</h2>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Trip Details</h2>
+            {trip.tripId && (
+              <span className="mt-0.5 inline-block rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-semibold tracking-wide text-slate-700">
+                {trip.tripId}
+              </span>
+            )}
+          </div>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -90,7 +100,7 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
               </span>
               {trip.vehicle?.make && (
                 <span className="ml-2 text-xs text-gray-500">
-                  {trip.vehicle.make} {trip.vehicle.model}
+                  {trip.vehicle.make} {trip.vehicle.model} {trip.vehicle.year}
                 </span>
               )}
             </DetailItem>
@@ -178,12 +188,14 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             >
               Close
             </button>
-            <button
-              onClick={() => onEdit(trip)}
-              className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-            >
-              Edit Trip
-            </button>
+            {mayEdit && (
+              <button
+                onClick={() => onEdit(trip)}
+                className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              >
+                Edit Trip
+              </button>
+            )}
           </div>
         </div>
       </div>

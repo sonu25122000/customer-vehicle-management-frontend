@@ -8,6 +8,9 @@ const TITLES = {
   '/vehicles': 'Vehicle Management',
   '/trips': 'Trip Management',
   '/toll-prices': 'Toll Prices',
+  '/vehicle-catalog': 'Vehicle Catalog',
+  '/coupons': 'Coupons & Offers',
+  '/users': 'Users',
 };
 
 export default function DashboardLayout() {

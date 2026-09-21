@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import SearchableSelect from '../components/SearchableSelect';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import { fetchVehicleCatalog, addCatalogItem, removeCatalogItem } from '../api/vehicleCatalog';
 import { CarIcon, TagIcon, FactoryIcon, LayersIcon, PlusCircleIcon, XIcon } from '../components/icons';
+import { canEdit } from '../utils/permissions';
 
 const TABS = [
   {
@@ -51,6 +53,7 @@ function countFor(kind, vehicleTypes) {
 }
 
 export default function VehicleCatalogPage() {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
   // Single nested tree from the DB: { vehicleTypes: [{ name, categories, makes: [{ name, models }] }] }
   const [catalog, setCatalog] = useState(null);
   const [activeTab, setActiveTab] = useState('vehicleType');
@@ -212,6 +215,7 @@ export default function VehicleCatalogPage() {
           </div>
         </div>
 
+        {mayEdit && (
         <form
           onSubmit={handleAdd}
           className="mb-6 flex flex-col gap-3 rounded-xl bg-gray-50/80 p-3.5 ring-1 ring-gray-100 sm:flex-row sm:items-end"
@@ -289,6 +293,7 @@ export default function VehicleCatalogPage() {
             {submitting ? 'Adding...' : 'Add'}
           </button>
         </form>
+        )}
 
         {loading ? (
           <div className="flex flex-wrap gap-2">
@@ -317,14 +322,16 @@ export default function VehicleCatalogPage() {
                 className={`group flex items-center gap-1.5 rounded-full py-1.5 pl-3.5 pr-1.5 text-sm font-medium ring-1 transition-colors ${accent.chip} ${accent.ring} hover:ring-red-200`}
               >
                 <span>{itemName}</span>
-                <button
-                  type="button"
-                  onClick={() => confirmDelete(itemName)}
-                  aria-label={`Delete ${itemName}`}
-                  className="flex h-5 w-5 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-colors hover:bg-red-100 hover:text-red-600 hover:opacity-100"
-                >
-                  <XIcon className="h-3 w-3" />
-                </button>
+                {mayEdit && (
+                  <button
+                    type="button"
+                    onClick={() => confirmDelete(itemName)}
+                    aria-label={`Delete ${itemName}`}
+                    className="flex h-5 w-5 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60 transition-colors hover:bg-red-100 hover:text-red-600 hover:opacity-100"
+                  >
+                    <XIcon className="h-3 w-3" />
+                  </button>
+                )}
               </div>
             ))}
           </div>

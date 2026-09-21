@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { fetchMe } from './store/authSlice';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleRoute from './components/RoleRoute';
 import DashboardLayout from './components/DashboardLayout';
 import LoginPage from './pages/LoginPage';
 import CustomersPage from './pages/CustomersPage';
@@ -11,6 +12,8 @@ import VehiclesPage from './pages/VehiclesPage';
 import TripsPage from './pages/TripsPage';
 import TollPricesPage from './pages/TollPricesPage';
 import VehicleCatalogPage from './pages/VehicleCatalogPage';
+import CouponsPage from './pages/CouponsPage';
+import UsersPage from './pages/UsersPage';
 
 const SESSION_POLL_MS = Number(import.meta.env.VITE_SESSION_POLL_MS) || 15000;
 
@@ -64,6 +67,22 @@ export default function App() {
           <Route path="/vehicle-catalog" element={<VehicleCatalogPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/toll-prices" element={<TollPricesPage />} />
+          <Route
+            path="/coupons"
+            element={
+              <RoleRoute allow={['admin']}>
+                <CouponsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <RoleRoute allow={['admin']}>
+                <UsersPage />
+              </RoleRoute>
+            }
+          />
         </Route>
         <Route path="*" element={<Navigate to="/customers" replace />} />
       </Routes>

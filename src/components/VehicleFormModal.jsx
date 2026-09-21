@@ -8,6 +8,8 @@ const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'Electric'];
 const VEHICLE_STATUSES = ['Active', 'On Hold', 'Inactive'];
 const VEHICLE_NO_RE = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/;
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 const emptyForm = {
   vehicleNo: '',
   vehicleType: '',
@@ -17,6 +19,7 @@ const emptyForm = {
   status: 'On Hold',
   make: '',
   model: '',
+  year: '',
   ownerName: '',
   ownerMobile: '',
 };
@@ -48,6 +51,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           status: initialData.status || 'On Hold',
           make: initialData.make || '',
           model: initialData.model || '',
+          year: initialData.year ?? '',
           ownerName: initialData.ownerName || '',
           ownerMobile: initialData.ownerMobile || '',
         }
@@ -114,6 +118,9 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
     if (!form.fuel.trim()) next.fuel = 'Fuel type is required';
     if (!form.make.trim()) next.make = 'Make is required';
     if (!form.model.trim()) next.model = 'Model is required';
+    if (!String(form.year).trim()) next.year = 'Year is required';
+    else if (!/^\d{4}$/.test(String(form.year)) || Number(form.year) < 1990 || Number(form.year) > CURRENT_YEAR + 1)
+      next.year = `Enter a year between 1990 and ${CURRENT_YEAR + 1}`;
     if (!form.ownerName.trim()) next.ownerName = 'Owner/Host name is required';
     if (!form.ownerMobile.trim()) next.ownerMobile = 'Owner mobile is required';
     else if (!/^[0-9]{10}$/.test(form.ownerMobile.trim())) next.ownerMobile = 'Enter a valid 10-digit mobile number';
@@ -134,6 +141,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
       status: form.status,
       make: form.make.trim(),
       model: form.model.trim(),
+      year: Number(form.year),
       ownerName: form.ownerName.trim(),
       ownerMobile: form.ownerMobile.trim(),
     });
@@ -249,6 +257,24 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
                 getOptionLabel={(m) => m}
               />
               {errors.model && <span className={errorClass}>{errors.model}</span>}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                Year <RequiredMark />
+              </span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="1990"
+                max={CURRENT_YEAR + 1}
+                className={fieldClass('year')}
+                value={form.year}
+                onChange={(e) => update('year', e.target.value)}
+                placeholder={`e.g. ${CURRENT_YEAR}`}
+                aria-invalid={Boolean(errors.year)}
+              />
+              {errors.year && <span className={errorClass}>{errors.year}</span>}
             </label>
 
             <label className="flex flex-col gap-1.5">

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { canEdit } from '../utils/permissions';
 import TripTable from '../components/TripTable';
 import Pagination from '../components/Pagination';
 import TripFormModal from '../components/TripFormModal';
@@ -23,6 +25,7 @@ const LIMIT = 10;
 const STATUS_OPTIONS = ['', 'Yet to Start', 'On Trip', 'Completed', 'Cancelled'];
 
 export default function TripsPage() {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
 
@@ -233,12 +236,14 @@ export default function TripsPage() {
           </select>
         </div>
 
-        <button
-          onClick={() => setFormModal({ mode: 'create', data: null })}
-          className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-        >
-          + Create Trip
-        </button>
+        {mayEdit && (
+          <button
+            onClick={() => setFormModal({ mode: 'create', data: null })}
+            className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            + Create Trip
+          </button>
+        )}
       </div>
 
       <TripTable

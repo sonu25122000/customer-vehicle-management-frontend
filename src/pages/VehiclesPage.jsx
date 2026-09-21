@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { canEdit } from '../utils/permissions';
 import VehicleTable from '../components/VehicleTable';
 import Pagination from '../components/Pagination';
 import VehicleFormModal from '../components/VehicleFormModal';
@@ -27,6 +28,7 @@ const LIMIT = 10;
 export default function VehiclesPage() {
   const dispatch = useDispatch();
   const filters = useSelector((state) => state.filters);
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
 
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -258,12 +260,14 @@ export default function VehiclesPage() {
 
         <FiltersPopover fields={['rating']} />
 
-        <button
-          onClick={() => setFormModal({ mode: 'create', data: null })}
-          className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-        >
-          + Create Vehicle
-        </button>
+        {mayEdit && (
+          <button
+            onClick={() => setFormModal({ mode: 'create', data: null })}
+            className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            + Create Vehicle
+          </button>
+        )}
       </div>
 
       <VehicleTable

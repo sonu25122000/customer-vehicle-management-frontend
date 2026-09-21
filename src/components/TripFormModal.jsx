@@ -321,7 +321,14 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Update Trip' : 'Create Trip'}</h2>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Update Trip' : 'Create Trip'}</h2>
+            {isEdit && initialData?.tripId && (
+              <span className="mt-0.5 inline-block rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-semibold tracking-wide text-slate-700">
+                {initialData.tripId}
+              </span>
+            )}
+          </div>
           <button
             onClick={onClose}
             aria-label="Close"

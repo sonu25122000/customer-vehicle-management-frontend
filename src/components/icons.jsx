@@ -314,6 +314,33 @@ export function LayersIcon(props) {
   );
 }
 
+export function LockIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V7.5a4 4 0 0 1 8 0V11" />
+    </svg>
+  );
+}
+
+export function PercentIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <path d="M18 6 6 18" />
+      <circle cx="7.5" cy="7.5" r="2.2" />
+      <circle cx="16.5" cy="16.5" r="2.2" />
+    </svg>
+  );
+}
+
+export function ShieldIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base(props)}>
+      <path d="M12 3.5 5 6v5.5c0 4.5 3 7.6 7 9 4-1.4 7-4.5 7-9V6l-7-2.5Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function MapPinIcon(props) {
   return (
     <svg viewBox="0 0 24 24" {...base(props)}>

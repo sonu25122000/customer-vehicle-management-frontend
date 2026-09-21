@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import ImageLightbox from './ImageLightbox';
 import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
 import { FileTextIcon } from './icons';
+import { canEdit } from '../utils/permissions';
 
 function DetailItem({ label, children, full }) {
   return (
@@ -15,6 +17,7 @@ function DetailItem({ label, children, full }) {
 
 export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePhotos, onManageDocuments }) {
   const [lightbox, setLightbox] = useState(null);
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
   if (!vehicle) return null;
 
   const mainPhotos = [
@@ -61,6 +64,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <DetailItem label="Fuel">{vehicle.fuel || '-'}</DetailItem>
             <DetailItem label="Make">{vehicle.make || '-'}</DetailItem>
             <DetailItem label="Model">{vehicle.model || '-'}</DetailItem>
+            <DetailItem label="Year">{vehicle.year || '-'}</DetailItem>
             <DetailItem label="Owner/Host">{vehicle.ownerName}</DetailItem>
             <DetailItem label="Owner Mobile">{vehicle.ownerMobile || '-'}</DetailItem>
             <DetailItem label="Status">
@@ -186,26 +190,30 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             >
               Close
             </button>
-            <button
-              onClick={() => onManagePhotos(vehicle)}
-              className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
-            >
-              Manage Photos
-            </button>
-            {onManageDocuments && (
-              <button
-                onClick={() => onManageDocuments(vehicle)}
-                className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
-              >
-                Manage Documents
-              </button>
+            {mayEdit && (
+              <>
+                <button
+                  onClick={() => onManagePhotos(vehicle)}
+                  className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+                >
+                  Manage Photos
+                </button>
+                {onManageDocuments && (
+                  <button
+                    onClick={() => onManageDocuments(vehicle)}
+                    className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+                  >
+                    Manage Documents
+                  </button>
+                )}
+                <button
+                  onClick={() => onEdit(vehicle)}
+                  className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  Edit Vehicle
+                </button>
+              </>
             )}
-            <button
-              onClick={() => onEdit(vehicle)}
-              className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-            >
-              Edit Vehicle
-            </button>
           </div>
         </div>
       </div>

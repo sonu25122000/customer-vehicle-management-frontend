@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
@@ -6,6 +7,7 @@ import TripStatusBadge from './TripStatusBadge';
 import ImageLightbox from './ImageLightbox';
 import { FileTextIcon } from './icons';
 import { fetchTrips } from '../api/trips';
+import { canEdit } from '../utils/permissions';
 
 function formatMoney(value) {
   const num = Number(value || 0);
@@ -54,6 +56,7 @@ function DocThumb({ label, url, onOpen }) {
 }
 
 export default function CustomerViewModal({ customer, onClose, onEdit, onDocuments }) {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
   const [lightbox, setLightbox] = useState(null);
   const [trips, setTrips] = useState(null);
   const [tripsError, setTripsError] = useState(false);
@@ -210,7 +213,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
             >
               Close
             </button>
-            {onDocuments && (
+            {mayEdit && onDocuments && (
               <button
                 onClick={() => onDocuments(customer)}
                 className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
@@ -218,12 +221,14 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
                 Manage Documents
               </button>
             )}
-            <button
-              onClick={() => onEdit(customer)}
-              className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-            >
-              Edit Customer
-            </button>
+            {mayEdit && (
+              <button
+                onClick={() => onEdit(customer)}
+                className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              >
+                Edit Customer
+              </button>
+            )}
           </div>
         </div>
       </div>

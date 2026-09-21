@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
-import { MenuIcon, ChevronDownIcon, LogoutIcon } from './icons';
+import { MenuIcon, ChevronDownIcon, LogoutIcon, LockIcon } from './icons';
+import ChangePasswordModal from './ChangePasswordModal';
 
 export default function Header({ title, onMenuClick }) {
   const [open, setOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const menuRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,11 +48,22 @@ export default function Header({ title, onMenuClick }) {
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full z-20 mt-2 w-44 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
             <div className="border-b border-gray-100 px-3.5 py-2">
               <p className="text-xs font-semibold capitalize text-gray-900">{admin?.username}</p>
-              <p className="text-[0.7rem] text-gray-500">Administrator</p>
+              <p className="text-[0.7rem] capitalize text-gray-500">{admin?.role || 'Administrator'}</p>
             </div>
+
+            <button
+              onClick={() => {
+                setOpen(false);
+                setChangePasswordOpen(true);
+              }}
+              className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2 text-left text-xs text-gray-600 hover:bg-gray-50"
+            >
+              <LockIcon className="h-3.5 w-3.5" />
+              Change Password
+            </button>
 
             <button
               onClick={handleLogout}
@@ -62,6 +75,8 @@ export default function Header({ title, onMenuClick }) {
           </div>
         )}
       </div>
+
+      {changePasswordOpen && <ChangePasswordModal onClose={() => setChangePasswordOpen(false)} />}
     </header>
   );
 }

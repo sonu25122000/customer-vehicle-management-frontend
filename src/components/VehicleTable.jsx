@@ -1,6 +1,8 @@
+import { useSelector } from 'react-redux';
 import { EyeIcon, PencilIcon, TrashIcon, CameraIcon, FileTextIcon } from './icons';
 import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
+import { canEdit } from '../utils/permissions';
 
 const thClass =
   'px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500 bg-gray-50';
@@ -18,6 +20,8 @@ export default function VehicleTable({
   onManagePhotos,
   onManageDocuments,
 }) {
+  const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+
   if (loading) {
     return (
       <div className="overflow-hidden rounded-xl bg-white shadow-sm">
@@ -53,6 +57,7 @@ export default function VehicleTable({
             <th className={thClass}>Status</th>
             <th className={thClass}>Make</th>
             <th className={thClass}>Model</th>
+            <th className={thClass}>Year</th>
             <th className={thClass}>Owner/Host</th>
             <th className={thClass}>Owner Mobile</th>
             <th className={thClass}>Rating</th>
@@ -75,6 +80,7 @@ export default function VehicleTable({
               </td>
               <td className={tdClass}>{v.make || '-'}</td>
               <td className={tdClass}>{v.model || '-'}</td>
+              <td className={tdClass}>{v.year || '-'}</td>
               <td className={`${tdClass} font-semibold text-gray-900`}>{v.ownerName}</td>
               <td className={tdClass}>{v.ownerMobile || '-'}</td>
               <td className={tdClass}>
@@ -97,38 +103,42 @@ export default function VehicleTable({
                   >
                     <EyeIcon className="h-3.5 w-3.5" />
                   </button>
-                  <button
-                    onClick={() => onEdit(v)}
-                    title="Edit"
-                    aria-label="Edit"
-                    className={`${actionBtn} bg-gray-100 text-gray-600 hover:bg-gray-200`}
-                  >
-                    <PencilIcon className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onManagePhotos(v)}
-                    title="Manage Photos"
-                    aria-label="Manage Photos"
-                    className={`${actionBtn} bg-violet-50 text-violet-600 hover:bg-violet-100`}
-                  >
-                    <CameraIcon className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onManageDocuments(v)}
-                    title="Manage Documents"
-                    aria-label="Manage Documents"
-                    className={`${actionBtn} bg-teal-50 text-teal-600 hover:bg-teal-100`}
-                  >
-                    <FileTextIcon className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(v)}
-                    title="Delete"
-                    aria-label="Delete"
-                    className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
-                  >
-                    <TrashIcon className="h-3.5 w-3.5" />
-                  </button>
+                  {mayEdit && (
+                    <>
+                      <button
+                        onClick={() => onEdit(v)}
+                        title="Edit"
+                        aria-label="Edit"
+                        className={`${actionBtn} bg-gray-100 text-gray-600 hover:bg-gray-200`}
+                      >
+                        <PencilIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onManagePhotos(v)}
+                        title="Manage Photos"
+                        aria-label="Manage Photos"
+                        className={`${actionBtn} bg-violet-50 text-violet-600 hover:bg-violet-100`}
+                      >
+                        <CameraIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onManageDocuments(v)}
+                        title="Manage Documents"
+                        aria-label="Manage Documents"
+                        className={`${actionBtn} bg-teal-50 text-teal-600 hover:bg-teal-100`}
+                      >
+                        <FileTextIcon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(v)}
+                        title="Delete"
+                        aria-label="Delete"
+                        className={`${actionBtn} bg-red-50 text-red-600 hover:bg-red-100`}
+                      >
+                        <TrashIcon className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>
