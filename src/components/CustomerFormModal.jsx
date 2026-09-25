@@ -65,8 +65,9 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
   const notesWords = wordCount(form.notes);
   // Profile status can only move to Accepted once selfie, driving licence and Aadhaar are all
   // on file — see backend's matching check in customerController.updateCustomer.
-  const docs = initialData?.documents || {};
-  const hasRequiredDocs = Boolean(docs.selfie && docs.drivingLicence && docs.aadhaar);
+  // documentTypes is the summary the customer API returns (the files live in customer-documents).
+  const docTypes = initialData?.documentTypes || [];
+  const hasRequiredDocs = ['selfie', 'drivingLicence', 'aadhaar'].every((type) => docTypes.includes(type));
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;

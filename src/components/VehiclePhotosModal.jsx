@@ -5,7 +5,7 @@ import { canDelete } from '../utils/permissions';
 import { CameraIcon, XIcon, UploadIcon, EyeIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
 import { compressImage } from '../utils/compressImage';
-import { uploadVehiclePhotos, deleteVehiclePhoto } from '../api/vehicles';
+import { uploadVehiclePhotos, deleteVehiclePhoto, groupVehiclePhotos } from '../api/vehicleMedia';
 
 const MAIN_SLOTS = [
   { key: 'front', label: 'Front Photo' },
@@ -145,8 +145,8 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
   async function removeSavedPhoto(slot) {
     setRemovingSlot(slot);
     try {
-      const res = await deleteVehiclePhoto(vehicle._id, slot);
-      setVehicle(res.data);
+      const res = await deleteVehiclePhoto(vehicle.photoIds[slot]);
+      setVehicle((prev) => ({ ...prev, ...groupVehiclePhotos(res.data) }));
       toast.success('Photo removed');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to remove photo');
@@ -171,8 +171,8 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
   async function removeSavedAdditional(index) {
     setRemovingSlot(`additional:${index}`);
     try {
-      const res = await deleteVehiclePhoto(vehicle._id, `additional:${index}`);
-      setVehicle(res.data);
+      const res = await deleteVehiclePhoto(vehicle.photoIds.additional[index]);
+      setVehicle((prev) => ({ ...prev, ...groupVehiclePhotos(res.data) }));
       toast.success('Photo removed');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to remove photo');
@@ -188,7 +188,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
       const files = { ...pending, additional: pendingAdditional };
       const res = await uploadVehiclePhotos(vehicle._id, files);
       toast.success('Photos uploaded successfully');
-      onDone(res.data);
+      onDone({ ...vehicle, ...groupVehiclePhotos(res.data) });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to upload photos');
     } finally {

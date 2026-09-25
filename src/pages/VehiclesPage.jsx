@@ -14,6 +14,7 @@ import FiltersPopover from '../components/FiltersPopover';
 import StatTile from '../components/StatTile';
 import { SearchIcon, CarIcon, RouteIcon, CheckCircleIcon, ClockIcon, GaugeIcon } from '../components/icons';
 import { setSearch } from '../store/filtersSlice';
+import { fetchVehicleWithMedia } from '../api/vehicleMedia';
 import {
   fetchVehicles,
   fetchVehicle,
@@ -129,9 +130,7 @@ export default function VehiclesPage() {
         loadStats();
         // If photos were skipped when this vehicle was first created, offer the upload
         // screen again now instead of only ever surfacing it once, at creation time.
-        const p = res.data.photos;
-        const hasNoPhotos = !p?.front && !p?.back && !p?.passengerSide && !p?.driverSide && !p?.additional?.length;
-        if (hasNoPhotos) setPhotosVehicle(res.data);
+        if (!res.data.photoCount) openPhotos(res.data);
       } else {
         await createVehicle(payload);
         toast.success('Vehicle created successfully');
@@ -148,8 +147,9 @@ export default function VehiclesPage() {
     }
   }
 
-  // The list endpoint omits photo data to keep the page payload small (see backend), so
-  // View/Manage Photos — which need the actual images — fetch the full record on demand.
+  // Neither the list nor the vehicle record carries photo/document files (they live in their own
+  // collections). View loads just the record, and its View Photos / View Documents buttons fetch the
+  // files on demand; Manage Photos / Documents load the record together with its files.
   async function openView(v) {
     try {
       const full = await fetchVehicle(v._id);
@@ -161,7 +161,7 @@ export default function VehiclesPage() {
 
   async function openPhotos(v) {
     try {
-      const full = await fetchVehicle(v._id);
+      const full = await fetchVehicleWithMedia(v._id);
       setPhotosVehicle(full);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load vehicle details');
@@ -170,15 +170,15 @@ export default function VehiclesPage() {
 
   async function openDocuments(v) {
     try {
-      const full = await fetchVehicle(v._id);
+      const full = await fetchVehicleWithMedia(v._id);
       setDocumentsVehicle(full);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load vehicle details');
     }
   }
 
-  // The table row doesn't carry photo data (see backend's list-payload comment) — the edit form
-  // needs it to know whether Active can be selected (see VehicleFormModal's 4-photo gate).
+  // The table row doesn't carry photoSlots — the edit form needs it to know whether Active can be
+  // selected (see VehicleFormModal's 4-photo gate).
   async function openEdit(v) {
     try {
       const full = await fetchVehicle(v._id);
@@ -310,11 +310,11 @@ export default function VehiclesPage() {
           }}
           onManagePhotos={(v) => {
             setViewVehicle(null);
-            setPhotosVehicle(v);
+            openPhotos(v);
           }}
           onManageDocuments={(v) => {
             setViewVehicle(null);
-            setDocumentsVehicle(v);
+            openDocuments(v);
           }}
         />
       )}

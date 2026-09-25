@@ -4,7 +4,7 @@ import { FileTextIcon, UploadIcon, XIcon, EyeIcon, CameraIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
 import CameraCapture from './CameraCapture';
 import { compressImage } from '../utils/compressImage';
-import { uploadCustomerDocuments } from '../api/customers';
+import { fetchCustomerDocuments, uploadCustomerDocuments, documentsByType } from '../api/customerDocuments';
 
 const DOC_SLOTS = [
   { key: 'selfie', label: 'Selfie', imageOnly: true, allowCamera: true },
@@ -159,8 +159,10 @@ function DocSlot({ label, imageOnly, allowCamera, existingUrl, pendingFile, pend
   );
 }
 
-export default function CustomerDocumentsModal({ customer: initialCustomer, onClose, onDone }) {
-  const [customer, setCustomer] = useState(initialCustomer);
+export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
+  // Saved documents by type ({ selfie: dataUri, ... }), loaded from the customer-documents API;
+  // null while loading.
+  const [existing, setExisting] = useState(null);
   const [pending, setPending] = useState({ selfie: null, drivingLicence: null, aadhaar: null, other: null });
   const [uploading, setUploading] = useState(false);
   const [compressing, setCompressing] = useState(false);
@@ -174,6 +176,23 @@ export default function CustomerDocumentsModal({ customer: initialCustomer, onCl
     },
     []
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchCustomerDocuments(customer._id)
+      .then((list) => {
+        if (!cancelled) setExisting(documentsByType(list));
+      })
+      .catch(() => {
+        if (!cancelled) {
+          toast.error('Failed to load documents');
+          setExisting({});
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [customer._id]);
 
   function previewUrlFor(slot, file) {
     if (objectUrlsRef.current[slot]) URL.revokeObjectURL(objectUrlsRef.current[slot]);
@@ -203,16 +222,16 @@ export default function CustomerDocumentsModal({ customer: initialCustomer, onCl
     }
     // Clearing an already-uploaded document just clears it locally for re-upload —
     // no dedicated delete-one-document endpoint; re-uploading overwrites it server-side.
-    setCustomer((prev) => ({ ...prev, documents: { ...prev.documents, [slot]: '' } }));
+    setExisting((prev) => ({ ...prev, [slot]: '' }));
   }
 
   async function handleUpload() {
     if (!hasPending) return;
     setUploading(true);
     try {
-      const res = await uploadCustomerDocuments(customer._id, pending);
+      await uploadCustomerDocuments(customer._id, pending);
       toast.success('Documents uploaded successfully');
-      onDone(res.data);
+      onDone(customer);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to upload documents');
     } finally {
@@ -245,14 +264,14 @@ export default function CustomerDocumentsModal({ customer: initialCustomer, onCl
                 label={label}
                 imageOnly={imageOnly}
                 allowCamera={allowCamera}
-                existingUrl={customer.documents?.[key]}
+                existingUrl={existing?.[key]}
                 pendingFile={pending[key]}
                 pendingPreviewUrl={objectUrlsRef.current[key]}
                 onPick={(file) => pick(key, file)}
                 onClear={() => clear(key)}
                 onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
                 onCamera={() => setCameraSlot(key)}
-                disabled={uploading || compressing}
+                disabled={existing === null || uploading || compressing}
               />
             ))}
           </div>

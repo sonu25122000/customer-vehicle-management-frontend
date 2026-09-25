@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { FileTextIcon, UploadIcon, XIcon, EyeIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
 import { compressImage } from '../utils/compressImage';
-import { uploadVehicleDocuments } from '../api/vehicles';
+import { uploadVehicleDocuments } from '../api/vehicleMedia';
 
 const DOC_SLOTS = [
   { key: 'rc', label: 'RC (Registration Certificate)' },
@@ -159,9 +159,9 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
     if (!hasPending) return;
     setUploading(true);
     try {
-      const res = await uploadVehicleDocuments(vehicle._id, pending);
+      await uploadVehicleDocuments(vehicle._id, pending);
       toast.success('Documents uploaded successfully');
-      onDone(res.data);
+      onDone(vehicle);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to upload documents');
     } finally {

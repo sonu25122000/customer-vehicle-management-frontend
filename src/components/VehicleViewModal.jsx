@@ -1,10 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import ImageLightbox from './ImageLightbox';
 import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
-import { FileTextIcon } from './icons';
+import { FileTextIcon, EyeIcon } from './icons';
 import { canEdit } from '../utils/permissions';
+import { fetchVehiclePhotos, fetchVehicleDocuments, groupVehiclePhotos, groupVehicleDocuments } from '../api/vehicleMedia';
+
+// "N items on file · [View]" row shown before a vehicle's photos/documents are fetched.
+function ViewFilesRow({ summary, loading, label, onView }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
+      <span className="text-xs text-gray-600">{summary}</span>
+      <button
+        type="button"
+        onClick={onView}
+        disabled={loading}
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 transition-colors hover:bg-blue-50 disabled:cursor-wait disabled:opacity-60"
+      >
+        <EyeIcon className="h-3.5 w-3.5" />
+        {loading ? 'Loading...' : label}
+      </button>
+    </div>
+  );
+}
 
 function DetailItem({ label, children, full }) {
   return (
@@ -18,21 +38,59 @@ function DetailItem({ label, children, full }) {
 export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePhotos, onManageDocuments }) {
   const [lightbox, setLightbox] = useState(null);
   const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
+  // The vehicle record only says what's on file (photoCount / documentTypes). The files come from
+  // the vehicle-photos / vehicle-documents APIs when the matching View button is clicked.
+  // Each is null = not requested yet, 'loading', or the loaded files.
+  const [photoFiles, setPhotoFiles] = useState(null);
+  const [documentFiles, setDocumentFiles] = useState(null);
+
+  useEffect(() => {
+    setPhotoFiles(null);
+    setDocumentFiles(null);
+  }, [vehicle?._id]);
+
   if (!vehicle) return null;
 
-  const mainPhotos = [
-    { key: 'front', label: 'Front' },
-    { key: 'back', label: 'Back' },
-    { key: 'passengerSide', label: 'Passenger Side' },
-    { key: 'driverSide', label: 'Driver Side' },
-  ].filter((p) => vehicle.photos?.[p.key]);
+  async function loadPhotos() {
+    setPhotoFiles('loading');
+    try {
+      setPhotoFiles(groupVehiclePhotos(await fetchVehiclePhotos(vehicle._id)).photos);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load photos');
+      setPhotoFiles(null);
+    }
+  }
 
-  const additional = vehicle.photos?.additional || [];
+  async function loadDocuments() {
+    setDocumentFiles('loading');
+    try {
+      setDocumentFiles(groupVehicleDocuments(await fetchVehicleDocuments(vehicle._id)));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load documents');
+      setDocumentFiles(null);
+    }
+  }
 
-  const documents = [
+  const photosLoaded = photoFiles && photoFiles !== 'loading';
+  const documentsLoaded = documentFiles && documentFiles !== 'loading';
+
+  const mainPhotos = photosLoaded
+    ? [
+        { key: 'front', label: 'Front' },
+        { key: 'back', label: 'Back' },
+        { key: 'passengerSide', label: 'Passenger Side' },
+        { key: 'driverSide', label: 'Driver Side' },
+      ].filter((p) => photoFiles[p.key])
+    : [];
+
+  const additional = photosLoaded ? photoFiles.additional || [] : [];
+
+  const documentLabels = [
     { key: 'rc', label: 'RC' },
     { key: 'insurance', label: 'Insurance' },
-  ].filter((d) => vehicle.documents?.[d.key]);
+  ];
+  const documentsOnFile = documentLabels.filter((d) => (vehicle.documentTypes || []).includes(d.key));
+  const documents = documentsLoaded ? documentLabels.filter((d) => documentFiles[d.key]) : [];
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/55 p-4" onClick={onClose}>
@@ -104,6 +162,23 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             </div>
           </div>
 
+          {!photosLoaded && (
+            <div>
+              <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
+                Photos
+              </span>
+              {vehicle.photoCount ? (
+                <ViewFilesRow
+                  summary={`${vehicle.photoCount} photo${vehicle.photoCount === 1 ? '' : 's'} on file`}
+                  loading={photoFiles === 'loading'}
+                  label="View Photos"
+                  onView={loadPhotos}
+                />
+              ) : (
+                <p className="text-center text-xs text-gray-400">No photos uploaded yet.</p>
+              )}
+            </div>
+          )}
           {(mainPhotos.length > 0 || additional.length > 0) && (
             <div>
               <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
@@ -114,11 +189,11 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
                   <button
                     key={p.key}
                     type="button"
-                    onClick={() => setLightbox({ src: vehicle.photos[p.key], label: p.label })}
+                    onClick={() => setLightbox({ src: photoFiles[p.key], label: p.label })}
                     className="flex cursor-pointer flex-col gap-1"
                   >
                     <img
-                      src={vehicle.photos[p.key]}
+                      src={photoFiles[p.key]}
                       alt={p.label}
                       className="h-20 w-full rounded-lg object-cover transition-opacity hover:opacity-90"
                     />
@@ -142,7 +217,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
               </div>
             </div>
           )}
-          {mainPhotos.length === 0 && additional.length === 0 && (
+          {photosLoaded && mainPhotos.length === 0 && additional.length === 0 && (
             <p className="text-center text-xs text-gray-400">No photos uploaded yet.</p>
           )}
 
@@ -150,10 +225,17 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
               Documents
             </span>
-            {documents.length > 0 ? (
+            {!documentsLoaded && documentsOnFile.length > 0 ? (
+              <ViewFilesRow
+                summary={`${documentsOnFile.map((d) => d.label).join(", ")} on file`}
+                loading={documentFiles === "loading"}
+                label="View Documents"
+                onView={loadDocuments}
+              />
+            ) : documents.length > 0 ? (
               <div className="grid grid-cols-4 gap-2">
                 {documents.map((d) => {
-                  const url = vehicle.documents[d.key];
+                  const url = documentFiles[d.key];
                   const isPdf = url.startsWith('data:application/pdf');
                   return (
                     <button
