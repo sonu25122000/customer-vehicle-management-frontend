@@ -5,8 +5,10 @@ import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 import TripStatusBadge from './TripStatusBadge';
 import ImageLightbox from './ImageLightbox';
-import { FileTextIcon } from './icons';
+import toast from 'react-hot-toast';
+import { FileTextIcon, EyeIcon } from './icons';
 import { fetchTrips } from '../api/trips';
+import { fetchCustomerDocuments, documentsByType } from '../api/customerDocuments';
 import { canEdit } from '../utils/permissions';
 
 function formatMoney(value) {
@@ -60,6 +62,24 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
   const [lightbox, setLightbox] = useState(null);
   const [trips, setTrips] = useState(null);
   const [tripsError, setTripsError] = useState(false);
+  // The customer record only says which document types are on file (documentTypes). The files are
+  // fetched from the customer-documents API when "View Documents" is clicked, not when this opens.
+  // null = not requested yet, 'loading', or { selfie: dataUri, ... }.
+  const [documentFiles, setDocumentFiles] = useState(null);
+
+  useEffect(() => {
+    setDocumentFiles(null);
+  }, [customer?._id]);
+
+  async function loadDocuments() {
+    setDocumentFiles('loading');
+    try {
+      setDocumentFiles(documentsByType(await fetchCustomerDocuments(customer._id)));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load documents');
+      setDocumentFiles(null);
+    }
+  }
 
   useEffect(() => {
     if (!customer?._id) return;
@@ -80,7 +100,10 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
     { key: 'drivingLicence', label: 'Driving Licence' },
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'other', label: 'Other' },
-  ].filter((d) => customer.documents?.[d.key]);
+  ];
+  const documentTypes = customer.documentTypes || [];
+  const onFile = documents.filter((d) => documentTypes.includes(d.key));
+  const loaded = documentFiles && documentFiles !== 'loading' ? documents.filter((d) => documentFiles[d.key]) : [];
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/55 p-4" onClick={onClose}>
@@ -190,14 +213,31 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
             <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
               Documents
             </span>
-            {documents.length > 0 ? (
+            {onFile.length === 0 ? (
+              <p className="text-center text-xs text-gray-400">No documents uploaded yet.</p>
+            ) : documentFiles === null || documentFiles === 'loading' ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
+                <span className="text-xs text-gray-600">
+                  {onFile.map((d) => d.label).join(', ')} on file
+                </span>
+                <button
+                  type="button"
+                  onClick={loadDocuments}
+                  disabled={documentFiles === 'loading'}
+                  className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 transition-colors hover:bg-blue-50 disabled:cursor-wait disabled:opacity-60"
+                >
+                  <EyeIcon className="h-3.5 w-3.5" />
+                  {documentFiles === 'loading' ? 'Loading...' : 'View Documents'}
+                </button>
+              </div>
+            ) : loaded.length > 0 ? (
               <div className="grid grid-cols-4 gap-2">
-                {documents.map((d) => (
+                {loaded.map((d) => (
                   <DocThumb
                     key={d.key}
                     label={d.label}
-                    url={customer.documents[d.key]}
-                    onOpen={() => setLightbox({ src: customer.documents[d.key], label: d.label })}
+                    url={documentFiles[d.key]}
+                    onOpen={() => setLightbox({ src: documentFiles[d.key], label: d.label })}
                   />
                 ))}
               </div>

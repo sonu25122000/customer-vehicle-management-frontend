@@ -41,30 +41,3 @@ export function updateVehicle(id, payload) {
 export function deleteVehicle(id) {
   return api.delete(`/vehicles/${id}`).then((res) => res.data);
 }
-
-export function uploadVehicleDocuments(id, files) {
-  const form = new FormData();
-  Object.entries(files).forEach(([field, file]) => {
-    if (file) form.append(field, file);
-  });
-  return api
-    .post(`/vehicles/${id}/documents`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
-    .then((res) => res.data);
-}
-
-export function uploadVehiclePhotos(id, files) {
-  const form = new FormData();
-  Object.entries(files).forEach(([field, value]) => {
-    if (!value) return;
-    if (Array.isArray(value)) {
-      value.forEach((file) => form.append(field, file));
-    } else {
-      form.append(field, value);
-    }
-  });
-  return api.post(`/vehicles/${id}/photos`, form, { headers: { 'Content-Type': 'multipart/form-data' } }).then((res) => res.data);
-}
-
-export function deleteVehiclePhoto(id, slot) {
-  return api.delete(`/vehicles/${id}/photos/${encodeURIComponent(slot)}`).then((res) => res.data);
-}

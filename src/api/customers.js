@@ -52,14 +52,3 @@ export function updateCustomer(id, payload) {
 export function deleteCustomer(id) {
   return api.delete(`/customers/${id}`).then((res) => res.data);
 }
-
-export function uploadCustomerDocuments(id, files) {
-  const form = new FormData();
-  Object.entries(files).forEach(([field, file]) => {
-    if (file) form.append(field, file);
-  });
-  return api
-    .post(`/customers/${id}/documents`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
-    .then((res) => res.data);
-}
-

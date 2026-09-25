@@ -134,8 +134,8 @@ export default function CustomersPage() {
         loadStats();
         // If documents were skipped when this customer was first created, offer the upload
         // screen again now instead of only ever surfacing it once, at creation time.
-        const d = res.data.documents;
-        const hasNoDocuments = !d?.drivingLicence && !d?.aadhaar && !d?.other;
+        const types = res.data.documentTypes || [];
+        const hasNoDocuments = !['drivingLicence', 'aadhaar', 'other'].some((type) => types.includes(type));
         if (hasNoDocuments) setDocumentsCustomer(res.data);
       } else {
         await createCustomer(payload);

@@ -78,9 +78,9 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
 
   const isEdit = mode === 'edit';
   // Active can't be selected until all 4 photo sides are on file — initialData only carries
-  // photos when the caller fetched the full vehicle record (see VehiclesPage's openEdit).
-  const photos = initialData?.photos;
-  const hasAllPhotoSides = Boolean(photos?.front && photos?.back && photos?.passengerSide && photos?.driverSide);
+  // photoSlots when the caller fetched the vehicle record (see VehiclesPage's openEdit).
+  const photoSlots = initialData?.photoSlots || [];
+  const hasAllPhotoSides = ['front', 'back', 'passengerSide', 'driverSide'].every((slot) => photoSlots.includes(slot));
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
