@@ -313,7 +313,7 @@ export default function LoginPage() {
               Reliable &middot; Always with you
             </p>
             <p className="mt-1 text-[0.65rem] text-blue-300/70">
-              Roam Wheels &copy; 2026 All rights reserved.
+              Roam Wheels &copy; {new Date().getFullYear()} All rights reserved.
             </p>
           </div>
         </div>
