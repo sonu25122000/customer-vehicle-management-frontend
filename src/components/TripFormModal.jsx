@@ -26,6 +26,10 @@ const ALLOWED_NEXT_STATUSES = {
   Cancelled: ['Cancelled'],
 };
 
+// Mirrors backend tripController COUPON_EDITABLE_STATUSES — the coupon can be kept, swapped or
+// removed while the trip hasn't finished.
+const COUPON_EDITABLE_STATUSES = ['Yet to Start', 'On Trip'];
+
 const emptyForm = {
   customer: '',
   vehicle: '',
@@ -78,17 +82,29 @@ function couponDiscount(coupon, amount) {
 }
 
 export default function TripFormModal({ mode, initialData, onClose, onSubmit, submitting }) {
+  // Coupon already on the trip being edited, if its coupon can still be changed. The stored amount is
+  // net of that coupon, so the form starts from the amount BEFORE the discount (amount + discount) and
+  // the backend takes the discount off again on save (see tripController.updateTrip).
+  const initialCouponId =
+    initialData && COUPON_EDITABLE_STATUSES.includes(initialData.status) && initialData.coupon
+      ? initialData.coupon?._id || initialData.coupon
+      : '';
   const [form, setForm] = useState(() =>
     initialData
       ? {
           customer: initialData.customer?._id || initialData.customer || '',
           vehicle: initialData.vehicle?._id || initialData.vehicle || '',
-          coupon: '',
+          coupon: initialCouponId,
           startDate: toDateInputValue(initialData.startDate),
           startTime: initialData.startTime || '',
           endDate: toDateInputValue(initialData.endDate),
           endTime: initialData.endTime || '',
-          amount: initialData.amount ?? '',
+          amount:
+            initialData.amount === undefined || initialData.amount === null
+              ? ''
+              : initialCouponId
+                ? Math.round((Number(initialData.amount) + Number(initialData.couponDiscount || 0)) * 100) / 100
+                : initialData.amount,
           tollCharges: initialData.tollCharges ?? '',
           advance: initialData.advance ?? '',
           securityDeposit: initialData.securityDeposit ?? '',
@@ -125,13 +141,18 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   // other field's value is disabled here for clarity (the backend ignores them either way).
   const isCancelling = form.status === 'Cancelled' && existingStatus !== 'Cancelled';
   const ratingEnabled = form.status === 'Completed';
-  // Refund can never exceed the advance actually paid — see backend/src/controllers/tripController.js.
-  const maxRefund = Math.min(Number(form.advance || 0), Number(form.amount || 0));
-  // A coupon can be picked when the trip is created, or later while editing as long as the trip
-  // doesn't have one yet (see backend createTrip/updateTrip); once applied it's shown read-only. The amount typed in is the gross — the backend stores it net of the discount.
-  const couponSelectable = !(isEdit && (initialData?.couponCode || existingStatus === 'Cancelled'));
+  // Refund can never exceed the advance actually paid, nor the trip's stored (net) amount. Both come
+  // from the saved trip, as on the backend (see tripController.updateTrip's cancellation branch).
+  const maxRefund = isEdit
+    ? Math.min(Number(initialData?.advance || 0), Number(initialData?.amount || 0))
+    : Math.min(Number(form.advance || 0), Number(form.amount || 0));
+  // A coupon can be picked when the trip is created, and kept, swapped or removed while editing
+  // until the trip is Completed (see backend createTrip/updateTrip). The amount typed in is the
+  // amount before the discount; the backend stores it net of the discount.
+  const couponSelectable = !isEdit || COUPON_EDITABLE_STATUSES.includes(existingStatus);
   const showCoupon = couponSelectable && !isCancelling;
   const selectedCoupon = showCoupon ? couponOptions.find((c) => c._id === form.coupon) : null;
+  const currentCouponExpired = Boolean(selectedCoupon?.isCurrent && !selectedCoupon.stillApplicable);
   const discount = couponDiscount(selectedCoupon, form.amount);
   const payableAmount = Math.max(Number(form.amount || 0) - discount, 0);
 
@@ -179,20 +200,23 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   }, [form.customer]);
 
   // Coupons offered for the chosen customer — only ones usable right now (active, in their window,
-  // not used up) that are open to all customers or list this customer. Re-fetched whenever the
-  // customer changes, and any previously picked coupon is dropped since it may not apply anymore.
+  // not used up) that are open to all customers or list this customer — plus, when editing, the
+  // coupon already on this trip even if it has expired since. Re-fetched whenever the customer
+  // changes; a picked coupon that isn't in the new list is dropped.
   useEffect(() => {
     if (!couponSelectable) return undefined;
-    setForm((prev) => (prev.coupon ? { ...prev, coupon: '' } : prev));
     if (!form.customer) {
+      setForm((prev) => (prev.coupon ? { ...prev, coupon: '' } : prev));
       setCouponOptions([]);
       return undefined;
     }
     let cancelled = false;
     setCouponsLoading(true);
-    fetchApplicableCoupons(form.customer)
+    fetchApplicableCoupons(form.customer, initialCouponId)
       .then((list) => {
-        if (!cancelled) setCouponOptions(list);
+        if (cancelled) return;
+        setCouponOptions(list);
+        setForm((prev) => (prev.coupon && !list.some((c) => c._id === prev.coupon) ? { ...prev, coupon: '' } : prev));
       })
       .catch(() => {
         if (!cancelled) {
@@ -206,7 +230,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     return () => {
       cancelled = true;
     };
-  }, [form.customer, couponSelectable]);
+  }, [form.customer, couponSelectable, initialCouponId]);
 
   // If this trip already references a customer/vehicle that isn't in the (active-only)
   // options list — e.g. a soft-deleted customer, or a vehicle that's non-Active/currently on
@@ -319,7 +343,8 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     onSubmit({
       customer: form.customer,
       vehicle: form.vehicle,
-      coupon: showCoupon && form.coupon ? form.coupon : undefined,
+      // '' removes the trip's coupon on edit; undefined leaves it untouched (e.g. when cancelling).
+      coupon: showCoupon ? form.coupon || '' : undefined,
       startDate: form.startDate,
       startTime: form.startTime,
       endDate: form.endDate || undefined,
@@ -676,13 +701,23 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                             {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
                           </span>
                         </span>
-                        <span
-                          className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
-                            c.applicability === 'all' ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-700'
-                          }`}
-                        >
-                          {c.applicability === 'all' ? 'All customers' : 'This customer'}
-                        </span>
+                        {c.isCurrent ? (
+                          <span
+                            className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                              c.stillApplicable ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'
+                            }`}
+                          >
+                            {c.stillApplicable ? 'Applied' : 'Applied · expired'}
+                          </span>
+                        ) : (
+                          <span
+                            className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                              c.applicability === 'all' ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-700'
+                            }`}
+                          >
+                            {c.applicability === 'all' ? 'All customers' : 'This customer'}
+                          </span>
+                        )}
                       </span>
                     )
                   }
@@ -690,21 +725,30 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                 {form.customer && !couponsLoading && couponOptions.length === 0 && (
                   <span className="text-xs text-gray-400">No coupons are currently applicable to this customer.</span>
                 )}
+                {currentCouponExpired && (
+                  <span className="text-xs text-amber-700">
+                    {selectedCoupon.code} has expired since it was applied. It still applies to this trip, or you can
+                    pick another coupon{couponOptions.some((c) => !c.isCurrent) ? '' : ' (none are available right now)'}.
+                  </span>
+                )}
+                {isEdit && initialCouponId && !form.coupon && (
+                  <span className="text-xs text-gray-500">The coupon will be removed from this trip when you save.</span>
+                )}
                 {selectedCoupon && (
                   <span className="text-xs text-emerald-700">
                     {selectedCoupon.code} takes off ₹{discount.toLocaleString()} — payable amount ₹{payableAmount.toLocaleString()}
                     {form.amount === '' && ' (enter the amount to see the discount)'}
-                    {isEdit && form.amount !== '' && ' — the amount above is reduced by the coupon when you save'}
+                    {isEdit && form.amount !== '' && ' — the amount above is before the discount, which is taken off when you save'}
                   </span>
                 )}
               </div>
             )}
 
-            {isEdit && initialData?.couponCode && (
+            {isEdit && initialData?.couponCode && !showCoupon && (
               <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800 ring-1 ring-emerald-100 sm:col-span-2">
-                Coupon <strong>{initialData.couponCode}</strong> was applied when this trip was created (−₹
+                Coupon <strong>{initialData.couponCode}</strong> is applied to this trip (−₹
                 {Number(initialData.couponDiscount || 0).toLocaleString()}). The amount shown is already after the
-                discount, and the coupon can't be changed.
+                discount{isCancelling ? '.' : ', and the coupon can no longer be changed.'}
               </p>
             )}
 
