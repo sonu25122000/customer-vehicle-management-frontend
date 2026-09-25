@@ -14,8 +14,10 @@ const LIMIT = 10;
 
 function couponStatus(coupon) {
   const now = new Date();
-  if (!coupon.isActive) return { label: 'Inactive', className: 'bg-gray-100 text-gray-600' };
+  // Expiry is checked first: the backend switches expired coupons to inactive when coupons are
+  // loaded, and those should still read "Expired" rather than "Inactive".
   if (new Date(coupon.expiresAt) < now) return { label: 'Expired', className: 'bg-red-50 text-red-700' };
+  if (!coupon.isActive) return { label: 'Inactive', className: 'bg-gray-100 text-gray-600' };
   if (new Date(coupon.startAt) > now) return { label: 'Scheduled', className: 'bg-amber-50 text-amber-700' };
   return { label: 'Active', className: 'bg-emerald-50 text-emerald-700' };
 }
