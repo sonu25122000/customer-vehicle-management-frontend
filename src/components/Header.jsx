@@ -29,7 +29,8 @@ export default function Header({ title, onMenuClick }) {
   }
 
   return (
-    <header className="relative z-30 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-2.5 sm:px-5">
+    // h-14 matches the sidebar's logo strip so their bottom borders line up.
+    <header className="relative z-30 flex h-14 flex-shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 sm:px-5">
       <button onClick={onMenuClick} aria-label="Open menu" className="cursor-pointer text-gray-700 md:hidden">
         <MenuIcon className="h-5 w-5" />
       </button>
