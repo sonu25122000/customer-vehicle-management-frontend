@@ -19,7 +19,26 @@ const roleBadgeClass = {
 const TABS = [
   { key: 'active', label: 'Active' },
   { key: 'inactive', label: 'Inactive' },
+  { key: 'all', label: 'All' },
 ];
+
+const TAB_TEXT = {
+  active: {
+    tile: 'Active Accounts',
+    hint: "There's no public signup — create every account here. Deleting an account only deactivates it.",
+    empty: 'No active accounts found.',
+  },
+  inactive: {
+    tile: 'Inactive Accounts',
+    hint: 'Deactivated accounts can’t sign in. Reactivate one to restore its access.',
+    empty: 'No inactive accounts — deleted users show up here.',
+  },
+  all: {
+    tile: 'All Accounts',
+    hint: 'Every account, active and deactivated.',
+    empty: 'No accounts found.',
+  },
+};
 
 const thClass = 'bg-gray-50 px-3 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500';
 const tdClass = 'border-t border-gray-100 px-3 py-2 align-middle';
@@ -29,7 +48,7 @@ export default function UsersPage() {
   const currentAdminId = useSelector((state) => state.auth.admin?.id);
   const [tab, setTab] = useState('active');
   const [users, setUsers] = useState([]);
-  const [counts, setCounts] = useState({ active: 0, inactive: 0 });
+  const [counts, setCounts] = useState({ active: 0, inactive: 0, all: 0 });
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -124,12 +143,13 @@ export default function UsersPage() {
     acc[role] = users.filter((u) => u.role === role).length;
     return acc;
   }, {});
-  const isActiveTab = tab === 'active';
+  const isAllTab = tab === 'all';
+  const text = TAB_TEXT[tab];
 
   return (
     <>
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile icon={UsersIcon} label={isActiveTab ? 'Active Accounts' : 'Inactive Accounts'} value={loading ? '—' : users.length} accent="blue" />
+        <StatTile icon={UsersIcon} label={text.tile} value={loading ? '—' : users.length} accent="blue" />
         <StatTile icon={ShieldIcon} label="Admins" value={loading ? '—' : roleCounts.admin || 0} accent="red" />
         <StatTile icon={PencilIcon} label="Moderators" value={loading ? '—' : roleCounts.moderator || 0} accent="violet" />
         <StatTile icon={EyeIcon} label="Viewers" value={loading ? '—' : roleCounts.viewer || 0} accent="teal" />
@@ -155,9 +175,7 @@ export default function UsersPage() {
           ))}
         </div>
         <p className="hidden text-xs text-gray-500 md:block">
-          {isActiveTab
-            ? "There's no public signup — create every account here. Deleting an account only deactivates it."
-            : 'Deactivated accounts can’t sign in. Reactivate one to restore its access.'}
+          {text.hint}
         </p>
         <button
           onClick={() => setCreateOpen(true)}
@@ -180,7 +198,7 @@ export default function UsersPage() {
         </div>
       ) : !users.length ? (
         <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
-          {isActiveTab ? 'No active accounts found.' : 'No inactive accounts — deleted users show up here.'}
+          {text.empty}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
@@ -189,13 +207,16 @@ export default function UsersPage() {
               <tr>
                 <th className={thClass}>Username</th>
                 <th className={thClass}>Role</th>
-                <th className={thClass}>{isActiveTab ? 'Created' : 'Deactivated'}</th>
+                {isAllTab && <th className={thClass}>Status</th>}
+                <th className={thClass}>{tab === 'inactive' ? 'Deactivated' : 'Created'}</th>
                 <th className={thClass}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => {
                 const isSelf = u._id === currentAdminId;
+                // Per row, not per tab: the All tab mixes active and deactivated accounts.
+                const shownDate = tab === 'inactive' ? u.deactivatedAt : u.createdAt;
                 return (
                   <tr key={u._id} className="transition-colors hover:bg-gray-50">
                     <td className={`${tdClass} font-semibold capitalize text-gray-900`}>
@@ -207,12 +228,23 @@ export default function UsersPage() {
                         {u.role}
                       </span>
                     </td>
+                    {isAllTab && (
+                      <td className={tdClass}>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                            u.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {u.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    )}
                     <td className={`${tdClass} text-gray-500`}>
-                      {(isActiveTab ? u.createdAt : u.deactivatedAt) ? new Date(isActiveTab ? u.createdAt : u.deactivatedAt).toLocaleDateString() : '-'}
+                      {shownDate ? new Date(shownDate).toLocaleDateString() : '-'}
                     </td>
                     <td className={`${tdClass} whitespace-nowrap`}>
                       <div className="flex gap-1.5">
-                        {isActiveTab ? (
+                        {u.isActive ? (
                           <>
                             <button
                               onClick={() => setEditTarget(u)}

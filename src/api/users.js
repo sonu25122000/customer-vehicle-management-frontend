@@ -1,6 +1,6 @@
 import api from './client';
 
-// status: 'active' | 'inactive' (the Users page tabs). Resolves to { data, counts: { active, inactive } }.
+// status: 'active' | 'inactive' | 'all' (the Users page tabs). Resolves to { data, counts: { active, inactive, all } }.
 export function fetchUsers(status = 'active') {
   return api.get('/auth/users', { params: { status } }).then((res) => res.data);
 }
