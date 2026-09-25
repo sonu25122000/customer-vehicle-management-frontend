@@ -159,24 +159,14 @@ export default function LoginPage() {
 
       <div className="relative z-10 grid min-h-full w-full md:grid-cols-[1fr_1fr]">
         {/* Left: brand / hero copy, floating directly on the photo */}
-        <div className="hidden flex-col justify-between p-10 md:flex md:pl-14 lg:pl-20">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-2 ring-blue-600">
-              <img
-                src={logo}
-                alt="Roam Wheels"
-                className="h-full w-full object-contain"
-              />
-            </span>
-            <span className="leading-none">
-              <span className="block text-lg font-extrabold tracking-tight text-slate-900">
-                ROAM WHEELS
-              </span>
-              <span className="block text-[0.6rem] font-bold tracking-[0.2em] text-blue-600">
-                CAR RENTALS
-              </span>
-            </span>
-          </div>
+        <div className="hidden flex-col justify-between p-10 md:flex md:pl-14 md:pt-8 lg:pl-20">
+          {/* Sits straight on the light sky of the photo, top-aligned with the sign-in card. */}
+          <img
+            src={logo}
+            alt="Roam Wheels"
+            className="h-28 w-auto self-start object-contain drop-shadow-[0_1px_6px_rgba(255,255,255,0.9)] xl:h-32"
+          />
+
 
           <div>
             <p className="text-sm font-semibold text-slate-700">Welcome to</p>

@@ -4,7 +4,9 @@ import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
 import { isAdmin, canManageCoupons } from '../utils/permissions';
 import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon, PercentIcon, ShieldIcon } from './icons';
-import logo from '../assets/logo.png';
+// Dark-background logo, cropped tight to its artwork. Its image background is #010917, the same as
+// the sidebar, so there's no visible box; spacing around it comes from the wrapper below.
+import logo from '../assets/logo-dark.png';
 
 const navItems = [
   { to: '/customers', label: 'Customers', icon: UsersIcon, end: true },
@@ -34,18 +36,13 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       <aside
-        className={`fixed top-0 z-40 flex h-dvh w-64 flex-shrink-0 flex-col overflow-y-auto bg-gray-950 px-4 py-5 transition-transform duration-200 ease-out md:sticky md:translate-x-0 ${
+        className={`fixed top-0 z-40 flex h-dvh w-64 flex-shrink-0 flex-col overflow-y-auto bg-[#010917] px-4 py-5 transition-transform duration-200 ease-out md:sticky md:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="mb-6 flex items-center gap-2.5 px-1">
-          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
-            <img src={logo} alt="Roam Wheels" className="h-full w-full object-contain" />
-          </span>
-          <span className="leading-none">
-            <span className="block text-sm font-extrabold tracking-tight text-white">ROAM WHEELS</span>
-            <span className="block text-[0.6rem] font-bold tracking-[0.2em] text-blue-400">CAR RENTALS</span>
-          </span>
+        {/* Compact logo, centred, with equal space above and below and a divider separating it from the menu. */}
+        <div className="-mx-4 -mt-5 mb-4 flex flex-shrink-0 justify-center border-b border-white/10 py-4">
+          <img src={logo} alt="Roam Wheels" className="block h-auto w-32" />
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
