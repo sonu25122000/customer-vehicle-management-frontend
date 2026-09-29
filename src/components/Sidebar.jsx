@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
 import { isAdmin, canManageCoupons } from '../utils/permissions';
 import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon, PercentIcon, ShieldIcon } from './icons';
-// Dark-background logo, cropped tight to its artwork. Its image background is #010917, the same as
-// the sidebar, so there's no visible box; spacing around it comes from the wrapper below.
-import logo from '../assets/logo-dark.png';
+// Horizontal dark-background logo, cropped tight to its artwork. Its image background (#010a18) matches
+// the sidebar's #010917, so there's no visible box; spacing around it comes from the wrapper below.
+import logo from '../assets/logo2.png';
 
 const navItems = [
   { to: '/customers', label: 'Customers', icon: UsersIcon, end: true },
@@ -41,8 +41,8 @@ export default function Sidebar({ open, onClose }) {
         }`}
       >
         {/* Compact logo, centred, with equal space above and below and a divider separating it from the menu. */}
-        <div className="-mx-4 -mt-5 mb-4 flex flex-shrink-0 justify-center border-b border-white/10 py-4">
-          <img src={logo} alt="Roam Wheels" className="block h-auto w-32" />
+        <div className="-mx-4 -mt-5 mb-4 flex flex-shrink-0 justify-center border-b border-white/10 px-4 py-4">
+          <img src={logo} alt="Roam Wheels" className="block h-auto w-full" />
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
