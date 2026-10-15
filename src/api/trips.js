@@ -36,6 +36,12 @@ export function deleteTrip(id) {
   return api.delete(`/trips/${id}`).then((res) => res.data);
 }
 
+// New OTP for the customer to start ('start') or end ('end') the trip on the customer site. Every call
+// gives a new code; the previous one stops working. Resolves to { start, end } — the live codes.
+export function generateTripOtp(id, purpose) {
+  return api.post(`/trips/${id}/otp`, { purpose }).then((res) => res.data.data);
+}
+
 export function rescheduleTrip(id, payload) {
   return api.post(`/trips/${id}/reschedule`, payload).then((res) => res.data);
 }

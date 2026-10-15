@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import TripStatusBadge from './TripStatusBadge';
+import CreatedByBadge from './CreatedByBadge';
+import TripOtpPanel from './TripOtpPanel';
 import { canEdit } from '../utils/permissions';
 
 function formatMoney(value) {
@@ -108,6 +110,9 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
               <TripStatusBadge status={trip.status} />
             </DetailItem>
             <DetailItem label="Booked Date">{formatDateTime(trip.bookedDate)}</DetailItem>
+            <DetailItem label="Created By">
+              <CreatedByBadge value={trip.createdBy} />
+            </DetailItem>
             <DetailItem label="Start">
               {formatDate(trip.startDate)} <span className="text-gray-500">{trip.startTime}</span>
             </DetailItem>
@@ -133,13 +138,37 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             <DetailItem label="Starting Odometer">{trip.startOdometer ?? '-'}</DetailItem>
             <DetailItem label="Ending Odometer">{trip.endOdometer ?? '-'}</DetailItem>
             {distance !== null && <DetailItem label="Distance Covered">{distance} km</DetailItem>}
+            {trip.startedAt && (
+              <DetailItem label="Started">
+                {formatDateTime(trip.startedAt)}{' '}
+                <span className="text-xs text-gray-500">{trip.startedBy === 'customer' ? '(by customer, with OTP)' : '(by admin)'}</span>
+              </DetailItem>
+            )}
+            {trip.endedAt && (
+              <DetailItem label="Ended">
+                {formatDateTime(trip.endedAt)}{' '}
+                <span className="text-xs text-gray-500">{trip.endedBy === 'customer' ? '(by customer, with OTP)' : '(by admin)'}</span>
+              </DetailItem>
+            )}
             <DetailItem label="Trip Rating">
               {trip.rating ? <StarRating value={trip.rating} readOnly /> : <span className="text-gray-400">Not rated</span>}
+            </DetailItem>
+            <DetailItem label="Customer's Vehicle Rating">
+              {trip.customerRating ? (
+                <span className="flex flex-col gap-1">
+                  <StarRating value={trip.customerRating} readOnly />
+                  {trip.customerReview && <span className="text-xs italic text-gray-600">&ldquo;{trip.customerReview}&rdquo;</span>}
+                </span>
+              ) : (
+                <span className="text-gray-400">{trip.status === 'Completed' ? 'Not rated yet' : 'After completion'}</span>
+              )}
             </DetailItem>
             {trip.status === 'Cancelled' && (
               <DetailItem label="Refund Amount">₹{formatMoney(trip.refundAmount)}</DetailItem>
             )}
           </div>
+
+          {mayEdit && <TripOtpPanel key={trip._id} trip={trip} />}
 
           {(trip.rescheduleHistory?.length > 0 || trip.endDateHistory?.length > 0) && (
             <div className="flex flex-col gap-2 rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">

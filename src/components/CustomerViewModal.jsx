@@ -3,11 +3,13 @@ import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
+import CreatedByBadge from './CreatedByBadge';
 import TripStatusBadge from './TripStatusBadge';
 import ImageLightbox from './ImageLightbox';
 import toast from 'react-hot-toast';
 import { FileTextIcon, EyeIcon } from './icons';
 import { fetchTrips } from '../api/trips';
+import { fetchCustomerHistory } from '../api/customers';
 import { fetchCustomerDocuments, documentsByType } from '../api/customerDocuments';
 import { canEdit } from '../utils/permissions';
 
@@ -32,6 +34,18 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+const HISTORY_FIELD_LABELS = {
+  name: 'Name',
+  mobile1: 'Mobile 1',
+  mobile2: 'Mobile 2',
+  email: 'Email',
+  customerType: 'Customer Type',
+  profileVerified: 'Profile Verified',
+  rating: 'Rating',
+  notes: 'Notes',
+  password: 'Password',
+};
+
 function DetailItem({ label, children, full }) {
   return (
     <div className={`flex flex-col gap-1 ${full ? 'col-span-full' : ''}`}>
@@ -40,6 +54,8 @@ function DetailItem({ label, children, full }) {
     </div>
   );
 }
+
+const DOC_STATUS_CLASS = { Approved: 'text-emerald-700', Rejected: 'text-red-600', Pending: 'text-amber-700' };
 
 function DocThumb({ label, url, onOpen }) {
   const isPdf = (url || '').startsWith('data:application/pdf');
@@ -81,6 +97,16 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
     }
   }
 
+  // null = loading, [] = none, or the history rows (newest first).
+  const [history, setHistory] = useState(null);
+  useEffect(() => {
+    if (!customer?._id) return;
+    setHistory(null);
+    fetchCustomerHistory(customer._id)
+      .then(setHistory)
+      .catch(() => setHistory([]));
+  }, [customer?._id, customer?.updatedAt]);
+
   useEffect(() => {
     if (!customer?._id) return;
     setTrips(null);
@@ -103,6 +129,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
   ];
   const documentTypes = customer.documentTypes || [];
   const onFile = documents.filter((d) => documentTypes.includes(d.key));
+  const docStatus = (key) => customer.documentStatuses?.[key] || 'Pending';
   const loaded = documentFiles && documentFiles !== 'loading' ? documents.filter((d) => documentFiles[d.key]) : [];
 
   return (
@@ -136,6 +163,10 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
             <DetailItem label="Last Booked Date">{formatDate(customer.lastBookedDate)}</DetailItem>
             <DetailItem label="Rating">
               <StarRating value={customer.rating || 0} readOnly />
+            </DetailItem>
+            <DetailItem label="Email">{customer.email || '-'}</DetailItem>
+            <DetailItem label="Created By">
+              <CreatedByBadge value={customer.createdBy} />
             </DetailItem>
             <DetailItem label="Created">{formatDateTime(customer.createdAt)}</DetailItem>
             <DetailItem label="Last Updated" full>
@@ -211,14 +242,50 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
 
           <div>
             <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
+              Profile Edit History {history?.length ? `(${history.length})` : ''}
+            </span>
+            {history === null ? (
+              <p className="text-center text-xs text-gray-400">Loading edit history...</p>
+            ) : history.length === 0 ? (
+              <p className="text-center text-xs text-gray-400">No edits yet.</p>
+            ) : (
+              <ol className="max-h-56 divide-y divide-gray-100 overflow-y-auto rounded-lg border border-gray-100">
+                {history.map((h) => (
+                  <li key={h._id} className="px-3 py-2 text-xs">
+                    <div className="mb-1 flex flex-wrap items-center gap-2 text-gray-500">
+                      <CreatedByBadge value={h.changedBy} />
+                      {h.changedByName && <span className="font-semibold text-gray-700">{h.changedByName}</span>}
+                      <span>{formatDateTime(h.changedAt)}</span>
+                    </div>
+                    <ul className="flex flex-col gap-0.5">
+                      {h.changes.map((c) => (
+                        <li key={c.field} className="text-gray-700">
+                          <span className="font-semibold">{HISTORY_FIELD_LABELS[c.field] || c.field}:</span>{' '}
+                          <span className="text-gray-400 line-through">{String(c.from ?? '') || '—'}</span>{' '}
+                          → <span>{String(c.to ?? '') || '—'}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+
+          <div>
+            <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
               Documents
             </span>
             {onFile.length === 0 ? (
               <p className="text-center text-xs text-gray-400">No documents uploaded yet.</p>
             ) : documentFiles === null || documentFiles === 'loading' ? (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
-                <span className="text-xs text-gray-600">
-                  {onFile.map((d) => d.label).join(', ')} on file
+                <span className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
+                  {onFile.map((d) => (
+                    <span key={d.key}>
+                      {d.label}: <span className={`font-semibold ${DOC_STATUS_CLASS[docStatus(d.key)]}`}>{docStatus(d.key)}</span>
+                    </span>
+                  ))}
                 </span>
                 <button
                   type="button"
@@ -235,7 +302,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
                 {loaded.map((d) => (
                   <DocThumb
                     key={d.key}
-                    label={d.label}
+                    label={`${d.label} · ${docStatus(d.key)}`}
                     url={documentFiles[d.key]}
                     onOpen={() => setLightbox({ src: documentFiles[d.key], label: d.label })}
                   />

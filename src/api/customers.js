@@ -25,6 +25,11 @@ export function fetchCustomer(id) {
   return api.get(`/customers/${id}`).then((res) => res.data.data);
 }
 
+// Profile edit history (admin edits and the customer's own edits on the customer site), newest first.
+export function fetchCustomerHistory(id) {
+  return api.get(`/customers/${id}/history`).then((res) => res.data.data);
+}
+
 export function fetchCustomerOptions() {
   return api.get('/customers/options').then((res) => res.data.data);
 }

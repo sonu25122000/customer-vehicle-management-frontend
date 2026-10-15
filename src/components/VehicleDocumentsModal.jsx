@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FileTextIcon, UploadIcon, XIcon, EyeIcon } from './icons';
+import { FileTextIcon, UploadIcon, XIcon, EyeIcon, DownloadIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
 import { compressImage } from '../utils/compressImage';
 import { uploadVehicleDocuments } from '../api/vehicleMedia';
@@ -14,7 +14,7 @@ function isPdfDataUri(url) {
   return (url || '').startsWith('data:application/pdf');
 }
 
-function DocSlot({ label, existingUrl, pendingFile, pendingPreviewUrl, onPick, onClear, onView, disabled }) {
+function DocSlot({ label, existingUrl, fileName, pendingFile, pendingPreviewUrl, onPick, onClear, onView, disabled }) {
   const inputRef = useRef(null);
   const pendingIsPdf = pendingFile?.type === 'application/pdf';
   const existingIsPdf = isPdfDataUri(existingUrl);
@@ -94,6 +94,17 @@ function DocSlot({ label, existingUrl, pendingFile, pendingPreviewUrl, onPick, o
           </div>
         )}
       </div>
+      {existingUrl && !pendingFile && fileName && (
+        <a
+          href={existingUrl}
+          download={fileName}
+          title={`Download ${fileName}`}
+          className="flex min-w-0 items-center gap-1 text-[0.7rem] font-medium text-blue-600 hover:underline"
+        >
+          <DownloadIcon className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">{fileName}</span>
+        </a>
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -193,11 +204,12 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
                 key={key}
                 label={label}
                 existingUrl={vehicle.documents?.[key]}
+                fileName={vehicle.documentNames?.[key]}
                 pendingFile={pending[key]}
                 pendingPreviewUrl={objectUrlsRef.current[key]}
                 onPick={(file) => pick(key, file)}
                 onClear={() => clear(key)}
-                onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
+                onView={(url, isPdf) => setLightbox({ src: url, label: vehicle.documentNames?.[key] || label, isPdf })}
                 disabled={uploading || compressing}
               />
             ))}

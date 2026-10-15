@@ -20,6 +20,7 @@ const emptyForm = {
   make: '',
   model: '',
   year: '',
+  pricePerDay: '',
   ownerName: '',
   ownerMobile: '',
 };
@@ -52,6 +53,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           make: initialData.make || '',
           model: initialData.model || '',
           year: initialData.year ?? '',
+          pricePerDay: initialData.pricePerDay ?? '',
           ownerName: initialData.ownerName || '',
           ownerMobile: initialData.ownerMobile || '',
         }
@@ -121,6 +123,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
     if (!String(form.year).trim()) next.year = 'Year is required';
     else if (!/^\d{4}$/.test(String(form.year)) || Number(form.year) < 1990 || Number(form.year) > CURRENT_YEAR + 1)
       next.year = `Enter a year between 1990 and ${CURRENT_YEAR + 1}`;
+    if (form.pricePerDay !== '' && !(Number(form.pricePerDay) >= 1)) next.pricePerDay = 'Enter an amount of at least ₹1, or leave it blank';
     if (!form.ownerName.trim()) next.ownerName = 'Owner/Host name is required';
     if (!form.ownerMobile.trim()) next.ownerMobile = 'Owner mobile is required';
     else if (!/^[0-9]{10}$/.test(form.ownerMobile.trim())) next.ownerMobile = 'Enter a valid 10-digit mobile number';
@@ -142,6 +145,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
       make: form.make.trim(),
       model: form.model.trim(),
       year: Number(form.year),
+      pricePerDay: form.pricePerDay === '' ? null : Number(form.pricePerDay),
       ownerName: form.ownerName.trim(),
       ownerMobile: form.ownerMobile.trim(),
     });
@@ -275,6 +279,27 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
                 aria-invalid={Boolean(errors.year)}
               />
               {errors.year && <span className={errorClass}>{errors.year}</span>}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                Price per Day (₹) <span className="font-normal text-gray-400">(optional)</span>
+              </span>
+              <input
+                type="number"
+                inputMode="decimal"
+                min="1"
+                className={fieldClass('pricePerDay')}
+                value={form.pricePerDay}
+                onChange={(e) => update('pricePerDay', e.target.value)}
+                placeholder="e.g. 2500"
+                aria-invalid={Boolean(errors.pricePerDay)}
+              />
+              {errors.pricePerDay ? (
+                <span className={errorClass}>{errors.pricePerDay}</span>
+              ) : (
+                <span className="text-xs text-gray-400">Used to price bookings on the customer site</span>
+              )}
             </label>
 
             <label className="flex flex-col gap-1.5">

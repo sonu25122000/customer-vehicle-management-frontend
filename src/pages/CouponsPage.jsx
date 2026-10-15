@@ -215,14 +215,21 @@ export default function CouponsPage() {
                         </span>
                       ) : (
                         <span>
-                          {c.usageCount || 0} <span className="text-gray-400">/ unlimited</span>
+                          {c.usageCount || 0} <span className="text-gray-400" title="Unlimited">/ ∞</span>
                         </span>
                       )}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.startAt).toLocaleString()}</td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.expiresAt).toLocaleString()}</td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle">
-                      <span className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${status.className}`}>{status.label}</span>
+                      <div className="flex flex-wrap gap-1">
+                        <span className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${status.className}`}>{status.label}</span>
+                        {c.isPublic && (
+                          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-semibold text-blue-700" title="Shown on the customer site">
+                            Public
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle whitespace-nowrap">
                       <div className="flex gap-1.5">
