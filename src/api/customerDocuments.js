@@ -1,21 +1,25 @@
 import api from './client';
 
-// Customer verification documents live in their own collection, linked to the customer by id —
-// see backend routes/customerDocumentRoutes.js.
+// Customer verification documents live in their own collection, linked to the customer by id, with the
+// files themselves in S3 — see backend routes/customerDocumentRoutes.js. Each row's `file` is a
+// short-lived link to the file.
 
 export function fetchCustomerDocuments(customerId) {
   return api.get('/customer-documents', { params: { customer: customerId } }).then((res) => res.data.data);
 }
 
-export function uploadCustomerDocuments(customerId, files) {
-  const form = new FormData();
-  form.append('customer', customerId);
-  Object.entries(files).forEach(([type, file]) => {
-    if (file) form.append(type, file);
-  });
-  return api
-    .post('/customer-documents', form, { headers: { 'Content-Type': 'multipart/form-data' } })
-    .then((res) => res.data);
+// One request per file: each can be up to 2MB, and a request has to stay under the hosting platform's
+// 4.5MB body limit. Resolves to the last response (which carries the full, updated list).
+export async function uploadCustomerDocuments(customerId, files) {
+  let last = null;
+  for (const [type, file] of Object.entries(files).filter(([, f]) => f)) {
+    const form = new FormData();
+    form.append('customer', customerId);
+    form.append(type, file);
+    // eslint-disable-next-line no-await-in-loop
+    last = await api.post('/customer-documents', form, { headers: { 'Content-Type': 'multipart/form-data' } }).then((res) => res.data);
+  }
+  return last;
 }
 
 // Approve or reject documents — one ({ documents: [id] }), several, or all of the customer's documents

@@ -38,6 +38,11 @@ export function updateVehicle(id, payload) {
   return api.put(`/vehicles/${id}`, payload).then((res) => res.data);
 }
 
+// Changes only the status. Active needs all 4 photo sides, the RC and the insurance on file.
+export function updateVehicleStatus(id, status) {
+  return api.patch(`/vehicles/${id}/status`, { status }).then((res) => res.data);
+}
+
 export function deleteVehicle(id) {
   return api.delete(`/vehicles/${id}`).then((res) => res.data);
 }

@@ -4,7 +4,9 @@ import toast from 'react-hot-toast';
 import { canDelete } from '../utils/permissions';
 import { CameraIcon, XIcon, UploadIcon, EyeIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
-import { compressImage } from '../utils/compressImage';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { prepareCarPhoto } from '../utils/compressImage';
+import { fileSizeError } from '../utils/files';
 import { uploadVehiclePhotos, deleteVehiclePhoto, groupVehiclePhotos } from '../api/vehicleMedia';
 
 const MAIN_SLOTS = [
@@ -23,7 +25,7 @@ function PhotoSlot({ label, existingUrl, pendingUrl, onPick, onClear, onView, di
       <span className="text-xs font-semibold text-gray-600">{label}</span>
       <div
         onClick={() => !disabled && !previewUrl && inputRef.current?.click()}
-        className={`group relative flex h-32 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors ${
+        className={`group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors ${
           previewUrl ? 'border-transparent' : 'cursor-pointer border-gray-300 hover:border-blue-400'
         } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
       >
@@ -104,6 +106,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
   const [pendingAdditional, setPendingAdditional] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [removingSlot, setRemovingSlot] = useState(null);
+  const [confirmRemove, setConfirmRemove] = useState(null); // { slot, label }
   const [lightbox, setLightbox] = useState(null);
   const [compressing, setCompressing] = useState(false);
   const additionalInputRef = useRef(null);
@@ -124,10 +127,17 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
   const hasPending = Object.values(pending).some(Boolean) || pendingAdditional.length > 0;
   const totalAdditional = (vehicle.photos?.additional?.length || 0) + pendingAdditional.length;
 
+  // Every car photo is cropped to the site's 4:3 frame on upload (utils/compressImage.js prepareCarPhoto),
+  // so the preview here is exactly what customers see.
   async function pickMain(slot, file) {
     setCompressing(true);
     try {
-      const compressed = await compressImage(file);
+      const compressed = await prepareCarPhoto(file);
+      const sizeError = fileSizeError(compressed);
+      if (sizeError) {
+        toast.error(sizeError);
+        return;
+      }
       setPending((prev) => ({ ...prev, [slot]: compressed }));
     } finally {
       setCompressing(false);
@@ -139,15 +149,19 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
       setPending((prev) => ({ ...prev, [slot]: null }));
       return;
     }
-    if (vehicle.photos?.[slot]) removeSavedPhoto(slot);
+    // The 4 sides are needed for the vehicle to be Active — confirm first.
+    if (vehicle.photos?.[slot]) setConfirmRemove({ slot, label: MAIN_SLOTS.find((s) => s.key === slot)?.label || slot });
   }
 
   async function removeSavedPhoto(slot) {
     setRemovingSlot(slot);
     try {
       const res = await deleteVehiclePhoto(vehicle.photoIds[slot]);
-      setVehicle((prev) => ({ ...prev, ...groupVehiclePhotos(res.data) }));
-      toast.success('Photo removed');
+      const movedToHold = vehicle.status === 'Active' && res.vehicleStatus === 'On Hold';
+      setVehicle((prev) => ({ ...prev, ...groupVehiclePhotos(res.data), status: res.vehicleStatus || prev.status }));
+      if (movedToHold) toast('Photo removed — the vehicle is now On Hold', { icon: '⚠️', duration: 5000 });
+      else toast.success('Photo removed');
+      setConfirmRemove(null);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to remove photo');
     } finally {
@@ -161,8 +175,10 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
     if (selected.length < files.length) toast('Only 5 additional photos can be uploaded at a time', { icon: 'ℹ️' });
     setCompressing(true);
     try {
-      const compressed = await Promise.all(selected.map((file) => compressImage(file)));
-      setPendingAdditional((prev) => [...prev, ...compressed]);
+      const compressed = await Promise.all(selected.map((file) => prepareCarPhoto(file)));
+      const tooBig = compressed.map(fileSizeError).find(Boolean);
+      if (tooBig) toast.error(tooBig);
+      setPendingAdditional((prev) => [...prev, ...compressed.filter((f) => !fileSizeError(f))]);
     } finally {
       setCompressing(false);
     }
@@ -214,6 +230,9 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
         </div>
 
         <div className="flex flex-col gap-6 p-6">
+          <p className="-mb-2 text-xs text-gray-500">
+            Photos are cropped to the website&apos;s 4:3 landscape frame ({'1600×1200'}) — keep the whole car in the middle of the shot. Max 2 MB each.
+          </p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {MAIN_SLOTS.map(({ key, label }) => (
               <PhotoSlot
@@ -240,7 +259,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
                 <div
                   key={`saved-${i}`}
                   onClick={() => setLightbox({ src: url, label: `Additional Photo ${i + 1}` })}
-                  className="group relative h-20 w-20 cursor-pointer overflow-hidden rounded-lg"
+                  className="group relative aspect-[4/3] w-24 cursor-pointer overflow-hidden rounded-lg"
                 >
                   <img src={url} alt={`Additional ${i + 1}`} className="h-full w-full object-cover" />
                   {mayDelete && (
@@ -265,7 +284,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
                   <div
                     key={`pending-${i}`}
                     onClick={() => setLightbox({ src: previewUrl, label: `Pending Photo ${i + 1}` })}
-                    className="group relative h-20 w-20 cursor-pointer overflow-hidden rounded-lg ring-2 ring-blue-400"
+                    className="group relative aspect-[4/3] w-24 cursor-pointer overflow-hidden rounded-lg ring-2 ring-blue-400"
                   >
                     <img src={previewUrl} alt="Pending" className="h-full w-full object-cover" />
                     <button
@@ -287,7 +306,7 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
                   type="button"
                   onClick={() => additionalInputRef.current?.click()}
                   disabled={uploading || compressing}
-                  className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 text-gray-400 hover:border-blue-400"
+                  className="flex aspect-[4/3] w-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 text-gray-400 hover:border-blue-400"
                 >
                   <UploadIcon className="h-5 w-5" />
                   <span className="text-[0.65rem]">Add</span>
@@ -328,6 +347,21 @@ export default function VehiclePhotosModal({ vehicle: initialVehicle, onClose, o
       </div>
 
       <ImageLightbox src={lightbox?.src} label={lightbox?.label} onClose={() => setLightbox(null)} />
+      <ConfirmDeleteModal
+        target={confirmRemove ? { name: `the ${confirmRemove.label.toLowerCase()}`, detail: vehicle.vehicleNo } : null}
+        title={`Remove ${confirmRemove?.label || 'photo'}`}
+        verb="remove"
+        confirmLabel="Remove"
+        busyLabel="Removing..."
+        message={
+          vehicle.status === 'Active'
+            ? `Your vehicle will be put On Hold if you remove the ${confirmRemove?.label.toLowerCase()}. All 4 sides are needed for the vehicle to be Active, so it will come off the website until a new one is uploaded and the vehicle is set to Active again.`
+            : 'The photo will be removed from this vehicle.'
+        }
+        onCancel={() => setConfirmRemove(null)}
+        onConfirm={() => removeSavedPhoto(confirmRemove.slot)}
+        deleting={Boolean(removingSlot)}
+      />
     </div>
   );
 }

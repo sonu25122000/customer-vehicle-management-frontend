@@ -8,6 +8,7 @@ import TripStatusBadge from './TripStatusBadge';
 import ImageLightbox from './ImageLightbox';
 import toast from 'react-hot-toast';
 import { FileTextIcon, EyeIcon } from './icons';
+import { isPdfUrl } from '../utils/files';
 import { fetchTrips } from '../api/trips';
 import { fetchCustomerHistory } from '../api/customers';
 import { fetchCustomerDocuments, documentsByType } from '../api/customerDocuments';
@@ -58,7 +59,7 @@ function DetailItem({ label, children, full }) {
 const DOC_STATUS_CLASS = { Approved: 'text-emerald-700', Rejected: 'text-red-600', Pending: 'text-amber-700' };
 
 function DocThumb({ label, url, onOpen }) {
-  const isPdf = (url || '').startsWith('data:application/pdf');
+  const isPdf = isPdfUrl(url);
   return (
     <button type="button" onClick={onOpen} className="flex cursor-pointer flex-col gap-1">
       {isPdf ? (

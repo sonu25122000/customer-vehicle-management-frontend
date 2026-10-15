@@ -6,6 +6,7 @@ import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
 import { FileTextIcon, EyeIcon } from './icons';
 import { canEdit } from '../utils/permissions';
+import { isPdfUrl } from '../utils/files';
 import { fetchVehiclePhotos, fetchVehicleDocuments, groupVehiclePhotos, groupVehicleDocuments } from '../api/vehicleMedia';
 
 // "N items on file · [View]" row shown before a vehicle's photos/documents are fetched.
@@ -64,7 +65,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
   async function loadDocuments() {
     setDocumentFiles('loading');
     try {
-      setDocumentFiles(groupVehicleDocuments(await fetchVehicleDocuments(vehicle._id)));
+      setDocumentFiles(groupVehicleDocuments(await fetchVehicleDocuments(vehicle._id)).documents);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load documents');
       setDocumentFiles(null);
@@ -165,21 +166,6 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50/60 px-4 py-3 ring-1 ring-amber-100">
-            <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-gray-600">Customer Rating</span>
-            {vehicle.customerRatingsGiven ? (
-              <span className="flex items-center gap-2">
-                <StarRating value={vehicle.customerAvgRating} readOnly size="sm" />
-                <span className="text-xs text-gray-600">
-                  {vehicle.customerAvgRating.toFixed(1)} from {vehicle.customerRatingsGiven} customer
-                  {vehicle.customerRatingsGiven === 1 ? '' : 's'}
-                </span>
-              </span>
-            ) : (
-              <span className="text-xs text-gray-400">No customer ratings yet</span>
-            )}
-          </div>
-
           {!photosLoaded && (
             <div>
               <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-wide text-gray-500">
@@ -254,7 +240,7 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
               <div className="grid grid-cols-4 gap-2">
                 {documents.map((d) => {
                   const url = documentFiles[d.key];
-                  const isPdf = url.startsWith('data:application/pdf');
+                  const isPdf = isPdfUrl(url);
                   return (
                     <button
                       key={d.key}

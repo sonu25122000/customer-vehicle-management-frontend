@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FileTextIcon, UploadIcon, XIcon, EyeIcon, CameraIcon, CheckCircleIcon, ClockIcon, DownloadIcon } from './icons';
+import { FileTextIcon, UploadIcon, XIcon, EyeIcon, CameraIcon, CheckCircleIcon, ClockIcon } from './icons';
+import { isPdfUrl, fileSizeError } from '../utils/files';
 import ImageLightbox from './ImageLightbox';
 import CameraCapture from './CameraCapture';
 import { compressImage } from '../utils/compressImage';
@@ -14,14 +15,10 @@ const DOC_SLOTS = [
   { key: 'other', label: 'Other Document' },
 ];
 
-function isPdfDataUri(url) {
-  return (url || '').startsWith('data:application/pdf');
-}
-
 function DocSlot({ label, imageOnly, allowCamera, existingUrl, pendingFile, pendingPreviewUrl, onPick, onClear, onView, onCamera, disabled }) {
   const inputRef = useRef(null);
   const pendingIsPdf = pendingFile?.type === 'application/pdf';
-  const existingIsPdf = isPdfDataUri(existingUrl);
+  const existingIsPdf = isPdfUrl(existingUrl);
   const previewImageUrl = pendingFile ? (!pendingIsPdf ? pendingPreviewUrl : null) : !existingIsPdf ? existingUrl : null;
   const isPdf = pendingFile ? pendingIsPdf : existingIsPdf;
   const hasFile = Boolean(pendingFile || existingUrl);
@@ -177,8 +174,9 @@ function DocStatusBadge({ status }) {
   );
 }
 
-// Review status, generated file name and Approve / Reject for one saved document.
-function DocReview({ doc, fileUrl, busy, onApprove, onReject }) {
+// Review status and Approve / Reject for one saved document. (The generated file name is only the
+// stored file's name in S3 — it isn't shown here.)
+function DocReview({ doc, busy, onApprove, onReject }) {
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
   const status = doc.status || 'Pending';
@@ -189,17 +187,6 @@ function DocReview({ doc, fileUrl, busy, onApprove, onReject }) {
         <DocStatusBadge status={status} />
         <span className="text-[0.6rem] text-gray-400">by {doc.uploadedBy === 'customer' ? 'customer' : 'admin'}</span>
       </div>
-      {doc.fileName && (
-        <a
-          href={fileUrl}
-          download={doc.fileName}
-          title={`Download ${doc.fileName}`}
-          className="flex min-w-0 items-center gap-1 text-[0.65rem] font-medium text-blue-600 hover:underline"
-        >
-          <DownloadIcon className="h-3 w-3 flex-shrink-0" />
-          <span className="truncate">{doc.fileName}</span>
-        </a>
-      )}
       {status === 'Rejected' && doc.rejectionReason && (
         <p className="text-[0.65rem] leading-snug text-red-600">Reason: {doc.rejectionReason}</p>
       )}
@@ -325,6 +312,11 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
     setCompressing(true);
     try {
       const compressed = await compressImage(file);
+      const sizeError = fileSizeError(compressed);
+      if (sizeError) {
+        toast.error(sizeError);
+        return;
+      }
       previewUrlFor(slot, compressed);
       setPending((prev) => ({ ...prev, [slot]: compressed }));
     } finally {
@@ -415,14 +407,13 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
                   pendingPreviewUrl={objectUrlsRef.current[key]}
                   onPick={(file) => pick(key, file)}
                   onClear={() => clear(key)}
-                  onView={(url, isPdf) => setLightbox({ src: url, label: saved[key]?.fileName || label, isPdf })}
+                  onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
                   onCamera={() => setCameraSlot(key)}
                   disabled={busy}
                 />
                 {existing?.[key] && saved[key] && !pending[key] && (
                   <DocReview
                     doc={saved[key]}
-                    fileUrl={existing[key]}
                     busy={busy}
                     onApprove={() => review('Approved', [saved[key]._id])}
                     onReject={(reason) => review('Rejected', [saved[key]._id], reason)}

@@ -21,6 +21,7 @@ import {
   fetchVehicleStats,
   createVehicle,
   updateVehicle,
+  updateVehicleStatus,
   deleteVehicle,
 } from '../api/vehicles';
 
@@ -123,7 +124,11 @@ export default function VehiclesPage() {
     setSubmitting(true);
     try {
       if (formModal.mode === 'edit') {
-        const res = await updateVehicle(formModal.data._id, payload);
+        // Details and status are saved separately — the status has its own endpoint (and its own rule:
+        // Active needs all 4 photo sides, the RC and the insurance).
+        const { status, ...details } = payload;
+        let res = await updateVehicle(formModal.data._id, details);
+        if (status && status !== formModal.data.status) res = await updateVehicleStatus(formModal.data._id, status);
         toast.success('Vehicle updated successfully');
         setFormModal(null);
         loadVehicles();

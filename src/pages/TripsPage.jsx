@@ -23,6 +23,7 @@ const RATING_OPTIONS = [
 
 const LIMIT = 10;
 const STATUS_OPTIONS = ['', 'Yet to Start', 'On Trip', 'Completed', 'Cancelled'];
+const SOURCE_OPTIONS = ['', 'Direct', 'Zoomcar'];
 
 export default function TripsPage() {
   const mayEdit = canEdit(useSelector((state) => state.auth.admin?.role));
@@ -44,6 +45,7 @@ export default function TripsPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [minRating, setMinRating] = useState('');
+  const [source, setSource] = useState('');
   const [trips, setTrips] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ export default function TripsPage() {
   const loadTrips = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetchTrips({ search, status, minRating, page, limit: LIMIT });
+      const res = await fetchTrips({ search, status, minRating, source, page, limit: LIMIT });
       setTrips(res.data);
       setPagination(res.pagination);
     } catch (err) {
@@ -69,7 +71,7 @@ export default function TripsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, status, minRating, page]);
+  }, [search, status, minRating, source, page]);
 
   useEffect(() => {
     loadTrips();
@@ -94,7 +96,7 @@ export default function TripsPage() {
     const timer = setTimeout(() => setPage(1), 350);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, status, minRating]);
+  }, [search, status, minRating, source]);
 
   async function handleReschedule(payload) {
     setRescheduling(true);
@@ -217,6 +219,19 @@ export default function TripsPage() {
           {STATUS_OPTIONS.map((s) => (
             <option key={s || 'all'} value={s}>
               {s || 'All Statuses'}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          aria-label="Booking source"
+          className="cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 outline-none transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+        >
+          {SOURCE_OPTIONS.map((s) => (
+            <option key={s || 'all'} value={s}>
+              {s || 'All Sources'}
             </option>
           ))}
         </select>

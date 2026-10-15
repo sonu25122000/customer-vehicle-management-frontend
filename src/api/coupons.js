@@ -4,12 +4,13 @@ export function fetchCoupons({ search = '', page = 1, limit = 10 } = {}) {
   return api.get('/coupons', { params: { search, page, limit } }).then((res) => res.data);
 }
 
-// Coupons the trip form can offer for this customer (live, not used up, all-customers or listing them).
-// currentCouponId is the coupon already on the trip being edited. It comes back flagged isCurrent
-// even if it has expired since (stillApplicable: false), because it stays valid on that trip.
+// Coupons the trip form can offer for this customer (live, not used up, all-customers or listing them);
+// without a customer, the ones open to all customers. currentCouponId is the coupon already on the trip
+// being edited. It comes back flagged isCurrent even if it has expired since (stillApplicable: false),
+// because it stays valid on that trip.
 export function fetchApplicableCoupons(customerId, currentCouponId) {
   return api
-    .get('/coupons/applicable', { params: { customer: customerId, current: currentCouponId || undefined } })
+    .get('/coupons/applicable', { params: { customer: customerId || undefined, current: currentCouponId || undefined } })
     .then((res) => res.data.data);
 }
 

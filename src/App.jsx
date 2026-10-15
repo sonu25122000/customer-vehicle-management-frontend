@@ -14,6 +14,9 @@ import TollPricesPage from './pages/TollPricesPage';
 import VehicleCatalogPage from './pages/VehicleCatalogPage';
 import CouponsPage from './pages/CouponsPage';
 import UsersPage from './pages/UsersPage';
+import ReportsPage from './pages/ReportsPage';
+import ExpensesPage from './pages/ExpensesPage';
+import HomeCarouselPage from './pages/HomeCarouselPage';
 
 const SESSION_POLL_MS = Number(import.meta.env.VITE_SESSION_POLL_MS) || 15000;
 
@@ -72,6 +75,30 @@ export default function App() {
             element={
               <RoleRoute allow={['moderator', 'admin']}>
                 <CouponsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <RoleRoute allow={['moderator', 'admin']}>
+                <ExpensesPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/home-carousel"
+            element={
+              <RoleRoute allow={['moderator', 'admin']}>
+                <HomeCarouselPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <RoleRoute allow={['admin']}>
+                <ReportsPage />
               </RoleRoute>
             }
           />

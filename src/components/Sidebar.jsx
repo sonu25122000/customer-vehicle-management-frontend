@@ -2,8 +2,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
-import { isAdmin, canManageCoupons } from '../utils/permissions';
-import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon, PercentIcon, ShieldIcon } from './icons';
+import { isAdmin, canEdit, canManageCoupons } from '../utils/permissions';
+import { UsersIcon, LogoutIcon, CarIcon, RouteIcon, MapPinIcon, TagIcon, PercentIcon, ShieldIcon, ChartIcon, RupeeIcon, StarSolidIcon } from './icons';
 // Horizontal dark-background logo, cropped tight to its artwork. Its image background (#010a18) matches
 // the sidebar's #010917, so there's no visible box; spacing around it comes from the wrapper below.
 import logo from '../assets/logo2.png';
@@ -15,6 +15,9 @@ const navItems = [
   { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/toll-prices', label: 'Toll Prices', icon: MapPinIcon },
   { to: '/coupons', label: 'Coupons & Offers', icon: PercentIcon, allowed: canManageCoupons },
+  { to: '/expenses', label: 'Expenses', icon: RupeeIcon, allowed: canEdit },
+  { to: '/home-carousel', label: 'Home Carousel', icon: StarSolidIcon, allowed: canEdit },
+  { to: '/reports', label: 'Reports', icon: ChartIcon, allowed: isAdmin },
   { to: '/users', label: 'Users', icon: ShieldIcon, allowed: isAdmin },
 ];
 
