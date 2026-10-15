@@ -11,6 +11,9 @@ const TITLES = {
   '/vehicle-catalog': 'Vehicle Catalog',
   '/coupons': 'Coupons & Offers',
   '/users': 'Users',
+  '/expenses': 'Vehicle Expenses',
+  '/home-carousel': 'Home Carousel',
+  '/reports': 'Reports',
 };
 
 export default function DashboardLayout() {

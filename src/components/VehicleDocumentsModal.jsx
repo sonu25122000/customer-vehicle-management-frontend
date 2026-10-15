@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { FileTextIcon, UploadIcon, XIcon, EyeIcon, DownloadIcon } from './icons';
+import { FileTextIcon, UploadIcon, XIcon, EyeIcon } from './icons';
 import ImageLightbox from './ImageLightbox';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { compressImage } from '../utils/compressImage';
-import { uploadVehicleDocuments } from '../api/vehicleMedia';
+import { isPdfUrl, fileSizeError } from '../utils/files';
+import { canDelete } from '../utils/permissions';
+import { uploadVehicleDocuments, deleteVehicleDocument, groupVehicleDocuments } from '../api/vehicleMedia';
 
 const DOC_SLOTS = [
   { key: 'rc', label: 'RC (Registration Certificate)' },
   { key: 'insurance', label: 'Insurance' },
 ];
 
-function isPdfDataUri(url) {
-  return (url || '').startsWith('data:application/pdf');
-}
-
-function DocSlot({ label, existingUrl, fileName, pendingFile, pendingPreviewUrl, onPick, onClear, onView, disabled }) {
+function DocSlot({ label, existingUrl, pendingFile, pendingPreviewUrl, onPick, onClear, onView, disabled, mayRemove }) {
   const inputRef = useRef(null);
   const pendingIsPdf = pendingFile?.type === 'application/pdf';
-  const existingIsPdf = isPdfDataUri(existingUrl);
+  const existingIsPdf = isPdfUrl(existingUrl);
   const previewImageUrl = pendingFile ? (!pendingIsPdf ? pendingPreviewUrl : null) : !existingIsPdf ? existingUrl : null;
   const isPdf = pendingFile ? pendingIsPdf : existingIsPdf;
   const hasFile = Boolean(pendingFile || existingUrl);
@@ -49,18 +49,22 @@ function DocSlot({ label, existingUrl, fileName, pendingFile, pendingPreviewUrl,
               </span>
             )}
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClear();
-              }}
-              disabled={disabled}
-              aria-label={`Remove ${label}`}
-              className="absolute right-1.5 top-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-opacity hover:bg-black/80"
-            >
-              <XIcon className="h-3.5 w-3.5" />
-            </button>
+            {/* Discarding a not-yet-uploaded file is fine for anyone; removing a saved one is a delete (admin only). */}
+            {(pendingFile || mayRemove) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClear();
+                }}
+                disabled={disabled}
+                aria-label={`Remove ${label}`}
+                title={pendingFile ? 'Discard' : `Remove ${label}`}
+                className="absolute right-1.5 top-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-opacity hover:bg-black/80"
+              >
+                <XIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
 
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 bg-black/50 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
               <button
@@ -94,17 +98,6 @@ function DocSlot({ label, existingUrl, fileName, pendingFile, pendingPreviewUrl,
           </div>
         )}
       </div>
-      {existingUrl && !pendingFile && fileName && (
-        <a
-          href={existingUrl}
-          download={fileName}
-          title={`Download ${fileName}`}
-          className="flex min-w-0 items-center gap-1 text-[0.7rem] font-medium text-blue-600 hover:underline"
-        >
-          <DownloadIcon className="h-3 w-3 flex-shrink-0" />
-          <span className="truncate">{fileName}</span>
-        </a>
-      )}
       <input
         ref={inputRef}
         type="file"
@@ -121,7 +114,10 @@ function DocSlot({ label, existingUrl, fileName, pendingFile, pendingPreviewUrl,
 }
 
 export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose, onDone }) {
+  const mayRemove = canDelete(useSelector((state) => state.auth.admin?.role));
   const [vehicle, setVehicle] = useState(initialVehicle);
+  const [confirmRemove, setConfirmRemove] = useState(null); // { slot, label }
+  const [removing, setRemoving] = useState(false);
   const [pending, setPending] = useState({ rc: null, insurance: null });
   const [uploading, setUploading] = useState(false);
   const [compressing, setCompressing] = useState(false);
@@ -148,6 +144,11 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
     setCompressing(true);
     try {
       const compressed = await compressImage(file);
+      const sizeError = fileSizeError(compressed);
+      if (sizeError) {
+        toast.error(sizeError);
+        return;
+      }
       previewUrlFor(slot, compressed);
       setPending((prev) => ({ ...prev, [slot]: compressed }));
     } finally {
@@ -161,18 +162,35 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
       setPending((prev) => ({ ...prev, [slot]: null }));
       return;
     }
-    // Clearing an already-uploaded document just clears it locally for re-upload —
-    // no dedicated delete-one-document endpoint; re-uploading overwrites it server-side.
-    setVehicle((prev) => ({ ...prev, documents: { ...prev.documents, [slot]: '' } }));
+    // A saved document is removed on the server — after confirming, since the RC and insurance are
+    // needed for the vehicle to be Active.
+    setConfirmRemove({ slot, label: DOC_SLOTS.find((d) => d.key === slot)?.label || slot });
+  }
+
+  async function removeSaved() {
+    const { slot } = confirmRemove;
+    setRemoving(true);
+    try {
+      const res = await deleteVehicleDocument(vehicle.documentIds[slot]);
+      const movedToHold = vehicle.status === 'Active' && res.vehicleStatus === 'On Hold';
+      setVehicle((prev) => ({ ...prev, ...groupVehicleDocuments(res.data), status: res.vehicleStatus || prev.status }));
+      if (movedToHold) toast('Document removed — the vehicle is now On Hold', { icon: '⚠️', duration: 5000 });
+      else toast.success('Document removed');
+      setConfirmRemove(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove document');
+    } finally {
+      setRemoving(false);
+    }
   }
 
   async function handleUpload() {
     if (!hasPending) return;
     setUploading(true);
     try {
-      await uploadVehicleDocuments(vehicle._id, pending);
+      const res = await uploadVehicleDocuments(vehicle._id, pending);
       toast.success('Documents uploaded successfully');
-      onDone(vehicle);
+      onDone({ ...vehicle, ...groupVehicleDocuments(res?.data) });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to upload documents');
     } finally {
@@ -204,13 +222,13 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
                 key={key}
                 label={label}
                 existingUrl={vehicle.documents?.[key]}
-                fileName={vehicle.documentNames?.[key]}
                 pendingFile={pending[key]}
                 pendingPreviewUrl={objectUrlsRef.current[key]}
                 onPick={(file) => pick(key, file)}
                 onClear={() => clear(key)}
-                onView={(url, isPdf) => setLightbox({ src: url, label: vehicle.documentNames?.[key] || label, isPdf })}
-                disabled={uploading || compressing}
+                onView={(url, isPdf) => setLightbox({ src: url, label, isPdf })}
+                disabled={uploading || compressing || removing}
+                mayRemove={mayRemove}
               />
             ))}
           </div>
@@ -236,6 +254,21 @@ export default function VehicleDocumentsModal({ vehicle: initialVehicle, onClose
       </div>
 
       <ImageLightbox src={lightbox?.src} label={lightbox?.label} isPdf={lightbox?.isPdf} onClose={() => setLightbox(null)} />
+      <ConfirmDeleteModal
+        target={confirmRemove ? { name: `the ${confirmRemove.label}`, detail: vehicle.vehicleNo } : null}
+        title={`Remove ${confirmRemove?.label || 'document'}`}
+        verb="remove"
+        confirmLabel="Remove"
+        busyLabel="Removing..."
+        message={
+          vehicle.status === 'Active'
+            ? `Your vehicle will be put On Hold if you remove the ${confirmRemove?.label}. It's needed for the vehicle to be Active, so it will come off the website until a new one is uploaded and the vehicle is set to Active again.`
+            : 'The file will be removed from this vehicle.'
+        }
+        onCancel={() => setConfirmRemove(null)}
+        onConfirm={removeSaved}
+        deleting={removing}
+      />
     </div>
   );
 }

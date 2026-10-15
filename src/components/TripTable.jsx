@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
+import SourceBadge from './SourceBadge';
 import TripStatusBadge from './TripStatusBadge';
 import { EyeIcon, PencilIcon, TrashIcon, ClockIcon } from './icons';
 import { canEdit, canDelete } from '../utils/permissions';
@@ -59,6 +60,7 @@ export default function TripTable({ trips, loading, page, limit, onView, onEdit,
             <th className={thClass}>Start</th>
             <th className={thClass}>End</th>
             <th className={thClass}>Status</th>
+            <th className={thClass}>Source</th>
             <th className={thClass}>Amount</th>
             <th className={thClass}>Due</th>
             <th className={thClass}>Rating</th>
@@ -104,6 +106,9 @@ export default function TripTable({ trips, loading, page, limit, onView, onEdit,
               </td>
               <td className={tdClass}>
                 <TripStatusBadge status={t.status} />
+              </td>
+              <td className={tdClass}>
+                <SourceBadge source={t.source} />
               </td>
               <td className={`${tdClass} whitespace-nowrap font-semibold text-gray-900`}>₹{formatMoney(t.amount)}</td>
               <td className={`${tdClass} whitespace-nowrap`}>

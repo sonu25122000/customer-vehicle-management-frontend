@@ -475,8 +475,9 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               Publicly visible
               <span className="block text-xs text-gray-400">
                 Show this coupon in the offers section of the customer site while it&apos;s live
-                {form.applicability === 'selected' ? ' (only the selected customers see it, when logged in)' : ''}. Unticked
-                coupons still work — they just aren&apos;t advertised.
+                {form.applicability === 'selected' ? ' (only the selected customers see it, when logged in)' : ''}. Unticked,
+                it never appears on the website — even if it&apos;s for all customers with no usage limit — but it can still
+                be applied to trips here. This list always shows every coupon.
               </span>
             </span>
           </label>

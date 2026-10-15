@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { XIcon } from './icons';
+import { isPdfUrl } from '../utils/files';
 
 export default function ImageLightbox({ src, label, isPdf: isPdfProp, onClose }) {
   useEffect(() => {
@@ -13,10 +14,10 @@ export default function ImageLightbox({ src, label, isPdf: isPdfProp, onClose })
 
   if (!src) return null;
 
-  // A pending (not-yet-uploaded) file's preview is a blob: URL, not a data:application/pdf
-  // one, so callers that already know the file type pass isPdf explicitly instead of relying
-  // on this URL sniff — otherwise a pending PDF silently rendered as (broken) <img>.
-  const isPdf = typeof isPdfProp === 'boolean' ? isPdfProp : src.startsWith('data:application/pdf');
+  // A pending (not-yet-uploaded) file's preview is a blob: URL that says nothing about its type, so
+  // callers that already know the file type pass isPdf explicitly instead of relying on this URL sniff
+  // — otherwise a pending PDF silently rendered as (broken) <img>.
+  const isPdf = typeof isPdfProp === 'boolean' ? isPdfProp : isPdfUrl(src);
 
   return (
     <div

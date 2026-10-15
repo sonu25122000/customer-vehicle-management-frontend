@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import TripStatusBadge from './TripStatusBadge';
 import CreatedByBadge from './CreatedByBadge';
+import SourceBadge from './SourceBadge';
 import TripOtpPanel from './TripOtpPanel';
 import { canEdit } from '../utils/permissions';
 
@@ -113,6 +114,9 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             <DetailItem label="Created By">
               <CreatedByBadge value={trip.createdBy} />
             </DetailItem>
+            <DetailItem label="Booking Source">
+              <SourceBadge source={trip.source} />
+            </DetailItem>
             <DetailItem label="Start">
               {formatDate(trip.startDate)} <span className="text-gray-500">{trip.startTime}</span>
             </DetailItem>
@@ -150,17 +154,18 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
                 <span className="text-xs text-gray-500">{trip.endedBy === 'customer' ? '(by customer, with OTP)' : '(by admin)'}</span>
               </DetailItem>
             )}
-            <DetailItem label="Trip Rating">
-              {trip.rating ? <StarRating value={trip.rating} readOnly /> : <span className="text-gray-400">Not rated</span>}
-            </DetailItem>
-            <DetailItem label="Customer's Vehicle Rating">
-              {trip.customerRating ? (
+            {/* One rating per trip — the customer gives it on the website after the trip, and it counts for
+                the trip and the car. */}
+            <DetailItem label="Rating & Review" full>
+              {trip.rating ? (
                 <span className="flex flex-col gap-1">
-                  <StarRating value={trip.customerRating} readOnly />
+                  <StarRating value={trip.rating} readOnly />
                   {trip.customerReview && <span className="text-xs italic text-gray-600">&ldquo;{trip.customerReview}&rdquo;</span>}
                 </span>
               ) : (
-                <span className="text-gray-400">{trip.status === 'Completed' ? 'Not rated yet' : 'After completion'}</span>
+                <span className="text-gray-400">
+                  {trip.status === 'Completed' ? 'The customer hasn’t rated this trip yet' : 'The customer rates the trip on the website once it’s completed'}
+                </span>
               )}
             </DetailItem>
             {trip.status === 'Cancelled' && (

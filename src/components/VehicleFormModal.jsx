@@ -79,10 +79,18 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
   const modelOptions = selectedVehicleType?.makes.find((m) => m.name === form.make)?.models || [];
 
   const isEdit = mode === 'edit';
-  // Active can't be selected until all 4 photo sides are on file — initialData only carries
-  // photoSlots when the caller fetched the vehicle record (see VehiclesPage's openEdit).
+  // Active can't be selected until everything it needs is on file — same rule as the backend
+  // (utils/media.js missingForActive): all 4 photo sides, the RC and the insurance. initialData only
+  // carries photoSlots/documentTypes when the caller fetched the vehicle record (VehiclesPage's openEdit).
   const photoSlots = initialData?.photoSlots || [];
-  const hasAllPhotoSides = ['front', 'back', 'passengerSide', 'driverSide'].every((slot) => photoSlots.includes(slot));
+  const documentTypes = initialData?.documentTypes || [];
+  const missingForActive = [
+    ...[['front', 'front photo'], ['back', 'back photo'], ['passengerSide', 'passenger side photo'], ['driverSide', 'driver side photo']]
+      .filter(([slot]) => !photoSlots.includes(slot))
+      .map(([, label]) => label),
+    ...[['rc', 'RC'], ['insurance', 'insurance']].filter(([type]) => !documentTypes.includes(type)).map(([, label]) => label),
+  ];
+  const hasAllPhotoSides = missingForActive.length === 0;
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
@@ -392,7 +400,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               {VEHICLE_STATUSES.map((s) => {
                 // Creation only ever allows "On Hold" — a brand new vehicle has no photos yet,
                 // so it can't be Active either. On edit, Active additionally stays locked until
-                // all 4 photo sides are uploaded (see hasAllPhotoSides above).
+                // all 4 photo sides, the RC and the insurance are uploaded (see missingForActive above).
                 const activeLockedForPhotos = s === 'Active' && isEdit && !hasAllPhotoSides;
                 const disabled = form.status !== s && ((!isEdit && s !== 'On Hold') || activeLockedForPhotos);
                 return (
@@ -401,7 +409,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
                     type="button"
                     onClick={() => !disabled && update('status', s)}
                     disabled={disabled}
-                    title={activeLockedForPhotos ? 'Upload all 4 vehicle photos (front, back, passenger side, driver side) before activating' : undefined}
+                    title={activeLockedForPhotos ? `Upload the ${missingForActive.join(', ')} before activating` : undefined}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                       disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     } ${
@@ -420,6 +428,9 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               })}
             </div>
             {!isEdit && <p className="text-xs text-gray-400">New vehicles always start as "On Hold".</p>}
+            {isEdit && !hasAllPhotoSides && (
+              <p className="text-xs text-gray-400">To set it Active, upload the {missingForActive.join(', ')} first.</p>
+            )}
           </div>
 
           <p className="-mt-1 text-xs text-gray-400">

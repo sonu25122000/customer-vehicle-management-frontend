@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import StarRating from './StarRating';
 import SearchableSelect from './SearchableSelect';
 import CustomerFormModal from './CustomerFormModal';
 import { PlusCircleIcon } from './icons';
@@ -26,6 +25,13 @@ const ALLOWED_NEXT_STATUSES = {
   Cancelled: ['Cancelled'],
 };
 
+// Where the booking came from — mirrors backend models/Trip.js TRIP_SOURCES. Bookings customers make on
+// the website are always Direct.
+const SOURCE_OPTIONS = [
+  { value: 'Direct', hint: 'Booked with us' },
+  { value: 'Zoomcar', hint: 'Booked via Zoomcar' },
+];
+
 // Mirrors backend tripController COUPON_EDITABLE_STATUSES — the coupon can be kept, swapped or
 // removed while the trip hasn't finished.
 const COUPON_EDITABLE_STATUSES = ['Yet to Start', 'On Trip'];
@@ -45,7 +51,7 @@ const emptyForm = {
   startOdometer: '',
   endOdometer: '',
   status: 'Yet to Start',
-  rating: 0,
+  source: 'Direct',
   refundAmount: '',
 };
 
@@ -111,7 +117,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
           startOdometer: initialData.startOdometer ?? '',
           endOdometer: initialData.endOdometer ?? '',
           status: initialData.status || 'Yet to Start',
-          rating: initialData.rating || 0,
+          source: initialData.source || 'Direct',
           refundAmount: '',
         }
       : emptyForm
@@ -134,13 +140,12 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   // Vehicle/start date+time are locked once a trip is past "Yet to Start" — reschedule
   // (from the trip table) is the only way to change start date/time from then on.
   const coreLocked = isEdit && existingStatus !== 'Yet to Start';
-  // Once Completed, end date/time are frozen — amount fields, odometer readings and rating
+  // Once Completed, end date/time are frozen — amount fields, odometer readings and booking source
   // remain editable (e.g. correcting the final odometer reading once the vehicle is back).
   const endFieldsLocked = isEdit && existingStatus === 'Completed';
   // The user is choosing to cancel this trip right now — only refund amount matters; every
   // other field's value is disabled here for clarity (the backend ignores them either way).
   const isCancelling = form.status === 'Cancelled' && existingStatus !== 'Cancelled';
-  const ratingEnabled = form.status === 'Completed';
   // Refund can never exceed the advance actually paid, nor the trip's stored (net) amount. Both come
   // from the saved trip, as on the backend (see tripController.updateTrip's cancellation branch).
   const maxRefund = isEdit
@@ -201,15 +206,12 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
 
   // Coupons offered for the chosen customer — only ones usable right now (active, in their window,
   // not used up) that are open to all customers or list this customer — plus, when editing, the
-  // coupon already on this trip even if it has expired since. Re-fetched whenever the customer
-  // changes; a picked coupon that isn't in the new list is dropped.
+  // coupon already on this trip even if it has expired since. Before a customer is picked, the
+  // coupons open to all customers. Re-fetched whenever the customer changes; a picked coupon that
+  // isn't in the new list is dropped. Public/private doesn't matter here — that's only whether the
+  // website advertises it. The backend checks the coupon again when the trip is saved.
   useEffect(() => {
     if (!couponSelectable) return undefined;
-    if (!form.customer) {
-      setForm((prev) => (prev.coupon ? { ...prev, coupon: '' } : prev));
-      setCouponOptions([]);
-      return undefined;
-    }
     let cancelled = false;
     setCouponsLoading(true);
     fetchApplicableCoupons(form.customer, initialCouponId)
@@ -272,9 +274,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
   }
 
   function updateStatus(value) {
-    // Rating only ever applies once Completed — clear a tentatively-picked rating if the
-    // status is changed away from Completed, so it doesn't linger looking "set" while disabled.
-    setForm((prev) => ({ ...prev, status: value, rating: value === 'Completed' ? prev.rating : 0 }));
+    setForm((prev) => ({ ...prev, status: value }));
     setErrors((prev) => ({ ...prev, status: undefined }));
   }
 
@@ -307,6 +307,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     const next = {};
     if (!form.customer) next.customer = 'Customer is required';
     if (!form.vehicle) next.vehicle = 'Vehicle is required';
+    if (!form.source) next.source = 'Booking source is required';
     if (!form.startDate) next.startDate = 'Start date is required';
     if (!form.startTime) next.startTime = 'Start time is required';
 
@@ -362,7 +363,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
       startOdometer: form.startOdometer === '' ? undefined : Number(form.startOdometer),
       endOdometer: form.endOdometer === '' ? undefined : Number(form.endOdometer),
       status: form.status,
-      rating: form.rating || undefined,
+      source: form.source,
       refundAmount: form.refundAmount === '' ? 0 : Number(form.refundAmount),
     });
   }
@@ -446,7 +447,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   This trip is <strong>{existingStatus}</strong> — customer, vehicle and start date/time can no
                   longer be changed here. Use <strong>Reschedule</strong> from the trip list to change the start
                   date/time.
-                  {endFieldsLocked && ' Only amount-related fields, odometer readings and rating remain editable.'}
+                  {endFieldsLocked && ' Only amount-related fields, odometer readings and booking source remain editable.'}
                 </>
               ) : (
                 'The customer on a trip can only be set at creation and cannot be changed here.'
@@ -536,6 +537,33 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               />
               {errors.vehicle && <span className={errorClass}>{errors.vehicle}</span>}
             </label>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <span className={labelTextClass}>
+                Booking Source <RequiredMark />
+              </span>
+              <div className="grid grid-cols-2 gap-2 sm:max-w-md" role="radiogroup" aria-label="Booking source">
+                {SOURCE_OPTIONS.map((s) => (
+                  <button
+                    key={s.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={form.source === s.value}
+                    disabled={isCancelling}
+                    onClick={() => update('source', s.value)}
+                    className={`flex cursor-pointer flex-col items-start rounded-lg border px-3 py-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      form.source === s.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-800 ring-1 ring-blue-500'
+                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-sm font-semibold">{s.value}</span>
+                    <span className="text-[0.7rem] text-gray-500">{s.hint}</span>
+                  </button>
+                ))}
+              </div>
+              {errors.source && <span className={errorClass}>{errors.source}</span>}
+            </div>
 
             <label className="flex flex-col gap-1.5">
               <span className={labelTextClass}>
@@ -687,10 +715,9 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   onChange={(id) => update('coupon', id)}
                   options={[{ _id: '', code: 'No coupon' }, ...couponOptions]}
                   loading={couponsLoading}
-                  disabled={!form.customer}
-                  placeholder={form.customer ? 'No coupon' : 'Select a customer first'}
+                  placeholder="No coupon"
                   searchPlaceholder="Search coupon code..."
-                  emptyMessage="No coupons available for this customer."
+                  emptyMessage={form.customer ? 'No coupons available for this customer.' : 'No coupons available for all customers.'}
                   getOptionValue={(c) => c._id}
                   getOptionLabel={(c) => c.code}
                   renderOption={(c) =>
@@ -728,8 +755,13 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                     )
                   }
                 />
-                {form.customer && !couponsLoading && couponOptions.length === 0 && (
-                  <span className="text-xs text-gray-400">No coupons are currently applicable to this customer.</span>
+                {!couponsLoading && couponOptions.length === 0 && (
+                  <span className="text-xs text-gray-400">
+                    {form.customer ? 'No coupons are currently applicable to this customer.' : 'No coupons for all customers right now.'}
+                  </span>
+                )}
+                {!form.customer && couponOptions.length > 0 && (
+                  <span className="text-xs text-gray-400">Showing coupons for all customers — pick a customer to also see coupons just for them.</span>
                 )}
                 {currentCouponExpired && (
                   <span className="text-xs text-amber-700">
@@ -806,12 +838,6 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
               {(errors.endOdometer || odometerError) && <span className={errorClass}>{errors.endOdometer || odometerError}</span>}
             </label>
 
-            <label className="flex flex-col gap-1.5">
-              <span className={labelTextClass}>
-                Trip Rating {!ratingEnabled && <span className="font-normal text-gray-400">(only once Completed)</span>}
-              </span>
-              <StarRating value={form.rating} onChange={(v) => update('rating', v)} readOnly={!ratingEnabled} />
-            </label>
           </div>
 
           <div className="flex flex-col gap-1.5">
