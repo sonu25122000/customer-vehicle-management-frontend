@@ -123,6 +123,9 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <DetailItem label="Make">{vehicle.make || '-'}</DetailItem>
             <DetailItem label="Model">{vehicle.model || '-'}</DetailItem>
             <DetailItem label="Year">{vehicle.year || '-'}</DetailItem>
+            <DetailItem label="Price per Day">
+              {vehicle.pricePerDay ? `₹${Number(vehicle.pricePerDay).toLocaleString()}` : '-'}
+            </DetailItem>
             <DetailItem label="Owner/Host">{vehicle.ownerName}</DetailItem>
             <DetailItem label="Owner Mobile">{vehicle.ownerMobile || '-'}</DetailItem>
             <DetailItem label="Status">
@@ -160,6 +163,21 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
                 </>
               )}
             </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50/60 px-4 py-3 ring-1 ring-amber-100">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-gray-600">Customer Rating</span>
+            {vehicle.customerRatingsGiven ? (
+              <span className="flex items-center gap-2">
+                <StarRating value={vehicle.customerAvgRating} readOnly size="sm" />
+                <span className="text-xs text-gray-600">
+                  {vehicle.customerAvgRating.toFixed(1)} from {vehicle.customerRatingsGiven} customer
+                  {vehicle.customerRatingsGiven === 1 ? '' : 's'}
+                </span>
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400">No customer ratings yet</span>
+            )}
           </div>
 
           {!photosLoaded && (

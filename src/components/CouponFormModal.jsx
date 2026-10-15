@@ -55,6 +55,7 @@ const emptyForm = {
   expiryTime: '',
   maxUsage: '',
   isActive: true,
+  isPublic: false,
 };
 
 export default function CouponFormModal({ mode, initialData, onClose, onSubmit, submitting }) {
@@ -75,6 +76,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       expiryTime: expiry.time,
       maxUsage: initialData.maxUsage ?? '',
       isActive: initialData.isActive ?? true,
+      isPublic: Boolean(initialData.isPublic),
     };
   });
   const [errors, setErrors] = useState({});
@@ -150,8 +152,10 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       }
     }
 
-    if (form.maxUsage === '') next.maxUsage = 'Maximum usage is required';
-    else if (!Number.isInteger(Number(form.maxUsage)) || Number(form.maxUsage) < 1) next.maxUsage = 'Enter a whole number of at least 1';
+    // Optional — blank means unlimited.
+    if (form.maxUsage === '') {
+      // unlimited
+    } else if (!Number.isInteger(Number(form.maxUsage)) || Number(form.maxUsage) < 1) next.maxUsage = 'Enter a whole number of at least 1, or leave it blank for unlimited';
     else if (isEdit && Number(form.maxUsage) < usageCount) next.maxUsage = `Cannot be less than the times already used (${usageCount})`;
 
     setErrors(next);
@@ -171,8 +175,10 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       customers: form.applicability === 'selected' ? form.customers : [],
       startAt: joinLocal(form.startDate, form.startTime).toISOString(),
       expiresAt: joinLocal(form.expiryDate, form.expiryTime).toISOString(),
-      maxUsage: Number(form.maxUsage),
+      // Blank = no limit (unlimited uses).
+      maxUsage: form.maxUsage === '' ? null : Number(form.maxUsage),
       isActive: form.isActive,
+      isPublic: form.isPublic,
     });
   }
 
@@ -426,7 +432,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
 
           <label className="flex flex-col gap-1.5 sm:max-w-[calc(50%-0.5rem)]">
             <span className={labelTextClass}>
-              Maximum Usage <RequiredMark />
+              Maximum Usage <span className="font-normal text-gray-400">(optional)</span>
             </span>
             <input
               type="number"
@@ -435,7 +441,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               className={fieldClass('maxUsage')}
               value={form.maxUsage}
               onChange={(e) => update('maxUsage', e.target.value)}
-              placeholder="e.g. 50"
+              placeholder="Unlimited (∞)"
               aria-invalid={Boolean(errors.maxUsage)}
             />
             {errors.maxUsage ? (
@@ -443,7 +449,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
             ) : (
               <span className="text-xs text-gray-400">
                 {isEdit ? `Used ${usageCount} time${usageCount === 1 ? '' : 's'} so far. ` : ''}
-                Total number of times this coupon can be applied to trips.
+                Leave blank for unlimited use.
               </span>
             )}
           </label>
@@ -456,6 +462,23 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             Active
+          </label>
+
+          <label className="-mt-2 flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={form.isPublic}
+              onChange={(e) => update('isPublic', e.target.checked)}
+              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span>
+              Publicly visible
+              <span className="block text-xs text-gray-400">
+                Show this coupon in the offers section of the customer site while it&apos;s live
+                {form.applicability === 'selected' ? ' (only the selected customers see it, when logged in)' : ''}. Unticked
+                coupons still work — they just aren&apos;t advertised.
+              </span>
+            </span>
           </label>
 
           <p className="-mt-1 text-xs text-gray-400">

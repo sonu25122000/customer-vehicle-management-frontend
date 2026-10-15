@@ -18,6 +18,15 @@ export function uploadCustomerDocuments(customerId, files) {
     .then((res) => res.data);
 }
 
+// Approve or reject documents — one ({ documents: [id] }), several, or all of the customer's documents
+// (documents omitted). Rejecting needs a reason, which the customer sees on the customer site.
+// Resolves to { data: documents, profileVerified, message }.
+export function reviewCustomerDocuments(customerId, { status, documents, reason }) {
+  return api
+    .post('/customer-documents/review', { customer: customerId, status, documents, reason })
+    .then((res) => res.data);
+}
+
 export function deleteCustomerDocument(id) {
   return api.delete(`/customer-documents/${id}`).then((res) => res.data);
 }

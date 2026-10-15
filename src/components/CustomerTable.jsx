@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import StarRating from './StarRating';
 import CustomerTypeBadge from './CustomerTypeBadge';
 import ProfileVerifiedBadge from './ProfileVerifiedBadge';
+import CreatedByBadge from './CreatedByBadge';
 import { EyeIcon, PencilIcon, TrashIcon, FileTextIcon } from './icons';
 import { canEdit, canDelete } from '../utils/permissions';
 
@@ -51,7 +52,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
 
   return (
     <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-      <table className="w-full min-w-[980px] border-collapse text-xs">
+      <table className="w-full min-w-[1060px] border-collapse text-xs">
         <thead>
           <tr>
             <th className={`${thClass} w-10`}>#</th>
@@ -60,6 +61,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
             <th className={thClass}>Mobile 2</th>
             <th className={thClass}>Customer Type</th>
             <th className={thClass}>Profile Verified</th>
+            <th className={thClass}>Created By</th>
             <th className={thClass}>Last Booked Date</th>
             <th className={thClass}>Rating</th>
             <th className={`${thClass} whitespace-nowrap`}>Actions</th>
@@ -77,6 +79,9 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
               </td>
               <td className={tdClass}>
                 <ProfileVerifiedBadge status={c.profileVerified} />
+              </td>
+              <td className={tdClass}>
+                <CreatedByBadge value={c.createdBy} />
               </td>
               <td className={`${tdClass} whitespace-nowrap`}>{formatDate(c.lastBookedDate)}</td>
               <td className={tdClass}>

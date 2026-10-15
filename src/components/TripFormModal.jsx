@@ -162,7 +162,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   // A trip can't move to "On Trip" until the customer's profile is Accepted — which itself only
-  // happens once selfie, driving licence and Aadhaar are on file. See backend's matching check
+  // happens once selfie, driving licence and Aadhaar are all approved. See backend's matching check
   // in tripController.updateTrip.
   const customerProfileAccepted = selectedCustomer?.profileVerified === 'Accepted';
 
@@ -255,8 +255,20 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     return vehicleOptions;
   })();
 
+  // Checked as the readings are typed (and again on submit, and by the backend): the ending reading
+  // needs a starting one and can never be below it.
+  const odometerError =
+    form.endOdometer === ''
+      ? null
+      : form.startOdometer === ''
+        ? 'Enter the starting reading first'
+        : Number(form.endOdometer) < Number(form.startOdometer)
+          ? `Ending reading cannot be less than the starting reading (${form.startOdometer})`
+          : null;
+
   function fieldClass(field) {
-    return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
+    const hasError = errors[field] || (field === 'endOdometer' && odometerError);
+    return `${baseInputClass} ${hasError ? errorInputClass : validInputClass}`;
   }
 
   function updateStatus(value) {
@@ -318,13 +330,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     if (!next.advance && form.advance !== '' && form.amount !== '' && Number(form.advance) > payableAmount) {
       next.advance = discount > 0 ? 'Advance cannot be greater than the amount payable after the coupon' : 'Advance cannot be greater than the trip amount';
     }
-    if (
-      form.startOdometer !== '' &&
-      form.endOdometer !== '' &&
-      Number(form.endOdometer) < Number(form.startOdometer)
-    ) {
-      next.endOdometer = 'Ending reading cannot be less than starting reading';
-    }
+    if (odometerError) next.endOdometer = odometerError;
 
     if (isCancelling) {
       const refund = form.refundAmount === '' ? 0 : Number(form.refundAmount);
@@ -794,10 +800,10 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                 className={fieldClass('endOdometer')}
                 value={form.endOdometer}
                 onChange={(e) => updateNumber('endOdometer', e.target.value)}
-                placeholder="e.g. 42850"
-                aria-invalid={Boolean(errors.endOdometer)}
+                placeholder={form.startOdometer !== '' ? `${form.startOdometer} or more` : 'e.g. 42850'}
+                aria-invalid={Boolean(errors.endOdometer || odometerError)}
               />
-              {errors.endOdometer && <span className={errorClass}>{errors.endOdometer}</span>}
+              {(errors.endOdometer || odometerError) && <span className={errorClass}>{errors.endOdometer || odometerError}</span>}
             </label>
 
             <label className="flex flex-col gap-1.5">
@@ -835,7 +841,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
             {!isEdit && <p className="text-xs text-gray-400">New trips always start as "Yet to Start".</p>}
             {availableStatuses.some((s) => s.value === 'On Trip') && !customerProfileAccepted && (
               <p className="text-xs text-gray-400">
-                Select a customer whose profile is Accepted (selfie, driving licence and Aadhaar uploaded) to start
+                Select a customer whose profile is Accepted (selfie, driving licence and Aadhaar all approved) to start
                 this trip.
               </p>
             )}

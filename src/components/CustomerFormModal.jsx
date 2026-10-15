@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import StarRating from './StarRating';
+import ProfileVerifiedBadge from './ProfileVerifiedBadge';
 
 const MAX_NOTES_WORDS = 300;
 const MAX_NAME_LENGTH = 50;
+// Same minimum as customer signup on the customer site (backend portalAuthController).
+const MIN_PASSWORD_LENGTH = 6;
 
 const emptyForm = {
   name: '',
@@ -11,7 +14,7 @@ const emptyForm = {
   rating: 0,
   notes: '',
   customerType: 'Good',
-  profileVerified: 'Pending',
+  password: '',
 };
 
 const CUSTOMER_TYPES = [
@@ -20,10 +23,11 @@ const CUSTOMER_TYPES = [
   { value: 'Bad', label: 'Bad', activeClass: 'bg-red-100 border-red-400 text-red-800' },
 ];
 
-const PROFILE_VERIFIED_STATUSES = [
-  { value: 'Accepted', label: 'Accepted', activeClass: 'bg-emerald-100 border-emerald-400 text-emerald-800' },
-  { value: 'Rejected', label: 'Rejected', activeClass: 'bg-red-100 border-red-400 text-red-800' },
-  { value: 'Pending', label: 'Pending', activeClass: 'bg-amber-100 border-amber-400 text-amber-800' },
+// The documents whose reviews decide the profile status (backend utils/verification.js).
+const REQUIRED_DOCS = [
+  { key: 'selfie', label: 'Selfie' },
+  { key: 'drivingLicence', label: 'DL' },
+  { key: 'aadhaar', label: 'Aadhaar' },
 ];
 
 const baseInputClass =
@@ -55,19 +59,17 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
           rating: initialData.rating || 0,
           notes: initialData.notes || '',
           customerType: initialData.customerType || 'Good',
-          profileVerified: initialData.profileVerified || 'Pending',
+          password: '',
         }
       : emptyForm
   );
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const isEdit = mode === 'edit';
   const notesWords = wordCount(form.notes);
-  // Profile status can only move to Accepted once selfie, driving licence and Aadhaar are all
-  // on file — see backend's matching check in customerController.updateCustomer.
-  // documentTypes is the summary the customer API returns (the files live in customer-documents).
-  const docTypes = initialData?.documentTypes || [];
-  const hasRequiredDocs = ['selfie', 'drivingLicence', 'aadhaar'].every((type) => docTypes.includes(type));
+  // Each document's review status, from the customer API's summary (the files live in customer-documents).
+  const docStatuses = initialData?.documentStatuses || {};
 
   function fieldClass(field) {
     return `${baseInputClass} ${errors[field] ? errorInputClass : validInputClass}`;
@@ -101,6 +103,11 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
 
     if (wordCount(form.notes) > MAX_NOTES_WORDS) next.notes = `Notes cannot exceed ${MAX_NOTES_WORDS} words`;
 
+    // Required when creating (the customer's login for the customer site); optional reset when editing.
+    if (!isEdit && !form.password) next.password = 'Password is required';
+    else if (form.password && form.password.length < MIN_PASSWORD_LENGTH)
+      next.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
+
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -116,7 +123,8 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
       rating: form.rating || undefined,
       notes: form.notes.trim(),
       customerType: form.customerType,
-      profileVerified: form.profileVerified,
+      // Only sent when entered — on edit, leaving it out keeps the current password.
+      ...(form.password ? { password: form.password } : {}),
     });
   }
 
@@ -170,13 +178,19 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
                 type="tel"
                 inputMode="tel"
                 maxLength={10}
-                className={fieldClass('mobile1')}
+                className={`${fieldClass('mobile1')} ${isEdit ? 'cursor-not-allowed bg-gray-100 text-gray-500' : ''}`}
                 value={form.mobile1}
                 onChange={(e) => updateMobile('mobile1', e.target.value)}
                 placeholder="Enter 10-digit mobile number"
                 aria-invalid={Boolean(errors.mobile1)}
+                disabled={isEdit}
+                title={isEdit ? "The mobile number is the customer's login and can't be changed" : undefined}
               />
-              {errors.mobile1 && <span className={errorClass}>{errors.mobile1}</span>}
+              {errors.mobile1 ? (
+                <span className={errorClass}>{errors.mobile1}</span>
+              ) : (
+                isEdit && <span className="text-xs text-gray-400">This is the customer&apos;s login and can&apos;t be changed.</span>
+              )}
             </label>
 
             <label className="flex flex-col gap-1.5">
@@ -192,6 +206,47 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
                 aria-invalid={Boolean(errors.mobile2)}
               />
               {errors.mobile2 && <span className={errorClass}>{errors.mobile2}</span>}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                {isEdit ? (
+                  <>
+                    New Password <span className="font-normal text-gray-400">(optional)</span>
+                  </>
+                ) : (
+                  <>
+                    Password <RequiredMark />
+                  </>
+                )}
+              </span>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  className={`${fieldClass('password')} w-full pr-14`}
+                  value={form.password}
+                  onChange={(e) => update('password', e.target.value)}
+                  placeholder={isEdit ? 'Leave blank to keep the current password' : 'At least 6 characters'}
+                  aria-invalid={Boolean(errors.password)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded px-1.5 py-0.5 text-xs font-semibold text-gray-500 hover:text-gray-800"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              {errors.password ? (
+                <span className={errorClass}>{errors.password}</span>
+              ) : (
+                <span className="text-xs text-gray-400">
+                  {isEdit
+                    ? 'Set a new temporary password to reset it — the customer must change it at their next login.'
+                    : 'A temporary password — the customer logs in with Mobile 1 and this, then has to set their own.'}
+                </span>
+              )}
             </label>
 
             <label className="flex flex-col gap-1.5">
@@ -222,36 +277,20 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
 
           <div className="flex flex-col gap-1.5">
             <span className={labelTextClass}>Profile Verified</span>
-            <div className="flex gap-2">
-              {PROFILE_VERIFIED_STATUSES.map((s) => {
-                // A new customer always starts Pending — Accepted/Rejected only become
-                // choosable once editing an existing customer. Accepted additionally stays
-                // locked until the selfie, driving licence and Aadhaar are all on file.
-                const lockedForDocs = s.value === 'Accepted' && isEdit && !hasRequiredDocs;
-                const disabled = (!isEdit && s.value !== 'Pending') || lockedForDocs;
-                return (
-                  <button
-                    key={s.value}
-                    type="button"
-                    onClick={() => !disabled && update('profileVerified', s.value)}
-                    disabled={disabled}
-                    title={lockedForDocs ? 'Upload the selfie, driving licence and Aadhaar before accepting this profile' : undefined}
-                    className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
-                      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-                    } ${form.profileVerified === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
-                  >
-                    {s.label}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap items-center gap-2">
+              <ProfileVerifiedBadge status={isEdit ? initialData?.profileVerified : 'Pending'} />
+              {isEdit &&
+                REQUIRED_DOCS.map((d) => (
+                  <span key={d.key} className="rounded-md bg-gray-100 px-2 py-0.5 text-[0.7rem] text-gray-600">
+                    {d.label}: <span className="font-semibold">{docStatuses[d.key] || 'Not uploaded'}</span>
+                  </span>
+                ))}
             </div>
-            {!isEdit && <p className="text-xs text-gray-400">New customers always start as "Pending".</p>}
-            {isEdit && !hasRequiredDocs && (
-              <p className="text-xs text-gray-400">
-                Upload the selfie, driving licence and Aadhaar (from the Documents screen) before this profile can be
-                Accepted.
-              </p>
-            )}
+            <p className="text-xs text-gray-400">
+              {isEdit
+                ? 'Set automatically from the document reviews — Accepted once the selfie, driving licence and Aadhaar are all approved. Review them from the Documents screen.'
+                : 'New customers always start as "Pending". It becomes Accepted once their documents are approved.'}
+            </p>
           </div>
 
           <label className="flex flex-col gap-1.5">
