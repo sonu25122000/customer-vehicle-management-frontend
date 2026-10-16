@@ -54,6 +54,7 @@ const emptyForm = {
   expiryDate: '',
   expiryTime: '',
   maxUsage: '',
+  perCustomerLimit: '',
   isActive: true,
   isPublic: false,
 };
@@ -75,6 +76,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       expiryDate: expiry.date,
       expiryTime: expiry.time,
       maxUsage: initialData.maxUsage ?? '',
+      perCustomerLimit: initialData.perCustomerLimit ?? '',
       isActive: initialData.isActive ?? true,
       isPublic: Boolean(initialData.isPublic),
     };
@@ -158,6 +160,14 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
     } else if (!Number.isInteger(Number(form.maxUsage)) || Number(form.maxUsage) < 1) next.maxUsage = 'Enter a whole number of at least 1, or leave it blank for unlimited';
     else if (isEdit && Number(form.maxUsage) < usageCount) next.maxUsage = `Cannot be less than the times already used (${usageCount})`;
 
+    // Optional — blank means no per-customer limit.
+    if (form.perCustomerLimit !== '') {
+      if (!Number.isInteger(Number(form.perCustomerLimit)) || Number(form.perCustomerLimit) < 1)
+        next.perCustomerLimit = 'Enter a whole number of at least 1, or leave it blank for no limit';
+      else if (form.maxUsage !== '' && Number(form.perCustomerLimit) > Number(form.maxUsage))
+        next.perCustomerLimit = 'Cannot be more than the maximum usage';
+    }
+
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -177,6 +187,8 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       expiresAt: joinLocal(form.expiryDate, form.expiryTime).toISOString(),
       // Blank = no limit (unlimited uses).
       maxUsage: form.maxUsage === '' ? null : Number(form.maxUsage),
+      // Blank = a customer can use it any number of times (e.g. 1 for a once-per-customer coupon).
+      perCustomerLimit: form.perCustomerLimit === '' ? null : Number(form.perCustomerLimit),
       isActive: form.isActive,
       isPublic: form.isPublic,
     });
@@ -430,7 +442,8 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
             </label>
           </div>
 
-          <label className="flex flex-col gap-1.5 sm:max-w-[calc(50%-0.5rem)]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5">
             <span className={labelTextClass}>
               Maximum Usage <span className="font-normal text-gray-400">(optional)</span>
             </span>
@@ -453,6 +466,28 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               </span>
             )}
           </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelTextClass}>
+              Uses per Customer <span className="font-normal text-gray-400">(optional)</span>
+            </span>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              className={fieldClass('perCustomerLimit')}
+              value={form.perCustomerLimit}
+              onChange={(e) => update('perCustomerLimit', e.target.value)}
+              placeholder="No limit per customer"
+              aria-invalid={Boolean(errors.perCustomerLimit)}
+            />
+            {errors.perCustomerLimit ? (
+              <span className={errorClass}>{errors.perCustomerLimit}</span>
+            ) : (
+              <span className="text-xs text-gray-400">e.g. 1 for a coupon each customer can use only once (like FIRSTBOOK).</span>
+            )}
+          </label>
+          </div>
 
           <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
             <input

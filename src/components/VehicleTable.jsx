@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { EyeIcon, PencilIcon, TrashIcon, CameraIcon, FileTextIcon } from './icons';
+import { EyeIcon, PencilIcon, TrashIcon, CameraIcon, FileTextIcon, MapPinIcon } from './icons';
 import StarRating from './StarRating';
 import VehicleStatusBadge from './VehicleStatusBadge';
 import { canEdit, canDelete } from '../utils/permissions';
@@ -49,7 +49,7 @@ export default function VehicleTable({
 
   return (
     <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-      <table className="w-full min-w-[1250px] border-collapse text-xs">
+      <table className="w-full min-w-[1400px] border-collapse text-xs">
         <thead>
           <tr>
             <th className={`${thClass} w-10`}>#</th>
@@ -62,6 +62,7 @@ export default function VehicleTable({
             <th className={thClass}>Year</th>
             <th className={thClass}>Owner/Host</th>
             <th className={thClass}>Owner Mobile</th>
+            <th className={thClass}>Parking Location</th>
             <th className={thClass}>Rating</th>
             <th className={`${thClass} whitespace-nowrap`}>Actions</th>
           </tr>
@@ -85,6 +86,16 @@ export default function VehicleTable({
               <td className={tdClass}>{v.year || '-'}</td>
               <td className={`${tdClass} font-semibold text-gray-900`}>{v.ownerName}</td>
               <td className={tdClass}>{v.ownerMobile || '-'}</td>
+              <td className={`${tdClass} max-w-[14rem]`}>
+                {v.parkingLocation?.address || Number.isFinite(v.parkingLocation?.lat) ? (
+                  <span className="flex items-center gap-1" title={v.parkingLocation.address || 'Pinned on the map'}>
+                    {Number.isFinite(v.parkingLocation?.lat) && <MapPinIcon className="h-3.5 w-3.5 flex-shrink-0 text-blue-600" />}
+                    <span className="truncate">{v.parkingLocation.address || 'Pinned on map'}</span>
+                  </span>
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
+              </td>
               <td className={tdClass}>
                 {v.ratingsGiven ? (
                   <span className="flex items-center gap-1">

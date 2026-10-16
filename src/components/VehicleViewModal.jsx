@@ -132,6 +132,19 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <DetailItem label="Status">
               <VehicleStatusBadge status={vehicle.status} />
             </DetailItem>
+            <DetailItem label="Parking Location" full>
+              {vehicle.parkingLocation?.address || (Number.isFinite(vehicle.parkingLocation?.lat) ? 'Pinned on the map' : '-')}
+              {Number.isFinite(vehicle.parkingLocation?.lat) && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${vehicle.parkingLocation.lat},${vehicle.parkingLocation.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 text-xs font-semibold text-blue-600 hover:underline"
+                >
+                  View on map
+                </a>
+              )}
+            </DetailItem>
           </div>
 
           <div className="grid grid-cols-3 gap-3 rounded-lg bg-gray-50 p-4">
