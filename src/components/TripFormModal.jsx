@@ -95,6 +95,8 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     initialData && COUPON_EDITABLE_STATUSES.includes(initialData.status) && initialData.coupon
       ? initialData.coupon?._id || initialData.coupon
       : '';
+  // The trip being edited (its own coupon use doesn't count against the per-customer limit).
+  const editingTripId = initialData?._id || '';
   const [form, setForm] = useState(() =>
     initialData
       ? {
@@ -214,7 +216,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     if (!couponSelectable) return undefined;
     let cancelled = false;
     setCouponsLoading(true);
-    fetchApplicableCoupons(form.customer, initialCouponId)
+    fetchApplicableCoupons(form.customer, initialCouponId, editingTripId)
       .then((list) => {
         if (cancelled) return;
         setCouponOptions(list);
@@ -232,7 +234,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     return () => {
       cancelled = true;
     };
-  }, [form.customer, couponSelectable, initialCouponId]);
+  }, [form.customer, couponSelectable, initialCouponId, editingTripId]);
 
   // If this trip already references a customer/vehicle that isn't in the (active-only)
   // options list — e.g. a soft-deleted customer, or a vehicle that's non-Active/currently on
@@ -732,6 +734,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                               ? `${c.value}% off${c.maxDiscount ? ` (max ₹${Number(c.maxDiscount).toLocaleString()})` : ''}`
                               : `₹${c.value} off`}
                             {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
+                            {c.perCustomerLimit ? ` · ${c.perCustomerLimit === 1 ? 'once' : `${c.perCustomerLimit}×`} per customer` : ''}
                           </span>
                         </span>
                         {c.isCurrent ? (

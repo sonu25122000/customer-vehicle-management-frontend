@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SearchableSelect from './SearchableSelect';
+import LocationPickerModal from './LocationPickerModal';
+import { MapPinIcon } from './icons';
 import { fetchVehicleCatalog } from '../api/vehicleCatalog';
 
 const TRANSMISSIONS = ['Manual', 'Automatic'];
@@ -23,6 +25,9 @@ const emptyForm = {
   pricePerDay: '',
   ownerName: '',
   ownerMobile: '',
+  parkingAddress: '',
+  parkingLat: null,
+  parkingLng: null,
 };
 
 const baseInputClass =
@@ -56,10 +61,15 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           pricePerDay: initialData.pricePerDay ?? '',
           ownerName: initialData.ownerName || '',
           ownerMobile: initialData.ownerMobile || '',
+          parkingAddress: initialData.parkingLocation?.address || '',
+          parkingLat: Number.isFinite(initialData.parkingLocation?.lat) ? initialData.parkingLocation.lat : null,
+          parkingLng: Number.isFinite(initialData.parkingLocation?.lng) ? initialData.parkingLocation.lng : null,
         }
       : emptyForm
   );
   const [errors, setErrors] = useState({});
+  const [pickingLocation, setPickingLocation] = useState(false);
+  const pinned = form.parkingLat !== null && form.parkingLng !== null;
   // Single nested tree from the DB: { vehicleTypes: [{ name, categories, makes: [{ name, models }] }] }
   const [catalog, setCatalog] = useState(null);
 
@@ -135,6 +145,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
     if (!form.ownerName.trim()) next.ownerName = 'Owner/Host name is required';
     if (!form.ownerMobile.trim()) next.ownerMobile = 'Owner mobile is required';
     else if (!/^[0-9]{10}$/.test(form.ownerMobile.trim())) next.ownerMobile = 'Enter a valid 10-digit mobile number';
+    if (form.parkingAddress.trim().length > 200) next.parkingAddress = 'Parking location cannot exceed 200 characters';
 
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -156,6 +167,11 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
       pricePerDay: form.pricePerDay === '' ? null : Number(form.pricePerDay),
       ownerName: form.ownerName.trim(),
       ownerMobile: form.ownerMobile.trim(),
+      parkingLocation: {
+        address: form.parkingAddress.trim(),
+        lat: pinned ? form.parkingLat : null,
+        lng: pinned ? form.parkingLng : null,
+      },
     });
   }
 
@@ -340,6 +356,55 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               />
               {errors.ownerMobile && <span className={errorClass}>{errors.ownerMobile}</span>}
             </label>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <span className={labelTextClass}>
+                Parking Location <span className="font-normal text-gray-400">(optional — shown on the customer site)</span>
+              </span>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  className={`${fieldClass('parkingAddress')} min-w-0 flex-1`}
+                  value={form.parkingAddress}
+                  onChange={(e) => update('parkingAddress', e.target.value)}
+                  maxLength={200}
+                  placeholder="e.g. Prestige Shantiniketan, Whitefield, Bengaluru"
+                  aria-invalid={Boolean(errors.parkingAddress)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPickingLocation(true)}
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+                >
+                  <MapPinIcon className="h-4 w-4" /> {pinned ? 'Change pin on map' : 'Choose on Google Maps'}
+                </button>
+              </div>
+              {errors.parkingAddress ? (
+                <span className={errorClass}>{errors.parkingAddress}</span>
+              ) : pinned ? (
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                  <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                    <MapPinIcon className="h-3.5 w-3.5" /> Pinned on map ({form.parkingLat}, {form.parkingLng})
+                  </span>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${form.parkingLat},${form.parkingLng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-blue-600 hover:underline"
+                  >
+                    View
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, parkingLat: null, parkingLng: null }))}
+                    className="cursor-pointer font-semibold text-red-600 hover:underline"
+                  >
+                    Remove pin
+                  </button>
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400">Type the address, and/or pin the exact spot on Google Maps.</span>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -456,6 +521,25 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           </div>
         </form>
       </div>
+
+      {pickingLocation && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <LocationPickerModal
+            initial={pinned ? { lat: form.parkingLat, lng: form.parkingLng } : null}
+            onClose={() => setPickingLocation(false)}
+            onPick={(point) => {
+              setForm((f) => ({
+                ...f,
+                parkingLat: point.lat,
+                parkingLng: point.lng,
+                // Fill in the address from the map only when none has been typed yet.
+                parkingAddress: f.parkingAddress.trim() ? f.parkingAddress : (point.address || '').slice(0, 200),
+              }));
+              setPickingLocation(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

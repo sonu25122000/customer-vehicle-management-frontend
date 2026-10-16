@@ -218,6 +218,11 @@ export default function CouponsPage() {
                           {c.usageCount || 0} <span className="text-gray-400" title="Unlimited">/ ∞</span>
                         </span>
                       )}
+                      {c.perCustomerLimit ? (
+                        <span className="block text-[0.7rem] text-gray-400">
+                          {c.perCustomerLimit === 1 ? 'Once' : `${c.perCustomerLimit}×`} per customer
+                        </span>
+                      ) : null}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.startAt).toLocaleString()}</td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-500">{new Date(c.expiresAt).toLocaleString()}</td>

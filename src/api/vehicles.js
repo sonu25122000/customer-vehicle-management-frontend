@@ -46,3 +46,8 @@ export function updateVehicleStatus(id, status) {
 export function deleteVehicle(id) {
   return api.delete(`/vehicles/${id}`).then((res) => res.data);
 }
+
+// The pin in a Google Maps link (short maps.app.goo.gl share links too) -> { lat, lng, placeName }.
+export function resolveMapLink(url) {
+  return api.post('/vehicles/map-link', { url }).then((res) => res.data.data);
+}
