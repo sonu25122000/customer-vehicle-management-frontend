@@ -177,7 +177,7 @@ export default function LoginPage() {
             </h1>
             <span className="mt-3 block h-1 w-14 rounded-full bg-blue-600" />
             <p className="mt-4 max-w-sm text-sm text-slate-600">
-              Manage customers, vehicles, bookings, tolls and payments — all in
+              Manage guests, vehicles, bookings, tolls and payments — all in
               one secure workspace built for speed, accuracy and control.
             </p>
           </div>

@@ -178,7 +178,7 @@ export default function HomeCarouselPage() {
         <div className="mr-auto">
           <p className="text-sm font-semibold text-gray-900">Reviews carousel on the home page</p>
           <p className="text-xs text-gray-500">
-            Rotates automatically on the website: the 5 latest 4–5★ customer reviews always come first (newest first), then your pinned
+            Rotates automatically on the website: the 5 latest 4–5★ guest reviews always come first (newest first), then your pinned
             slides below, up to {maxActive} in all. {activeCount} pinned.
           </p>
         </div>
@@ -196,7 +196,7 @@ export default function HomeCarouselPage() {
       {slides === null ? (
         <div className="h-40 animate-pulse rounded-xl bg-white shadow-sm" />
       ) : !slides.length ? (
-        <div className="rounded-xl bg-white p-10 text-center text-sm text-gray-500 shadow-sm">No slides yet — add one, or pick from customer reviews below.</div>
+        <div className="rounded-xl bg-white p-10 text-center text-sm text-gray-500 shadow-sm">No slides yet — add one, or pick from guest reviews below.</div>
       ) : (
         <ol className="flex flex-col gap-2">
           {slides.map((s, i) => (
@@ -222,7 +222,7 @@ export default function HomeCarouselPage() {
                   {s.subtitle && <span className="text-xs text-gray-400">{s.subtitle}</span>}
                   <StarRating value={s.rating} readOnly size="sm" />
                   {s.carName && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[0.65rem] font-semibold text-gray-600">{s.carName}</span>}
-                  {s.trip && <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-semibold text-blue-700">Customer review</span>}
+                  {s.trip && <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-semibold text-blue-700">Guest review</span>}
                 </div>
                 <p className="mt-1 line-clamp-2 text-sm text-gray-600">&ldquo;{s.text}&rdquo;</p>
               </div>
@@ -248,8 +248,8 @@ export default function HomeCarouselPage() {
       )}
 
       <div className="rounded-xl bg-white p-4 shadow-sm">
-        <p className="text-sm font-semibold text-gray-900">Customer reviews</p>
-        <p className="mb-3 text-xs text-gray-500">Reviews customers wrote after their trips, newest first. The 5 latest 4–5★ ones already appear on the website automatically — pin an older one to keep it in the carousel (you can edit the text and name first).</p>
+        <p className="text-sm font-semibold text-gray-900">Guest reviews</p>
+        <p className="mb-3 text-xs text-gray-500">Reviews guests wrote after their trips, newest first. The 5 latest 4–5★ ones already appear on the website automatically — pin an older one to keep it in the carousel (you can edit the text and name first).</p>
         {reviews === null ? (
           <div className="h-24 animate-pulse rounded-lg bg-gray-50" />
         ) : !reviews.length ? (
@@ -303,7 +303,7 @@ export default function HomeCarouselPage() {
         verb="remove"
         confirmLabel="Remove"
         busyLabel="Removing..."
-        message="It will no longer appear on the website. The customer's original review stays on their trip."
+        message="It will no longer appear on the website. The guest's original review stays on their trip."
         onCancel={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         deleting={busy}

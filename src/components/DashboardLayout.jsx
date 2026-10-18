@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 
 const TITLES = {
-  '/customers': 'Customer Management',
+  '/customers': 'Guest Management',
   '/vehicles': 'Vehicle Management',
   '/trips': 'Trip Management',
   '/toll-prices': 'Toll Prices',
@@ -19,7 +19,7 @@ const TITLES = {
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const title = TITLES[location.pathname] || 'Customer Management';
+  const title = TITLES[location.pathname] || 'Guest Management';
 
   return (
     <div className="flex h-dvh overflow-hidden bg-gray-100">

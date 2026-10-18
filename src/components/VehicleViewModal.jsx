@@ -127,6 +127,9 @@ export default function VehicleViewModal({ vehicle, onClose, onEdit, onManagePho
             <DetailItem label="Price per Day">
               {vehicle.pricePerDay ? `₹${Number(vehicle.pricePerDay).toLocaleString()}` : '-'}
             </DetailItem>
+            <DetailItem label="Price per Hour">
+              {vehicle.pricePerHour ? `₹${Number(vehicle.pricePerHour).toLocaleString()}` : '-'}
+            </DetailItem>
             <DetailItem label="Owner/Host">{vehicle.ownerName}</DetailItem>
             <DetailItem label="Owner Mobile">{vehicle.ownerMobile || '-'}</DetailItem>
             <DetailItem label="Status">

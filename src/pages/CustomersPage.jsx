@@ -74,7 +74,7 @@ export default function CustomersPage() {
       setPagination(res.pagination);
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      toast.error(err.response?.data?.message || 'Failed to load customers');
+      toast.error(err.response?.data?.message || 'Failed to load guests');
     } finally {
       if (requestId === requestIdRef.current) setLoading(false);
     }
@@ -128,18 +128,18 @@ export default function CustomersPage() {
     try {
       if (formModal.mode === 'edit') {
         const res = await updateCustomer(formModal.data._id, payload);
-        toast.success('Customer updated successfully');
+        toast.success('Guest updated successfully');
         setFormModal(null);
         loadCustomers();
         loadStats();
         // If documents were skipped when this customer was first created, offer the upload
         // screen again now instead of only ever surfacing it once, at creation time.
         const types = res.data.documentTypes || [];
-        const hasNoDocuments = !['drivingLicence', 'aadhaar', 'other'].some((type) => types.includes(type));
+        const hasNoDocuments = !['drivingLicence', 'aadhaar', 'aadhaarBack', 'other'].some((type) => types.includes(type));
         if (hasNoDocuments) setDocumentsCustomer(res.data);
       } else {
         await createCustomer(payload);
-        toast.success('Customer created successfully');
+        toast.success('Guest created successfully');
         setFormModal(null);
         loadCustomers();
         loadStats();
@@ -157,7 +157,7 @@ export default function CustomersPage() {
     setDeleting(true);
     try {
       await deleteCustomer(deleteTarget._id);
-      toast.success('Customer deleted successfully');
+      toast.success('Guest deleted successfully');
       setDeleteTarget(null);
       if (customers.length === 1 && page > 1) {
         setPage((p) => p - 1);
@@ -166,7 +166,7 @@ export default function CustomersPage() {
       }
       loadStats();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete customer');
+      toast.error(err.response?.data?.message || 'Failed to delete guest');
     } finally {
       setDeleting(false);
     }
@@ -177,7 +177,7 @@ export default function CustomersPage() {
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile
           icon={UsersIcon}
-          label="Total Customers"
+          label="Total Guests"
           value={statsLoading ? '—' : stats?.totalCustomers ?? 0}
           accent="blue"
         />
@@ -203,7 +203,7 @@ export default function CustomersPage() {
 
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <p className="text-xs text-gray-500">
-          {pagination.total || 0} customer{pagination.total === 1 ? '' : 's'}
+          {pagination.total || 0} guest{pagination.total === 1 ? '' : 's'}
         </p>
 
         <div className="relative ml-auto min-w-0 flex-1 sm:max-w-xs">
@@ -224,7 +224,7 @@ export default function CustomersPage() {
             onClick={() => setFormModal({ mode: 'create', data: null })}
             className="cursor-pointer whitespace-nowrap rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
           >
-            + Create Customer
+            + Create Guest
           </button>
         )}
       </div>

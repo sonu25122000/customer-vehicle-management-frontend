@@ -27,7 +27,8 @@ const CUSTOMER_TYPES = [
 const REQUIRED_DOCS = [
   { key: 'selfie', label: 'Selfie' },
   { key: 'drivingLicence', label: 'DL' },
-  { key: 'aadhaar', label: 'Aadhaar' },
+  { key: 'aadhaar', label: 'Aadhaar Front' },
+  { key: 'aadhaarBack', label: 'Aadhaar Back' },
 ];
 
 const baseInputClass =
@@ -138,7 +139,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Update Customer' : 'Create Customer'}</h2>
+          <h2 className="text-lg font-bold text-gray-900">{isEdit ? 'Update Guest' : 'Create Guest'}</h2>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -164,7 +165,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
                 value={form.name}
                 maxLength={MAX_NAME_LENGTH}
                 onChange={(e) => update('name', e.target.value.slice(0, MAX_NAME_LENGTH))}
-                placeholder="Enter customer name"
+                placeholder="Enter guest name"
                 aria-invalid={Boolean(errors.name)}
               />
               {errors.name && <span className={errorClass}>{errors.name}</span>}
@@ -184,12 +185,12 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
                 placeholder="Enter 10-digit mobile number"
                 aria-invalid={Boolean(errors.mobile1)}
                 disabled={isEdit}
-                title={isEdit ? "The mobile number is the customer's login and can't be changed" : undefined}
+                title={isEdit ? "The mobile number is the guest's login and can't be changed" : undefined}
               />
               {errors.mobile1 ? (
                 <span className={errorClass}>{errors.mobile1}</span>
               ) : (
-                isEdit && <span className="text-xs text-gray-400">This is the customer&apos;s login and can&apos;t be changed.</span>
+                isEdit && <span className="text-xs text-gray-400">This is the guest&apos;s login and can&apos;t be changed.</span>
               )}
             </label>
 
@@ -243,8 +244,8 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
               ) : (
                 <span className="text-xs text-gray-400">
                   {isEdit
-                    ? 'Set a new temporary password to reset it — the customer must change it at their next login.'
-                    : 'A temporary password — the customer logs in with Mobile 1 and this, then has to set their own.'}
+                    ? 'Set a new temporary password to reset it — the guest must change it at their next login.'
+                    : 'A temporary password — the guest logs in with Mobile 1 and this, then has to set their own.'}
                 </span>
               )}
             </label>
@@ -258,7 +259,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className={labelTextClass}>Customer Type</span>
+            <span className={labelTextClass}>Guest Type</span>
             <div className="flex gap-2">
               {CUSTOMER_TYPES.map((t) => (
                 <button
@@ -289,7 +290,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
             <p className="text-xs text-gray-400">
               {isEdit
                 ? 'Set automatically from the document reviews — Accepted once the selfie, driving licence and Aadhaar are all approved. Review them from the Documents screen.'
-                : 'New customers always start as "Pending". It becomes Accepted once their documents are approved.'}
+                : 'New guests always start as "Pending". It becomes Accepted once their documents are approved.'}
             </p>
           </div>
 
@@ -305,7 +306,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
               className={`${fieldClass('notes')} resize-none`}
               value={form.notes}
               onChange={(e) => updateNotes(e.target.value)}
-              placeholder="Add any additional notes about this customer..."
+              placeholder="Add any additional notes about this guest..."
             />
             {errors.notes && <span className={errorClass}>{errors.notes}</span>}
           </label>
@@ -328,7 +329,7 @@ export default function CustomerFormModal({ mode, initialData, onClose, onSubmit
               disabled={submitting}
               className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? 'Saving...' : isEdit ? 'Update Customer' : 'Save Customer'}
+              {submitting ? 'Saving...' : isEdit ? 'Update Guest' : 'Save Guest'}
             </button>
           </div>
         </form>

@@ -55,7 +55,7 @@ export default function TripTable({ trips, loading, page, limit, onView, onEdit,
           <tr>
             <th className={`${thClass} w-10`}>#</th>
             <th className={thClass}>Trip ID</th>
-            <th className={thClass}>Customer</th>
+            <th className={thClass}>Guest</th>
             <th className={thClass}>Vehicle</th>
             <th className={thClass}>Start</th>
             <th className={thClass}>End</th>

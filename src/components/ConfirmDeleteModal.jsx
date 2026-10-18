@@ -1,6 +1,6 @@
 export default function ConfirmDeleteModal({
   target,
-  title = 'Delete Customer',
+  title = 'Delete Guest',
   message = 'This action cannot be undone.',
   confirmLabel = 'Delete',
   busyLabel = 'Deleting...',

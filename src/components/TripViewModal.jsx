@@ -93,7 +93,7 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
 
         <div className="flex flex-col gap-5 p-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <DetailItem label="Customer">
+            <DetailItem label="Guest">
               {trip.customer?.name || 'Unknown'}
               {trip.customer?.mobile1 && <span className="ml-2 text-xs text-gray-500">{trip.customer.mobile1}</span>}
             </DetailItem>
@@ -145,13 +145,13 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
             {trip.startedAt && (
               <DetailItem label="Started">
                 {formatDateTime(trip.startedAt)}{' '}
-                <span className="text-xs text-gray-500">{trip.startedBy === 'customer' ? '(by customer, with OTP)' : '(by admin)'}</span>
+                <span className="text-xs text-gray-500">{trip.startedBy === 'customer' ? '(by guest, with OTP)' : '(by admin)'}</span>
               </DetailItem>
             )}
             {trip.endedAt && (
               <DetailItem label="Ended">
                 {formatDateTime(trip.endedAt)}{' '}
-                <span className="text-xs text-gray-500">{trip.endedBy === 'customer' ? '(by customer, with OTP)' : '(by admin)'}</span>
+                <span className="text-xs text-gray-500">{trip.endedBy === 'customer' ? '(by guest, with OTP)' : '(by admin)'}</span>
               </DetailItem>
             )}
             {/* One rating per trip — the customer gives it on the website after the trip, and it counts for
@@ -164,7 +164,7 @@ export default function TripViewModal({ trip, onClose, onEdit }) {
                 </span>
               ) : (
                 <span className="text-gray-400">
-                  {trip.status === 'Completed' ? 'The customer hasn’t rated this trip yet' : 'The customer rates the trip on the website once it’s completed'}
+                  {trip.status === 'Completed' ? 'The guest hasn’t rated this trip yet' : 'The guest rates the trip on the website once it’s completed'}
                 </span>
               )}
             </DetailItem>

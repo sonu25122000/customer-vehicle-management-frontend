@@ -63,7 +63,7 @@ export default function TripOtpPanel({ trip }) {
           <LockIcon className="h-3.5 w-3.5" /> Trip OTPs
         </span>
         <p className="mt-0.5 text-xs text-gray-500">
-          Share these with the customer so they can start and end the trip on the website. They don&apos;t change or
+          Share these with the guest so they can start and end the trip on the website. They don&apos;t change or
           expire, and are only visible here.
         </p>
       </div>
@@ -80,7 +80,7 @@ export default function TripOtpPanel({ trip }) {
       </div>
       {trip.status === 'Yet to Start' && trip.customer?.profileVerified && trip.customer.profileVerified !== 'Accepted' && (
         <p className="text-xs text-amber-700">
-          The customer&apos;s profile isn&apos;t verified yet, so the website will ask them to finish verification before they can use the start OTP.
+          The guest&apos;s profile isn&apos;t verified yet, so the website will ask them to finish verification before they can use the start OTP.
         </p>
       )}
     </div>

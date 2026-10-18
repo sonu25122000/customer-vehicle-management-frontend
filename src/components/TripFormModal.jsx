@@ -177,7 +177,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     fetchCustomerOptions()
       .then(setCustomerOptions)
       .catch(() => {
-        toast.error('Failed to load customers');
+        toast.error('Failed to load guests');
         setCustomerOptions([]);
       });
     fetchVehicleOptions({ activeOnly: true })
@@ -307,7 +307,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
 
   function validate() {
     const next = {};
-    if (!form.customer) next.customer = 'Customer is required';
+    if (!form.customer) next.customer = 'Guest is required';
     if (!form.vehicle) next.vehicle = 'Vehicle is required';
     if (!form.source) next.source = 'Booking source is required';
     if (!form.startDate) next.startDate = 'Start date is required';
@@ -378,12 +378,12 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
     setCreatingCustomer(true);
     try {
       const res = await createCustomer(payload);
-      toast.success('Customer created successfully');
+      toast.success('Guest created successfully');
       setCustomerOptions((prev) => [res.data, ...(prev || [])]);
       update('customer', res.data._id);
       setShowCreateCustomer(false);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create customer');
+      toast.error(err.response?.data?.message || 'Failed to create guest');
     } finally {
       setCreatingCustomer(false);
     }
@@ -450,13 +450,13 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-100">
               {coreLocked ? (
                 <>
-                  This trip is <strong>{existingStatus}</strong> — customer, vehicle and start date/time can no
+                  This trip is <strong>{existingStatus}</strong> — guest, vehicle and start date/time can no
                   longer be changed here. Use <strong>Reschedule</strong> from the trip list to change the start
                   date/time.
                   {endFieldsLocked && ' Only amount-related fields, odometer readings and booking source remain editable.'}
                 </>
               ) : (
-                'The customer on a trip can only be set at creation and cannot be changed here.'
+                'The guest on a trip can only be set at creation and cannot be changed here.'
               )}
             </p>
           )}
@@ -470,7 +470,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5 sm:col-span-2">
               <span className={labelTextClass}>
-                Customer <RequiredMark />
+                Guest <RequiredMark />
               </span>
               <div className="flex gap-2">
                 <div className="min-w-0 flex-1">
@@ -483,7 +483,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                     error={Boolean(errors.customer)}
                     placeholder="Search by name or mobile"
                     searchPlaceholder="Search by name or mobile..."
-                    emptyMessage="No customers yet — create one below."
+                    emptyMessage="No guests yet — create one below."
                     getOptionValue={(c) => c._id}
                     getOptionLabel={(c) => `${c.name} — ${c.mobile1}`}
                     getOptionSearchText={(c) => `${c.name} ${c.mobile1} ${c.mobile2 || ''}`}
@@ -499,7 +499,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   type="button"
                   onClick={() => setShowCreateCustomer(true)}
                   disabled={customerLocked}
-                  title="Create new customer"
+                  title="Create new guest"
                   className="flex flex-shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 transition-colors hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <PlusCircleIcon className="h-4 w-4" /> New
@@ -723,7 +723,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                   loading={couponsLoading}
                   placeholder="No coupon"
                   searchPlaceholder="Search coupon code..."
-                  emptyMessage={form.customer ? 'No coupons available for this customer.' : 'No coupons available for all customers.'}
+                  emptyMessage={form.customer ? 'No coupons available for this guest.' : 'No coupons available for all guests.'}
                   getOptionValue={(c) => c._id}
                   getOptionLabel={(c) => c.code}
                   renderOption={(c) =>
@@ -738,7 +738,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                               ? `${c.value}% off${c.maxDiscount ? ` (max ₹${Number(c.maxDiscount).toLocaleString()})` : ''}`
                               : `₹${c.value} off`}
                             {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
-                            {c.perCustomerLimit ? ` · ${c.perCustomerLimit === 1 ? 'once' : `${c.perCustomerLimit}×`} per customer` : ''}
+                            {c.perCustomerLimit ? ` · ${c.perCustomerLimit === 1 ? 'once' : `${c.perCustomerLimit}×`} per guest` : ''}
                             {c.minBookingAmount ? ` · min. booking ₹${Number(c.minBookingAmount).toLocaleString()}` : ''}
                           </span>
                           {c.note ? <span className="truncate text-[0.7rem] italic text-gray-400">{c.note}</span> : null}
@@ -757,7 +757,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                               c.applicability === 'all' ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-700'
                             }`}
                           >
-                            {c.applicability === 'all' ? 'All customers' : 'This customer'}
+                            {c.applicability === 'all' ? 'All guests' : 'This guest'}
                           </span>
                         )}
                       </span>
@@ -767,11 +767,11 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                 {errors.coupon && <span className={errorClass}>{errors.coupon}</span>}
                 {!couponsLoading && couponOptions.length === 0 && (
                   <span className="text-xs text-gray-400">
-                    {form.customer ? 'No coupons are currently applicable to this customer.' : 'No coupons for all customers right now.'}
+                    {form.customer ? 'No coupons are currently applicable to this guest.' : 'No coupons for all guests right now.'}
                   </span>
                 )}
                 {!form.customer && couponOptions.length > 0 && (
-                  <span className="text-xs text-gray-400">Showing coupons for all customers — pick a customer to also see coupons just for them.</span>
+                  <span className="text-xs text-gray-400">Showing coupons for all guests — pick a guest to also see coupons just for them.</span>
                 )}
                 {currentCouponExpired && (
                   <span className="text-xs text-amber-700">
@@ -864,7 +864,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                     type="button"
                     onClick={() => !disabled && updateStatus(s.value)}
                     disabled={disabled}
-                    title={lockedForProfile ? "This customer's profile must be Accepted before starting this trip" : undefined}
+                    title={lockedForProfile ? "This guest's profile must be Accepted before starting this trip" : undefined}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                       disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     } ${form.status === s.value ? s.activeClass : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
@@ -877,7 +877,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
             {!isEdit && <p className="text-xs text-gray-400">New trips always start as "Yet to Start".</p>}
             {availableStatuses.some((s) => s.value === 'On Trip') && !customerProfileAccepted && (
               <p className="text-xs text-gray-400">
-                Select a customer whose profile is Accepted (selfie, driving licence and Aadhaar all approved) to start
+                Select a guest whose profile is Accepted (selfie, driving licence and Aadhaar all approved) to start
                 this trip.
               </p>
             )}

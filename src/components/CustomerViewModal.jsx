@@ -40,7 +40,7 @@ const HISTORY_FIELD_LABELS = {
   mobile1: 'Mobile 1',
   mobile2: 'Mobile 2',
   email: 'Email',
-  customerType: 'Customer Type',
+  customerType: 'Guest Type',
   profileVerified: 'Profile Verified',
   rating: 'Rating',
   notes: 'Notes',
@@ -125,7 +125,8 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
   const documents = [
     { key: 'selfie', label: 'Selfie' },
     { key: 'drivingLicence', label: 'Driving Licence' },
-    { key: 'aadhaar', label: 'Aadhaar' },
+    { key: 'aadhaar', label: 'Aadhaar (Front)' },
+    { key: 'aadhaarBack', label: 'Aadhaar (Back)' },
     { key: 'other', label: 'Other' },
   ];
   const documentTypes = customer.documentTypes || [];
@@ -140,7 +141,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-bold text-gray-900">Customer Details</h2>
+          <h2 className="text-lg font-bold text-gray-900">Guest Details</h2>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -155,7 +156,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
             <DetailItem label="Name">{customer.name}</DetailItem>
             <DetailItem label="Mobile 1">{customer.mobile1}</DetailItem>
             <DetailItem label="Mobile 2">{customer.mobile2 || '-'}</DetailItem>
-            <DetailItem label="Customer Type">
+            <DetailItem label="Guest Type">
               <CustomerTypeBadge type={customer.customerType} />
             </DetailItem>
             <DetailItem label="Profile Verified">
@@ -334,7 +335,7 @@ export default function CustomerViewModal({ customer, onClose, onEdit, onDocumen
                 onClick={() => onEdit(customer)}
                 className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
               >
-                Edit Customer
+                Edit Guest
               </button>
             )}
           </div>

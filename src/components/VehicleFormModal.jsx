@@ -23,6 +23,7 @@ const emptyForm = {
   model: '',
   year: '',
   pricePerDay: '',
+  pricePerHour: '',
   ownerName: '',
   ownerMobile: '',
   parkingAddress: '',
@@ -59,6 +60,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
           model: initialData.model || '',
           year: initialData.year ?? '',
           pricePerDay: initialData.pricePerDay ?? '',
+          pricePerHour: initialData.pricePerHour ?? '',
           ownerName: initialData.ownerName || '',
           ownerMobile: initialData.ownerMobile || '',
           parkingAddress: initialData.parkingLocation?.address || '',
@@ -142,6 +144,9 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
     else if (!/^\d{4}$/.test(String(form.year)) || Number(form.year) < 1990 || Number(form.year) > CURRENT_YEAR + 1)
       next.year = `Enter a year between 1990 and ${CURRENT_YEAR + 1}`;
     if (form.pricePerDay !== '' && !(Number(form.pricePerDay) >= 1)) next.pricePerDay = 'Enter an amount of at least ₹1, or leave it blank';
+    if (form.pricePerHour !== '' && !(Number(form.pricePerHour) >= 1)) next.pricePerHour = 'Enter an amount of at least ₹1, or leave it blank';
+    else if (form.pricePerHour !== '' && form.pricePerDay !== '' && Number(form.pricePerHour) > Number(form.pricePerDay))
+      next.pricePerHour = 'The hourly price cannot be more than the daily price';
     if (!form.ownerName.trim()) next.ownerName = 'Owner/Host name is required';
     if (!form.ownerMobile.trim()) next.ownerMobile = 'Owner mobile is required';
     else if (!/^[0-9]{10}$/.test(form.ownerMobile.trim())) next.ownerMobile = 'Enter a valid 10-digit mobile number';
@@ -165,6 +170,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
       model: form.model.trim(),
       year: Number(form.year),
       pricePerDay: form.pricePerDay === '' ? null : Number(form.pricePerDay),
+      pricePerHour: form.pricePerHour === '' ? null : Number(form.pricePerHour),
       ownerName: form.ownerName.trim(),
       ownerMobile: form.ownerMobile.trim(),
       parkingLocation: {
@@ -322,7 +328,28 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
               {errors.pricePerDay ? (
                 <span className={errorClass}>{errors.pricePerDay}</span>
               ) : (
-                <span className="text-xs text-gray-400">Used to price bookings on the customer site</span>
+                <span className="text-xs text-gray-400">Used to price bookings on the website</span>
+              )}
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelTextClass}>
+                Price per Hour (₹) <span className="font-normal text-gray-400">(optional)</span>
+              </span>
+              <input
+                type="number"
+                inputMode="decimal"
+                min="1"
+                className={fieldClass('pricePerHour')}
+                value={form.pricePerHour}
+                onChange={(e) => update('pricePerHour', e.target.value)}
+                placeholder="e.g. 150"
+                aria-invalid={Boolean(errors.pricePerHour)}
+              />
+              {errors.pricePerHour ? (
+                <span className={errorClass}>{errors.pricePerHour}</span>
+              ) : (
+                <span className="text-xs text-gray-400">Shown on the website next to the daily price</span>
               )}
             </label>
 
@@ -359,7 +386,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
 
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <span className={labelTextClass}>
-                Parking Location <span className="font-normal text-gray-400">(optional — shown on the customer site)</span>
+                Parking Location <span className="font-normal text-gray-400">(optional — shown on the website)</span>
               </span>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <input

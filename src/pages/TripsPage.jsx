@@ -206,7 +206,7 @@ export default function TripsPage() {
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by customer or vehicle no."
+            placeholder="Search by guest or vehicle no."
             className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-xs text-gray-900 outline-none transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
           />
         </div>

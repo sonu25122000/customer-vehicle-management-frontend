@@ -82,7 +82,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       maxUsage: initialData.maxUsage ?? '',
       perCustomerLimit: initialData.perCustomerLimit ?? '',
       isActive: initialData.isActive ?? true,
-      isPublic: Boolean(initialData.isPublic),
+      isPublic: initialData.applicability === 'selected' ? false : Boolean(initialData.isPublic),
     };
   });
   const [errors, setErrors] = useState({});
@@ -90,6 +90,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
   const [customerSearch, setCustomerSearch] = useState('');
 
   const isEdit = mode === 'edit';
+  const forSelected = form.applicability === 'selected';
   const usageCount = isEdit ? initialData?.usageCount || 0 : 0;
 
   // A coupon saved before the 30-minute rule existed may sit on an odd minute (e.g. 10:17) — keep
@@ -109,7 +110,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
     fetchCustomerOptions()
       .then(setCustomerOptions)
       .catch(() => {
-        toast.error('Failed to load customers');
+        toast.error('Failed to load guests');
         setCustomerOptions([]);
       });
   }, [form.applicability, customerOptions]);
@@ -143,7 +144,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       next.minBookingAmount = 'Enter an amount of at least ₹1, or leave it blank for no minimum';
     }
     if (form.note.trim().length > 200) next.note = 'Note can be at most 200 characters';
-    if (form.applicability === 'selected' && form.customers.length === 0) next.customers = 'Select at least one customer';
+    if (form.applicability === 'selected' && form.customers.length === 0) next.customers = 'Select at least one guest';
     if (!form.startDate) next.startDate = 'Start date is required';
     if (!form.startTime) next.startTime = 'Start time is required';
     if (!form.expiryDate) next.expiryDate = 'Expiry date is required';
@@ -201,7 +202,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       // Blank = a customer can use it any number of times (e.g. 1 for a once-per-customer coupon).
       perCustomerLimit: form.perCustomerLimit === '' ? null : Number(form.perCustomerLimit),
       isActive: form.isActive,
-      isPublic: form.isPublic,
+      isPublic: form.applicability === 'selected' ? false : form.isPublic,
     });
   }
 
@@ -290,13 +291,17 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               </span>
               <div className="flex gap-2">
                 {[
-                  { value: 'all', label: 'All Customers' },
-                  { value: 'selected', label: 'Selected Customers' },
+                  { value: 'all', label: 'All Guests' },
+                  { value: 'selected', label: 'Selected Guests' },
                 ].map((t) => (
                   <button
                     key={t.value}
                     type="button"
-                    onClick={() => update('applicability', t.value)}
+                    onClick={() => {
+                      update('applicability', t.value);
+                      // A coupon for selected customers can't be shown publicly.
+                      if (t.value === 'selected') update('isPublic', false);
+                    }}
                     className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                       form.applicability === t.value ? 'border-blue-400 bg-blue-100 text-blue-800' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
                     }`}
@@ -382,14 +387,14 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
             {errors.note ? (
               <span className={errorClass}>{errors.note}</span>
             ) : (
-              <span className="text-xs text-gray-400">{form.note.length}/200 — shown with the coupon on the customer site.</span>
+              <span className="text-xs text-gray-400">{form.note.length}/200 — shown with the coupon on the website.</span>
             )}
           </label>
 
           {form.applicability === 'selected' && (
             <div className="flex flex-col gap-1.5">
               <span className={labelTextClass}>
-                Select Customers <RequiredMark /> {form.customers.length > 0 && `(${form.customers.length} selected)`}
+                Select Guests <RequiredMark /> {form.customers.length > 0 && `(${form.customers.length} selected)`}
               </span>
               <div className={`rounded-lg border ${errors.customers ? 'border-red-400' : 'border-gray-300'}`}>
                 <div className="relative border-b border-gray-100 p-2">
@@ -398,15 +403,15 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
                     type="text"
                     value={customerSearch}
                     onChange={(e) => setCustomerSearch(e.target.value)}
-                    placeholder="Search customers..."
+                    placeholder="Search guests..."
                     className="w-full rounded-md border-none bg-gray-50 py-1.5 pl-7 pr-2 text-xs text-gray-900 outline-none focus:bg-gray-100"
                   />
                 </div>
                 <div className="max-h-48 overflow-y-auto py-1">
                   {customerOptions === null ? (
-                    <p className="px-4 py-6 text-center text-xs text-gray-400">Loading customers...</p>
+                    <p className="px-4 py-6 text-center text-xs text-gray-400">Loading guests...</p>
                   ) : filteredCustomers.length === 0 ? (
-                    <p className="px-4 py-6 text-center text-xs text-gray-400">No customers found.</p>
+                    <p className="px-4 py-6 text-center text-xs text-gray-400">No guests found.</p>
                   ) : (
                     filteredCustomers.map((c) => (
                       <label key={c._id} className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -528,7 +533,7 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
 
           <label className="flex flex-col gap-1.5">
             <span className={labelTextClass}>
-              Uses per Customer <span className="font-normal text-gray-400">(optional)</span>
+              Uses per Guest <span className="font-normal text-gray-400">(optional)</span>
             </span>
             <input
               type="number"
@@ -537,13 +542,13 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               className={fieldClass('perCustomerLimit')}
               value={form.perCustomerLimit}
               onChange={(e) => update('perCustomerLimit', e.target.value)}
-              placeholder="No limit per customer"
+              placeholder="No limit per guest"
               aria-invalid={Boolean(errors.perCustomerLimit)}
             />
             {errors.perCustomerLimit ? (
               <span className={errorClass}>{errors.perCustomerLimit}</span>
             ) : (
-              <span className="text-xs text-gray-400">e.g. 1 for a coupon each customer can use only once (like FIRSTBOOK).</span>
+              <span className="text-xs text-gray-400">e.g. 1 for a coupon each guest can use only once (like FIRSTBOOK).</span>
             )}
           </label>
           </div>
@@ -558,20 +563,22 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
             Active
           </label>
 
-          <label className="-mt-2 flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+          <label
+            className={`-mt-2 flex items-start gap-2.5 text-sm ${forSelected ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer text-gray-700'}`}
+          >
             <input
               type="checkbox"
-              checked={form.isPublic}
+              checked={form.isPublic && !forSelected}
+              disabled={forSelected}
               onChange={(e) => update('isPublic', e.target.checked)}
-              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
             />
             <span>
               Publicly visible
               <span className="block text-xs text-gray-400">
-                Show this coupon in the offers section of the customer site while it&apos;s live
-                {form.applicability === 'selected' ? ' (only the selected customers see it, when logged in)' : ''}. Unticked,
-                it never appears on the website — even if it&apos;s for all customers with no usage limit — but it can still
-                be applied to trips here. This list always shows every coupon.
+                {forSelected
+                  ? 'Not available for a coupon for selected guests — it is never shown on the website. Share the code with those guests directly.'
+                  : 'Show this coupon in the offers section of the website while it is live. Unticked, it never appears on the website — even if it is for all guests with no usage limit — but it can still be applied to trips here. This list always shows every coupon.'}
               </span>
             </span>
           </label>

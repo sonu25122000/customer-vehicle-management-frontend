@@ -98,7 +98,7 @@ function ReportTable({ scope, rows, metrics, loading, empty }) {
             <tr className="bg-gray-50 font-semibold text-gray-900">
               <td className={tdClass}>Total</td>
               {metrics.map((m) => (
-                <td key={m.key} className={`${tdClass} text-right tabular-nums`} title={m.key === 'repeatCustomers' ? 'Not added up — the same customer can repeat on several days' : undefined}>
+                <td key={m.key} className={`${tdClass} text-right tabular-nums`} title={m.key === 'repeatCustomers' ? 'Not added up — the same guest can repeat on several days' : undefined}>
                   {m.key === 'repeatCustomers' ? '—' : metricValue(m.key, totals[m.key])}
                 </td>
               ))}
@@ -418,7 +418,7 @@ export default function ReportsPage() {
               <StatTile icon={RupeeIcon} label="Amount" value={money(summary.amount)} sub={`Toll ${money(summary.toll)}`} accent="green" />
               <StatTile
                 icon={UsersIcon}
-                label="New Customers"
+                label="New Guests"
                 value={summary.newCustomers.toLocaleString('en-IN')}
                 sub={tab === 'custom' ? `${summary.repeatCustomers} repeat` : undefined}
                 accent="violet"

@@ -3,7 +3,7 @@ import { ShieldIcon, UserIcon } from './icons';
 // Who created a customer / trip: from the admin portal, or the customer themselves on the customer site.
 const STYLES = {
   admin: { className: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200', Icon: ShieldIcon, label: 'Admin' },
-  customer: { className: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200', Icon: UserIcon, label: 'Customer' },
+  customer: { className: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200', Icon: UserIcon, label: 'Guest' },
 };
 
 export default function CreatedByBadge({ value }) {

@@ -195,7 +195,7 @@ export default function FiltersPopover({ fields = ALL_FIELDS }) {
                 {showCustomer && (
                   <RootRow
                     icon={UsersIcon}
-                    label="Select Customer"
+                    label="Select Guest"
                     preview={filters.customerIds.length ? `${filters.customerIds.length} selected` : ''}
                     onClick={() => setPanel('customer')}
                   />
@@ -283,7 +283,7 @@ export default function FiltersPopover({ fields = ALL_FIELDS }) {
           {panel === 'customer' && (
             <>
               <PanelHeader
-                label="Select Customer"
+                label="Select Guest"
                 onBack={() => setPanel('root')}
                 onReset={filters.customerIds.length ? () => dispatch(clearCustomerIds()) : null}
               />
@@ -293,16 +293,16 @@ export default function FiltersPopover({ fields = ALL_FIELDS }) {
                   autoFocus
                   value={customerSearch}
                   onChange={(e) => setCustomerSearch(e.target.value)}
-                  placeholder="Search customers..."
+                  placeholder="Search guests..."
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
               <div className="max-h-64 overflow-y-auto py-1">
                 {customerOptionsLoading ? (
-                  <p className="px-4 py-6 text-center text-sm text-gray-400">Loading customers...</p>
+                  <p className="px-4 py-6 text-center text-sm text-gray-400">Loading guests...</p>
                 ) : !customerOptions?.length ? (
-                  <p className="px-4 py-6 text-center text-sm text-gray-400">No customers found.</p>
+                  <p className="px-4 py-6 text-center text-sm text-gray-400">No guests found.</p>
                 ) : (
                   customerOptions
                     .filter((c) => {

@@ -11,7 +11,8 @@ import { fetchCustomerDocuments, uploadCustomerDocuments, reviewCustomerDocument
 const DOC_SLOTS = [
   { key: 'selfie', label: 'Selfie', imageOnly: true, allowCamera: true },
   { key: 'drivingLicence', label: 'Driving Licence (DL)' },
-  { key: 'aadhaar', label: 'Aadhaar' },
+  { key: 'aadhaar', label: 'Aadhaar (Front)' },
+  { key: 'aadhaarBack', label: 'Aadhaar (Back)' },
   { key: 'other', label: 'Other Document' },
 ];
 
@@ -199,7 +200,7 @@ function DocReview({ doc, busy, onApprove, onReject }) {
             maxLength={300}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Reason (shown to the customer)"
+            placeholder="Reason (shown to the guest)"
             className="resize-none rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
           />
           <div className="flex gap-1.5">
@@ -259,7 +260,7 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
   const [existing, setExisting] = useState(null);
   const [saved, setSaved] = useState({});
   const [profileVerified, setProfileVerified] = useState(customer.profileVerified || 'Pending');
-  const [pending, setPending] = useState({ selfie: null, drivingLicence: null, aadhaar: null, other: null });
+  const [pending, setPending] = useState({ selfie: null, drivingLicence: null, aadhaar: null, aadhaarBack: null, other: null });
   const [uploading, setUploading] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [compressing, setCompressing] = useState(false);
@@ -342,7 +343,7 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
       const res = await uploadCustomerDocuments(customer._id, pending);
       // Stay open so the new uploads can be reviewed straight away.
       Object.keys(pending).forEach((slot) => previewUrlFor(slot, null));
-      setPending({ selfie: null, drivingLicence: null, aadhaar: null, other: null });
+      setPending({ selfie: null, drivingLicence: null, aadhaar: null, aadhaarBack: null, other: null });
       applyDocuments(res.data, res.profileVerified);
       toast.success('Documents uploaded — they are now pending review');
     } catch (err) {
@@ -375,7 +376,7 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
       <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Customer Documents</h2>
+            <h2 className="text-lg font-bold text-gray-900">Guest Documents</h2>
             <p className="flex items-center gap-2 text-xs text-gray-500">
               {customer.name} <ProfileVerifiedBadge status={profileVerified} />
             </p>
@@ -392,7 +393,7 @@ export default function CustomerDocumentsModal({ customer, onClose, onDone }) {
         <div className="flex flex-col gap-5 p-6">
           <p className="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
             Review each document on its own. The profile is verified only once the selfie, driving licence and Aadhaar are
-            all approved. A rejected document&apos;s reason is shown to the customer so they can upload it again.
+            all approved. A rejected document&apos;s reason is shown to the guest so they can upload it again.
           </p>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

@@ -45,7 +45,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
   if (!customers.length) {
     return (
       <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
-        No customers found.
+        No guests found.
       </div>
     );
   }
@@ -59,7 +59,7 @@ export default function CustomerTable({ customers, loading, page, limit, onView,
             <th className={thClass}>Name</th>
             <th className={thClass}>Mobile 1</th>
             <th className={thClass}>Mobile 2</th>
-            <th className={thClass}>Customer Type</th>
+            <th className={thClass}>Guest Type</th>
             <th className={thClass}>Profile Verified</th>
             <th className={thClass}>Created By</th>
             <th className={thClass}>Last Booked Date</th>

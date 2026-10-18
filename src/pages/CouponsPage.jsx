@@ -214,7 +214,7 @@ export default function CouponsPage() {
                       ) : null}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-700">
-                      {c.applicability === 'all' ? 'All Customers' : `${c.customers?.length || 0} selected`}
+                      {c.applicability === 'all' ? 'All Guests' : `${c.customers?.length || 0} selected`}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle whitespace-nowrap text-gray-700">
                       {c.maxUsage ? (
@@ -228,7 +228,7 @@ export default function CouponsPage() {
                       )}
                       {c.perCustomerLimit ? (
                         <span className="block text-[0.7rem] text-gray-400">
-                          {c.perCustomerLimit === 1 ? 'Once' : `${c.perCustomerLimit}×`} per customer
+                          {c.perCustomerLimit === 1 ? 'Once' : `${c.perCustomerLimit}×`} per guest
                         </span>
                       ) : null}
                     </td>
@@ -238,7 +238,7 @@ export default function CouponsPage() {
                       <div className="flex flex-wrap gap-1">
                         <span className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${status.className}`}>{status.label}</span>
                         {c.isPublic && (
-                          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-semibold text-blue-700" title="Shown on the customer site">
+                          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-semibold text-blue-700" title="Shown on the website">
                             Public
                           </span>
                         )}
