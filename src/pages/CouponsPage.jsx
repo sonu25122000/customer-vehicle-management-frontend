@@ -198,11 +198,19 @@ export default function CouponsPage() {
                   <tr key={c._id} className="transition-colors hover:bg-gray-50">
                     <td className="border-t border-gray-100 px-3 py-2 align-middle">
                       <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold tracking-wide text-indigo-700">{c.code}</span>
+                      {c.note ? (
+                        <span className="mt-1 block max-w-[14rem] truncate text-[0.7rem] text-gray-500" title={c.note}>
+                          {c.note}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle font-semibold text-gray-900">
                       {c.discountType === 'percentage' ? `${c.value}%` : `₹${c.value}`}
                       {c.discountType === 'percentage' && c.maxDiscount ? (
                         <span className="ml-1 text-[0.7rem] font-normal text-gray-500">up to ₹{Number(c.maxDiscount).toLocaleString()}</span>
+                      ) : null}
+                      {c.minBookingAmount ? (
+                        <span className="block text-[0.7rem] font-normal text-gray-500">Min. booking ₹{Number(c.minBookingAmount).toLocaleString()}</span>
                       ) : null}
                     </td>
                     <td className="border-t border-gray-100 px-3 py-2 align-middle text-gray-700">

@@ -334,6 +334,10 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
       next.advance = discount > 0 ? 'Advance cannot be greater than the amount payable after the coupon' : 'Advance cannot be greater than the trip amount';
     }
     if (odometerError) next.endOdometer = odometerError;
+    // Mirrors backend minBookingProblem — a newly picked coupon needs the booking amount to meet its minimum.
+    if (selectedCoupon && !selectedCoupon.isCurrent && selectedCoupon.minBookingAmount && Number(form.amount || 0) < selectedCoupon.minBookingAmount) {
+      next.coupon = `${selectedCoupon.code} is only applicable on a minimum booking of ₹${Number(selectedCoupon.minBookingAmount).toLocaleString()}`;
+    }
 
     if (isCancelling) {
       const refund = form.refundAmount === '' ? 0 : Number(form.refundAmount);
@@ -735,7 +739,9 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                               : `₹${c.value} off`}
                             {c.maxUsage ? ` · ${c.maxUsage - (c.usageCount || 0)} use${c.maxUsage - (c.usageCount || 0) === 1 ? '' : 's'} left` : ''}
                             {c.perCustomerLimit ? ` · ${c.perCustomerLimit === 1 ? 'once' : `${c.perCustomerLimit}×`} per customer` : ''}
+                            {c.minBookingAmount ? ` · min. booking ₹${Number(c.minBookingAmount).toLocaleString()}` : ''}
                           </span>
+                          {c.note ? <span className="truncate text-[0.7rem] italic text-gray-400">{c.note}</span> : null}
                         </span>
                         {c.isCurrent ? (
                           <span
@@ -758,6 +764,7 @@ export default function TripFormModal({ mode, initialData, onClose, onSubmit, su
                     )
                   }
                 />
+                {errors.coupon && <span className={errorClass}>{errors.coupon}</span>}
                 {!couponsLoading && couponOptions.length === 0 && (
                   <span className="text-xs text-gray-400">
                     {form.customer ? 'No coupons are currently applicable to this customer.' : 'No coupons for all customers right now.'}

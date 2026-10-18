@@ -47,6 +47,8 @@ const emptyForm = {
   discountType: 'percentage',
   value: '',
   maxDiscount: '',
+  minBookingAmount: '',
+  note: '',
   applicability: 'all',
   customers: [],
   startDate: '',
@@ -69,6 +71,8 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       discountType: initialData.discountType || 'percentage',
       value: initialData.value ?? '',
       maxDiscount: initialData.maxDiscount ?? '',
+      minBookingAmount: initialData.minBookingAmount ?? '',
+      note: initialData.note || '',
       applicability: initialData.applicability || 'all',
       customers: (initialData.customers || []).map((c) => (typeof c === 'string' ? c : c._id)),
       startDate: start.date,
@@ -135,6 +139,10 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
     if (form.discountType === 'percentage' && form.maxDiscount !== '' && !(Number(form.maxDiscount) >= 1)) {
       next.maxDiscount = 'Enter an amount of at least ₹1, or leave it blank for no cap';
     }
+    if (form.minBookingAmount !== '' && !(Number(form.minBookingAmount) >= 1)) {
+      next.minBookingAmount = 'Enter an amount of at least ₹1, or leave it blank for no minimum';
+    }
+    if (form.note.trim().length > 200) next.note = 'Note can be at most 200 characters';
     if (form.applicability === 'selected' && form.customers.length === 0) next.customers = 'Select at least one customer';
     if (!form.startDate) next.startDate = 'Start date is required';
     if (!form.startTime) next.startTime = 'Start time is required';
@@ -181,6 +189,9 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
       value: Number(form.value),
       // Cap on the rupee discount — percentage coupons only (e.g. 20% up to ₹100); blank = no cap.
       maxDiscount: form.discountType === 'percentage' && form.maxDiscount !== '' ? Number(form.maxDiscount) : null,
+      // Blank = applies to a booking of any amount.
+      minBookingAmount: form.minBookingAmount === '' ? null : Number(form.minBookingAmount),
+      note: form.note.trim(),
       applicability: form.applicability,
       customers: form.applicability === 'selected' ? form.customers : [],
       startAt: joinLocal(form.startDate, form.startTime).toISOString(),
@@ -326,6 +337,54 @@ export default function CouponFormModal({ mode, initialData, onClose, onSubmit, 
               )}
             </label>
           )}
+
+          <label className="flex flex-col gap-1.5 sm:max-w-[calc(50%-0.5rem)]">
+            <span className={labelTextClass}>
+              Applicable on Minimum Booking of (₹) <span className="font-normal text-gray-400">(optional)</span>
+            </span>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                step="any"
+                className={`${fieldClass('minBookingAmount')} w-full pr-8`}
+                value={form.minBookingAmount}
+                onChange={(e) => update('minBookingAmount', e.target.value)}
+                placeholder="e.g. 2000"
+                aria-invalid={Boolean(errors.minBookingAmount)}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">₹</span>
+            </div>
+            {errors.minBookingAmount ? (
+              <span className={errorClass}>{errors.minBookingAmount}</span>
+            ) : (
+              <span className="text-xs text-gray-400">
+                {form.minBookingAmount
+                  ? `Only applies when the booking amount is ₹${Number(form.minBookingAmount).toLocaleString()} or more`
+                  : 'The coupon is rejected on bookings below this amount. Leave blank for no minimum.'}
+              </span>
+            )}
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelTextClass}>
+              Note <span className="font-normal text-gray-400">(optional)</span>
+            </span>
+            <textarea
+              rows={2}
+              maxLength={200}
+              className={`${fieldClass('note')} resize-y`}
+              value={form.note}
+              onChange={(e) => update('note', e.target.value)}
+              placeholder="e.g. Only applicable for Mysore trip"
+              aria-invalid={Boolean(errors.note)}
+            />
+            {errors.note ? (
+              <span className={errorClass}>{errors.note}</span>
+            ) : (
+              <span className="text-xs text-gray-400">{form.note.length}/200 — shown with the coupon on the customer site.</span>
+            )}
+          </label>
 
           {form.applicability === 'selected' && (
             <div className="flex flex-col gap-1.5">
