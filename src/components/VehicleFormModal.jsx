@@ -394,7 +394,7 @@ export default function VehicleFormModal({ mode, initialData, onClose, onSubmit,
                   value={form.parkingAddress}
                   onChange={(e) => update('parkingAddress', e.target.value)}
                   maxLength={200}
-                  placeholder="e.g. Prestige Shantiniketan, Whitefield, Bengaluru"
+                  placeholder="e.g. Prestige Shantiniketan, Bengaluru"
                   aria-invalid={Boolean(errors.parkingAddress)}
                 />
                 <button

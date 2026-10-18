@@ -107,7 +107,7 @@ function InteractiveMap({ point, onChange }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-          placeholder="Search a place, e.g. Phoenix Marketcity Whitefield"
+          placeholder="Search a place, e.g. Phoenix Marketcity, Bengaluru"
           className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
         />
         <button type="button" onClick={handleSearch} className="cursor-pointer rounded-lg bg-gray-800 px-3.5 py-2 text-sm font-semibold text-white hover:bg-gray-900">
